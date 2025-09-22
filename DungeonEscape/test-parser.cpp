@@ -19,8 +19,8 @@ int main() {
 	// Initialize parser
 	CommandParser myParser;
 
-	// Define test user input
-	std::string input = "use key on door";
+	// Define test user input  TRY TO OPEN DOOR
+	std::string input = "use door";
 
 	// Attempt to parse the input
 	myParser.parse(input, inventory, roomObjects, testSuccess);
@@ -37,6 +37,20 @@ int main() {
 
 	// Try new input           3
 	input = "get use door";
+
+	myParser.parse(input, inventory, roomObjects, testSuccess);
+
+	assert(testSuccess);
+
+	// Try new input           3
+	input = "use key with door";
+
+	myParser.parse(input, inventory, roomObjects, testSuccess);
+
+	assert(testSuccess);
+
+	// TRY OPEN DOOR
+	input = "use door";
 
 	myParser.parse(input, inventory, roomObjects, testSuccess);
 

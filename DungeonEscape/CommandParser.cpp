@@ -1,7 +1,8 @@
-#include <iostream>
 #include "CommandParser.hpp"
+#include <iostream>
 #include <fstream>
 #include <sstream>
+#include <algorithm>
 
 // Internal helpers
 
@@ -15,12 +16,16 @@ std::vector<std::string> CommandParser::splitString(std::string& input, char del
 	std::string token;
 
 	while (std::getline(iss, token, delimiter)) {
+		if (token == "on" || token == "with" || token == "to") {
+			continue; // skip specified prepositions
+		}
 		tokens.push_back(token);
 	}
 
 	return tokens;
 }
 
+// Is valid word bool checks if a word is present in an unordered map of items or objects
 bool CommandParser::isValidWord(const std::vector<std::string>& tokens, int index, const std::unordered_map<std::string, std::string>& inventory, const std::unordered_map<std::string, std::string>& roomObjects, int ignoreIndex1, int ignoreIndex2)
 {
 	if (index == ignoreIndex1 || index == ignoreIndex2)
@@ -36,6 +41,7 @@ bool CommandParser::isValidWord(const std::vector<std::string>& tokens, int inde
 // Constructor
 CommandParser::CommandParser() {
 	verbs["use"] = &CommandParser::handleUse;
+	verbs["open"] = &CommandParser::handleOpen;
 	// later: verbs["look"] = &CommandParser::handleLook;
 }
 
@@ -48,6 +54,9 @@ void CommandParser::parse(std::string& input, std::unordered_map<std::string, st
 	std::string object2 = "";
 	int verbIndex = -1;
 	int object1Index = -1;
+
+	std::transform(input.begin(), input.end(), input.begin(),
+		[](unsigned char c) { return std::tolower(c); });
 
 	// Add each separate word to tokens vector
 	std::vector<std::string> tokens = splitString(input, ' ');
@@ -92,6 +101,25 @@ void CommandParser::parse(std::string& input, std::unordered_map<std::string, st
 	outFile << verb << "|" << object1 << "|" << object2 << "\n";
 	outFile.close();
 
+	// write tokens to file
+	std::ofstream outFile2("testTokens", std::ios::app);
+
+	if (!outFile2) {
+		std::cerr << "Could not open file for writing\n";
+		return;
+	}
+
+	for (int i = 0; i < tokens.size(); i++) {
+		outFile2 << tokens[i];
+		if (i < tokens.size() - 1) outFile2 << "|";
+	}
+	outFile2 << "\n";
+	outFile2.close();
+
+	//                                       END OF TESTING
+
+	(this->*verbs[verb])(object1, object2);
+
 }
 
 
@@ -102,8 +130,41 @@ void CommandParser::parse(std::string& input, std::unordered_map<std::string, st
 void CommandParser::handleUse(const std::string& object1, const std::string& object2) {
 	if (object2.empty()) {
 		// Handle single-object case
+		if (object1 == "door") {
+			if (doorLocked) {
+				std::cout << "The door is locked, you will need to use the key on it first.\n";
+			}
+			else if (!doorLocked && !doorOpen) {
+				std::cout << "You open the door.\n";
+				doorOpen = true;
+			}
+			else {
+				std::cout << "You close the door.\n";
+				doorOpen = false;
+			}	
+		}
+		else {
+			std::cout << msgDontKnow;
+		}
 	}
 	else {
 		// Handle two object case
+		if ((object1 == "key" && object2 == "door") ||
+			(object2 == "key" && object1 == "door")) {
+			if (doorLocked) {
+				std::cout << "You unlock the door.\n";
+				doorLocked = false;
+			}
+			else {
+				std::cout << "The door is already unlocked.\n";
+			}
+		}
+		else {
+			std::cout << msgDontKnow;
+		}
 	}
+}
+
+void CommandParser::handleOpen(const std::string& object1, const std::string& object2)
+{
 }

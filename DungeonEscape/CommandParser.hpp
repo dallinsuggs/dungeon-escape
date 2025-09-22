@@ -6,6 +6,9 @@
 class CommandParser {
 private:
 	std::unordered_map<std::string, void (CommandParser::*)(const std::string&, const std::string&)> verbs;
+	std::string msgDontKnow = "I don't know how to do that.\n";
+	bool doorLocked = true;
+	bool doorOpen = false;
 
 	// Internal helpers
 	std::vector<std::string> splitString(std::string& input, char delimiter = ' ');
@@ -38,4 +41,6 @@ public:
 
 	// Use handler
 	void handleUse(const std::string& object1, const std::string& object2 = "");
+	// Open handler
+	void handleOpen(const std::string& object1, const std::string& object2 = "");
 };

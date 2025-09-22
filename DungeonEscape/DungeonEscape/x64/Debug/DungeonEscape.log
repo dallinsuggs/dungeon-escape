@@ -1,2 +1,4 @@
-﻿  test-parser.cpp
+﻿  CommandParser.cpp
+  test-parser.cpp
+  Generating Code...
   DungeonEscape.vcxproj -> C:\CppProjects\ConsolePrograms\DungeonEscape\DungeonEscape\x64\Debug\DungeonEscape.exe
