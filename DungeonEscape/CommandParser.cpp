@@ -15,6 +15,8 @@ std::vector<std::string> CommandParser::splitString(std::string& input, char del
 
 	std::string token;
 
+	// TODO: Have this check one word ahead to check for phrasal verbs like "pick up"
+
 	while (std::getline(iss, token, delimiter)) {
 		if (token == "on" || token == "with" || token == "to") {
 			continue; // skip specified prepositions
