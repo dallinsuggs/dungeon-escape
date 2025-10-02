@@ -1,7 +1,8 @@
 {
   "ExpandedNodes": [
-    ""
+    "",
+    "\\DungeonEscape"
   ],
-  "SelectedNode": "\\DungeonEscape.sln",
+  "SelectedNode": "\\DungeonEscape\\Item.hpp",
   "PreviewInSolutionExplorer": false
 }
