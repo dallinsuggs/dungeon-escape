@@ -1,8 +1,5 @@
 #include "CommandParser.hpp"
-#include <iostream>
-#include <fstream>
-#include <sstream>
-#include <algorithm>
+
 
 // INTERNAL HELPERS
 
@@ -28,13 +25,13 @@ std::vector<std::string> CommandParser::splitString(std::string& input, char del
 }
 
 // Is valid word bool checks if a word is present in an unordered map of items or objects
-bool CommandParser::isValidWord(const std::vector<std::string>& tokens, int index, const std::unordered_map<std::string, std::string>& inventory, const std::unordered_map<std::string, std::string>& roomObjects, int ignoreIndex1, int ignoreIndex2)
+bool CommandParser::isValidWord(const std::vector<std::string>& tokens, int index, const std::unordered_map<std::string, std::string>& inventory, const std::unordered_map<std::string, std::string>& roomItems, int ignoreIndex1, int ignoreIndex2)
 {
 	if (index == ignoreIndex1 || index == ignoreIndex2)
 		return false;
 	if (inventory.find(tokens[index]) != inventory.end())
 		return true;
-	if (roomObjects.find(tokens[index]) != roomObjects.end())
+	if (roomItems.find(tokens[index]) != roomItems.end())
 		return true;
 	return false;
 }
@@ -54,7 +51,7 @@ CommandParser::CommandParser() {
 }
 
 // Parse
-void CommandParser::parse(std::string& input, std::unordered_map<std::string, std::string>& inventory, std::unordered_map<std::string, std::string>& roomObjects, bool& testSuccess) {
+void CommandParser::parse(std::string& input, std::unordered_map<std::string, std::string>& inventory, std::unordered_map<std::string, std::string>& roomItems, bool& testSuccess) {
 
 	// Declare variables
 	std::string verb = "";
@@ -63,7 +60,7 @@ void CommandParser::parse(std::string& input, std::unordered_map<std::string, st
 	int verbIndex = -1;
 	int object1Index = -1;
 	inventoryMap = &inventory;
-	roomObjectsMap = &roomObjects;
+	roomItemsMap = &roomItems;
 
 	// Lower case input
 	std::transform(input.begin(), input.end(), input.begin(),
@@ -98,7 +95,7 @@ void CommandParser::parse(std::string& input, std::unordered_map<std::string, st
 	
 	// object1
 	for (int i = 0; i < tokens.size(); i++) {
-		if (isValidWord(tokens, i, inventory, roomObjects, verbIndex)) {
+		if (isValidWord(tokens, i, inventory, roomItems, verbIndex)) {
 			object1 = tokens[i];
 			object1Index = i;
 			break;
@@ -107,7 +104,7 @@ void CommandParser::parse(std::string& input, std::unordered_map<std::string, st
 
 	// object2
 	for (int i = 0; i < tokens.size(); i++) {
-		if (isValidWord(tokens, i, inventory, roomObjects, object1Index, verbIndex)) {
+		if (isValidWord(tokens, i, inventory, roomItems, object1Index, verbIndex)) {
 			object2 = tokens[i];
 			break;
 		}
@@ -205,13 +202,13 @@ void CommandParser::handleInventory(const std::string& object1, const std::strin
 // PHRASAL VERB HANDLERS
 
 // PickUp handler
-void CommandParser::handlePickUp(std::unordered_map<std::string, std::string>& inventory, std::unordered_map<std::string, std::string>& roomObjects, const std::string& object1)
+void CommandParser::handlePickUp(std::unordered_map<std::string, std::string>& inventory, std::unordered_map<std::string, std::string>& roomItems, const std::string& object1)
 {
-	if (roomObjects.find(object1) != roomObjects.end()) {
+	if (roomItems.find(object1) != roomItems.end()) {
 		if (!(inventory.find(object1) != inventory.end())) {
 			inventory[object1] = object1;
-			roomObjects.erase(object1);
-			std::cout << "You now possess a torch.\n";
+			roomItems.erase(object1);
+			std::cout << "You now possess a " + object1 + ".\n";
 		}
 		else {
 			std::cout << "You already have that.\n";
@@ -225,7 +222,7 @@ void CommandParser::handlePickUp(std::unordered_map<std::string, std::string>& i
 void CommandParser::handlePickUpWrapper(const std::string& object1, const std::string& object2)
 {
 	std::cout << "Entering handlePickUpWrapper with object1 = " << object1 << "\n";
-	std::cout << "inventoryMap = " << inventoryMap << ", roomObjectsMap = " << roomObjectsMap << "\n";
+	std::cout << "inventoryMap = " << inventoryMap << ", roomItemsMap = " << roomItemsMap << "\n";
 
-	handlePickUp(*inventoryMap, *roomObjectsMap, object1);
+	handlePickUp(*inventoryMap, *roomItemsMap, object1);
 }

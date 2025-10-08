@@ -2,14 +2,18 @@
 
 #include <string>
 #include <unordered_map>
+#include <iostream>
+#include <fstream>
+#include <sstream>
+#include <algorithm>
 
 class CommandParser {
 private:
 	std::unordered_map<std::string, void (CommandParser::*)(const std::string&, const std::string&)> verbs;
 
-	// Pointers for inventory and roomObjects
+	// Pointers for inventory and roomItems
 	std::unordered_map<std::string, std::string>* inventoryMap;
-	std::unordered_map<std::string, std::string>* roomObjectsMap;
+	std::unordered_map<std::string, std::string>* roomItemsMap;
 
 	// const string messages
 	const std::string msgDontKnow = "I don't know how to do that.\n";
@@ -25,7 +29,7 @@ private:
 		const std::vector<std::string>& tokens,
 		int index,                                // index of token I want to check
 		const std::unordered_map<std::string, std::string>& inventory,
-		const std::unordered_map<std::string, std::string>& roomObjects,
+		const std::unordered_map<std::string, std::string>& roomItems,
 		int ignoreIndex1 = -1,                    // default -1 if no index needs to be ignored
 		int ignoreIndex2 = -1
 	);
@@ -39,7 +43,7 @@ public:
 	void parse(
 		std::string& input, 
 		std::unordered_map<std::string, std::string>& inventory, 
-		std::unordered_map<std::string, std::string>& roomObjects,
+		std::unordered_map<std::string, std::string>& roomItems,
 		bool& testSuccess
 	);
 
@@ -57,6 +61,6 @@ public:
 	// PHRASAL VERB HANDLERS
 
 	// PickUp handler
-	void handlePickUp(std::unordered_map<std::string, std::string>& inventory, std::unordered_map<std::string, std::string>& roomObjects, const std::string& object1);
+	void handlePickUp(std::unordered_map<std::string, std::string>& inventory, std::unordered_map<std::string, std::string>& roomItems, const std::string& object1);
 	void handlePickUpWrapper(const std::string& object1, const std::string& object2 = "");  // wrapper for the handler
 };
