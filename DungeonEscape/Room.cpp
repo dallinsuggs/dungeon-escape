@@ -1,11 +1,6 @@
 #include "Room.hpp"
 
-Room::Room(const std::string& description) : description(description) {}
-
-// Add an item to this room's vector of items
-void Room::addItem(const Item& item) {
-	items.push_back(item);
-}
+Room::Room(const std::string& description, std::unordered_map<std::string, Item> roomItems) : description(description), roomItems(roomItems) {}
 
 // Store a pointer to another room in the exits map
 void Room::connectRoom(const std::string& direction, Room* otherRoom) {
@@ -27,10 +22,10 @@ std::ostream& operator<<(std::ostream& os, const Room& room) {
 	os << room.description << "\n";
 
 	// Print items if the room has any
-	if (!room.items.empty()) {
+	if (!room.roomItems.empty()) {
 		os << "Items here:\n";
-		for (const auto& item : room.items) {
-			os << " - " << item << "\n"; // calls Item's operator<<
+		for (const auto& pair : room.roomItems) {
+			os << " - " << pair.first << "\n";
 		}
 	}
 

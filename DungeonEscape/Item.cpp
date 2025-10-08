@@ -3,14 +3,10 @@
 #include <string>
 
 // Constructor
-Item::Item(const std::string& name, const std::string& description, const std::string& effect)
-	: name(name), description(description), effect(effect) {}
+Item::Item(const std::string& name, const std::string& description, bool moveable)
+	: name(name), description(description), moveable(moveable) { }
 
 std::ostream& operator<<(std::ostream& os, const Item& item) {
-	os << "Item: " << item.name << "\nDescription: " << item.description << "\nEffect: " << item.effect;
+	os << "Item: " << item.name << "\nDescription: " << item.description << "\nMoveable: " << item.moveable;
 	return os;
-}
-
-void Item::use() const {
-	std::cout << "You use the " << name << "." << std::endl;
 }
