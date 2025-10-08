@@ -1,6 +1,6 @@
 #pragma once
 #include <string>
-#include <vector>
+#include <unordered_map>
 #include <ostream>
 #include "Item.hpp"
 #include "Room.hpp"
@@ -12,23 +12,20 @@ private:
 	std::string name;
 	int health;
 	Room* currentRoom;
-	std::vector<Item> inventory;
+	std::unordered_map<std::string, Item> inventory; //map item name to Item object for easy lookup
 
 public:
 	// Constructor
-	Player(const std::string& name, int health);
+	Player(const std::string& name, int health, std::unordered_map<std::string, Item> inventory);
 
 	// Place the player into a starting room
 	void setCurrentRoom(Room* room);
 
+	// get the player's inventory
+	std::unordered_map<std::string, Item>& getInventory();
+
 	// Move to another room if there is an exit in that direction
-	void move(const std::string& direction);
-
-	// Pick up an item (adds to inventory)
-	void pickUp(const Item& item);
-
-	// Drop an item by name (removes from inventory)
-	void drop(const Item& item);
+	//void move(const std::string& direction);
 
 	// Overload << operator so we can print a Player with std::cout << player;
 	friend std::ostream& operator<<(std::ostream& os, const Player& player);

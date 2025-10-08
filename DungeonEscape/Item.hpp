@@ -6,11 +6,12 @@ class Item {
 private:
 	std::string name;
 	std::string description;
-	std::string effect; // not sure about this one, int? vector?
+	bool moveable; // whether the item can be picked up or not
+	//std::string effect; // not sure about this one, int? vector?
 
 public:
-	// constructor to initialize immutable members
-	Item(const std::string& name, const std::string& description, const std::string& effect);
+	// constructor 
+	Item(const std::string& name, const std::string& description, bool moveable /*const std::string& effect*/);
 
 	// Overload equality operator for comparisons
 	bool operator==(const Item& other) const {
@@ -19,7 +20,4 @@ public:
 
 	// Overload the output stream operator for easy printing, friend function
 	friend std::ostream& operator<<(std::ostream& os, const Item& item);
-
-	// possible behavior for Item class
-	void use() const;
 };

@@ -1,6 +1,7 @@
 #pragma once
 #include <string>
 #include <vector>
+#include <unordered_map>
 #include <map>
 #include <ostream>
 #include "Item.hpp"
@@ -10,15 +11,12 @@
 class Room {
 private:
 	std::string description; // Text describing the room
-	std::vector<Item> items; // Items lying around in the room
+	std::unordered_map<std::string, Item> roomItems; // Items lying around in the room
 	std::map<std::string, Room*> exits; // Maps directions ("north") to connected rooms
 
 public:
 	// Constructor
-	Room(const std::string& description);
-
-	// Add an item into the room (e.g. "put sword in kitchen")
-	void addItem(const Item& item);
+	Room(const std::string& description, std::unordered_map<std::string, Item> roomItems);
 
 	// Connect this room to another in a given direction
 	void connectRoom(const std::string& direction, Room* otherRoom);
