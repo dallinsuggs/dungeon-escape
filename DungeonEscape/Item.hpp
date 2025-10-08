@@ -10,8 +10,15 @@ private:
 	//std::string effect; // not sure about this one, int? vector?
 
 public:
+	// default constructor
+	Item() : name(""), description(""), moveable(false) {}
 	// constructor 
 	Item(const std::string& name, const std::string& description, bool moveable /*const std::string& effect*/);
+
+	// Getters
+	std::string getName() const;
+	std::string getDescription() const;
+	bool isMoveable() const;
 
 	// Overload equality operator for comparisons
 	bool operator==(const Item& other) const {

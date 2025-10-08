@@ -6,12 +6,12 @@
 int main() {
 
 	// Declare and initialize inventory and room object maps for testing purposes
-	std::unordered_map<std::string, std::string> inventory;
-	std::unordered_map<std::string, std::string> roomItems;
+	std::unordered_map<std::string, Item> inventory;
+	std::unordered_map<std::string, Item> roomItems;
 
-	inventory["key"] = "key";
-	roomItems["door"] = "door";
-	roomItems["torch"] = "torch";
+	inventory["key"] = Item("key", "a rusty key", true);
+	roomItems["door"] = Item("door", "a large wooden door with a keyhole", false);
+	roomItems["torch"] = Item("torch", "a glowing torch", true);
 
 	// Door open bool to test parsing logic outcomes
 	bool testSuccess = false;

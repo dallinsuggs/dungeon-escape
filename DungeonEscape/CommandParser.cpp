@@ -25,7 +25,7 @@ std::vector<std::string> CommandParser::splitString(std::string& input, char del
 }
 
 // Is valid word bool checks if a word is present in an unordered map of items or objects
-bool CommandParser::isValidWord(const std::vector<std::string>& tokens, int index, const std::unordered_map<std::string, std::string>& inventory, const std::unordered_map<std::string, std::string>& roomItems, int ignoreIndex1, int ignoreIndex2)
+bool CommandParser::isValidWord(const std::vector<std::string>& tokens, int index, const std::unordered_map<std::string, Item>& inventory, const std::unordered_map<std::string, Item>& roomItems, int ignoreIndex1, int ignoreIndex2)
 {
 	if (index == ignoreIndex1 || index == ignoreIndex2)
 		return false;
@@ -50,8 +50,8 @@ CommandParser::CommandParser() {
 	// later: verbs["look"] = &CommandParser::handleLook;
 }
 
-// Parse
-void CommandParser::parse(std::string& input, std::unordered_map<std::string, std::string>& inventory, std::unordered_map<std::string, std::string>& roomItems, bool& testSuccess) {
+// Parse function (primary function to interpret player input and delegate work to handler functions)
+void CommandParser::parse(std::string& input, std::unordered_map<std::string, Item>& inventory, std::unordered_map<std::string, Item>& roomItems, bool& testSuccess) {
 
 	// Declare variables
 	std::string verb = "";
@@ -145,6 +145,19 @@ void CommandParser::parse(std::string& input, std::unordered_map<std::string, st
 
 }
 
+// Message writer function takes a message template and optionally an object variable
+void CommandParser::writeMessage(const std::string& msgTemplate, const std::string& objectName)
+{
+	std::string output = msgTemplate;
+	if (!objectName.empty()) {
+		size_t pos = output.find("{object}");
+		if (pos != std::string::npos) {
+			output.replace(pos, 8, objectName);
+		}
+	}
+	std::cout << output << "\n";
+}
+
 
 
 // VERB HANDLERS
@@ -155,19 +168,19 @@ void CommandParser::handleUse(const std::string& object1, const std::string& obj
 		// Handle single-object case
 		if (object1 == "door") {
 			if (doorLocked) {
-				std::cout << "The door is locked, you will need to use the key on it first.\n";
+				writeMessage("The door is locked, you will need to use the key on it first.");
 			}
 			else if (!doorLocked && !doorOpen) {
-				std::cout << "You open the door.\n";
+				writeMessage("You open the door.");
 				doorOpen = true;
 			}
 			else {
-				std::cout << "You close the door.\n";
+				writeMessage("You close the door.");
 				doorOpen = false;
 			}	
 		}
 		else {
-			std::cout << msgDontKnow;
+			writeMessage(MSG_DONT_KNOW_HOW);
 		}
 	}
 	else {
@@ -175,15 +188,15 @@ void CommandParser::handleUse(const std::string& object1, const std::string& obj
 		if ((object1 == "key" && object2 == "door") ||
 			(object2 == "key" && object1 == "door")) {
 			if (doorLocked) {
-				std::cout << "You unlock the door.\n";
+				writeMessage("You unlock the door.");
 				doorLocked = false;
 			}
 			else {
-				std::cout << "The door is already unlocked.\n";
+				writeMessage("The door is already unlocked.");
 			}
 		}
 		else {
-			std::cout << msgDontKnow;
+			writeMessage(MSG_DONT_KNOW_HOW);
 		}
 	}
 }
@@ -196,26 +209,27 @@ void CommandParser::handleOpen(const std::string& object1, const std::string& ob
 // Inventory handler
 void CommandParser::handleInventory(const std::string& object1, const std::string& object2)
 {
-	std::cout << "Here is your inventory\n";
+	// TODO Replace with inventory print function from player class
+	writeMessage("Here is your inventory.");
 }
 
 // PHRASAL VERB HANDLERS
 
 // PickUp handler
-void CommandParser::handlePickUp(std::unordered_map<std::string, std::string>& inventory, std::unordered_map<std::string, std::string>& roomItems, const std::string& object1)
+void CommandParser::handlePickUp(std::unordered_map<std::string, Item>& inventory, std::unordered_map<std::string, Item>& roomItems, const std::string& object1)
 {
 	if (roomItems.find(object1) != roomItems.end()) {
 		if (!(inventory.find(object1) != inventory.end())) {
-			inventory[object1] = object1;
+			inventory[object1] = roomItems.find(object1)->second;
 			roomItems.erase(object1);
-			std::cout << "You now possess a " + object1 + ".\n";
+			writeMessage(MSG_PICK_UP, object1);
 		}
 		else {
-			std::cout << "You already have that.\n";
+			writeMessage(MSG_ALREADY_HAVE, object1);;
 		}
 	}
 	else {
-		std::cout << "I don't see a " + object1 + " here.\n";
+		writeMessage(MSG_DONT_SEE, object1);
 	}
 }
 
