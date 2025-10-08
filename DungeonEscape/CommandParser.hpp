@@ -6,7 +6,15 @@
 class CommandParser {
 private:
 	std::unordered_map<std::string, void (CommandParser::*)(const std::string&, const std::string&)> verbs;
-	std::string msgDontKnow = "I don't know how to do that.\n";
+
+	// Pointers for inventory and roomObjects
+	std::unordered_map<std::string, std::string>* inventoryMap;
+	std::unordered_map<std::string, std::string>* roomObjectsMap;
+
+	// const string messages
+	const std::string msgDontKnow = "I don't know how to do that.\n";
+
+	// booleans
 	bool doorLocked = true;
 	bool doorOpen = false;
 
@@ -43,4 +51,12 @@ public:
 	void handleUse(const std::string& object1, const std::string& object2 = "");
 	// Open handler
 	void handleOpen(const std::string& object1, const std::string& object2 = "");
+	// Inventory handler
+	void handleInventory(const std::string& object1, const std::string& object2 = "");
+
+	// PHRASAL VERB HANDLERS
+
+	// PickUp handler
+	void handlePickUp(std::unordered_map<std::string, std::string>& inventory, std::unordered_map<std::string, std::string>& roomObjects, const std::string& object1);
+	void handlePickUpWrapper(const std::string& object1, const std::string& object2 = "");  // wrapper for the handler
 };

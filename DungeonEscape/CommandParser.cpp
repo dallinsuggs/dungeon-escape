@@ -4,7 +4,7 @@
 #include <sstream>
 #include <algorithm>
 
-// Internal helpers
+// INTERNAL HELPERS
 
 // Split string helper
 std::vector<std::string> CommandParser::splitString(std::string& input, char delimiter)
@@ -38,12 +38,18 @@ bool CommandParser::isValidWord(const std::vector<std::string>& tokens, int inde
 		return true;
 	return false;
 }
+//                END HELPER FUNCTIONS
 
+
+// CLASS METHOD DEFINITIONS
 
 // Constructor
 CommandParser::CommandParser() {
+
+	// Initialize verbs umap
 	verbs["use"] = &CommandParser::handleUse;
 	verbs["open"] = &CommandParser::handleOpen;
+	verbs["pick up"] = &CommandParser::handlePickUpWrapper;
 	// later: verbs["look"] = &CommandParser::handleLook;
 }
 
@@ -56,12 +62,21 @@ void CommandParser::parse(std::string& input, std::unordered_map<std::string, st
 	std::string object2 = "";
 	int verbIndex = -1;
 	int object1Index = -1;
+	inventoryMap = &inventory;
+	roomObjectsMap = &roomObjects;
 
+	// Lower case input
 	std::transform(input.begin(), input.end(), input.begin(),
 		[](unsigned char c) { return std::tolower(c); });
 
 	// Add each separate word to tokens vector
 	std::vector<std::string> tokens = splitString(input, ' ');
+
+	// DEBUGGING:
+	//std::cout << "Tokens: ";
+	//for (auto& t : tokens) std::cout << t << "|";
+	
+
 
 	// Get verb
 	for (int i = 0; i < tokens.size(); i++) {
@@ -70,7 +85,16 @@ void CommandParser::parse(std::string& input, std::unordered_map<std::string, st
 			verbIndex = i;
 			break;
 		}
+		else if (i+1 < tokens.size()) {
+			if (verbs.find(tokens[i] + " " + tokens[i + 1]) != verbs.end()) {
+				verb = tokens[i] + " " + tokens[i + 1];
+				i++;
+				break;
+			}
+		}
 	}
+
+	//std::cout << "\nVerb found: " << verb << "\n"; // DEBUGGING
 	
 	// object1
 	for (int i = 0; i < tokens.size(); i++) {
@@ -167,6 +191,41 @@ void CommandParser::handleUse(const std::string& object1, const std::string& obj
 	}
 }
 
+// Open handler
 void CommandParser::handleOpen(const std::string& object1, const std::string& object2)
 {
+}
+
+// Inventory handler
+void CommandParser::handleInventory(const std::string& object1, const std::string& object2)
+{
+	std::cout << "Here is your inventory\n";
+}
+
+// PHRASAL VERB HANDLERS
+
+// PickUp handler
+void CommandParser::handlePickUp(std::unordered_map<std::string, std::string>& inventory, std::unordered_map<std::string, std::string>& roomObjects, const std::string& object1)
+{
+	if (roomObjects.find(object1) != roomObjects.end()) {
+		if (!(inventory.find(object1) != inventory.end())) {
+			inventory[object1] = object1;
+			roomObjects.erase(object1);
+			std::cout << "You now possess a torch.\n";
+		}
+		else {
+			std::cout << "You already have that.\n";
+		}
+	}
+	else {
+		std::cout << "I don't see a " + object1 + " here.\n";
+	}
+}
+
+void CommandParser::handlePickUpWrapper(const std::string& object1, const std::string& object2)
+{
+	std::cout << "Entering handlePickUpWrapper with object1 = " << object1 << "\n";
+	std::cout << "inventoryMap = " << inventoryMap << ", roomObjectsMap = " << roomObjectsMap << "\n";
+
+	handlePickUp(*inventoryMap, *roomObjectsMap, object1);
 }

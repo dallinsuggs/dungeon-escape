@@ -11,6 +11,7 @@ int main() {
 
 	inventory["key"] = "key";
 	roomObjects["door"] = "door";
+	roomObjects["torch"] = "torch";
 
 	// Door open bool to test parsing logic outcomes
 	bool testSuccess = false;
@@ -55,5 +56,13 @@ int main() {
 	myParser.parse(input, inventory, roomObjects, testSuccess);
 
 	assert(testSuccess);
+
+	// Try picking up
+	input = "pick up torch";
+
+	myParser.parse(input, inventory, roomObjects, testSuccess);
+
+	assert(testSuccess);
+	assert(inventory.find("torch") != inventory.end());
 
 }
