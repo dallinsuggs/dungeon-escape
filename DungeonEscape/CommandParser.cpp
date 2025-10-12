@@ -25,9 +25,9 @@ std::vector<std::string> CommandParser::splitString(std::string& input, char del
 }
 
 // Is valid word bool checks if a word is present in an unordered map of items or objects
-bool CommandParser::isValidWord(const std::vector<std::string>& tokens, int index, const std::unordered_map<std::string, Item>& inventory, const std::unordered_map<std::string, Item>& roomItems, int ignoreIndex1, int ignoreIndex2)
+bool CommandParser::isValidWord(const std::vector<std::string>& tokens, int index, const std::unordered_map<std::string, Item>& inventory, const std::unordered_map<std::string, Item>& roomItems, int ignoreIndex1, int ignoreIndex2, int ignoreIndex3)
 {
-	if (index == ignoreIndex1 || index == ignoreIndex2)
+	if (index == ignoreIndex1 || index == ignoreIndex2 || index == ignoreIndex3)
 		return false;
 	if (inventory.find(tokens[index]) != inventory.end())
 		return true;
@@ -46,8 +46,18 @@ CommandParser::CommandParser() {
 	// Initialize verbs umap
 	verbs["use"] = &CommandParser::handleUse;
 	verbs["open"] = &CommandParser::handleOpen;
-	verbs["pick up"] = &CommandParser::handlePickUpWrapper;
+	verbs["pick"] = &CommandParser::handlePick;
 	// later: verbs["look"] = &CommandParser::handleLook;
+
+	// Initialize prepositions set
+	prepositions.insert("up");
+	prepositions.insert("down");
+	prepositions.insert("under");
+	prepositions.insert("on");
+	prepositions.insert("to");
+	prepositions.insert("with");
+	prepositions.insert("at");
+
 }
 
 // Parse function (primary function to interpret player input and delegate work to handler functions)
@@ -55,12 +65,18 @@ void CommandParser::parse(std::string& input, std::unordered_map<std::string, It
 
 	// Declare variables
 	std::string verb = "";
+	std::string preposition = "";
 	std::string object1 = "";
 	std::string object2 = "";
 	int verbIndex = -1;
+	int prepIndex = -1;
 	int object1Index = -1;
 	inventoryMap = &inventory;
 	roomItemsMap = &roomItems;
+
+	// Declare command struct
+
+	ParsedCommand cmd;
 
 	// Lower case input
 	std::transform(input.begin(), input.end(), input.begin(),
@@ -78,14 +94,18 @@ void CommandParser::parse(std::string& input, std::unordered_map<std::string, It
 	// Get verb
 	for (int i = 0; i < tokens.size(); i++) {
 		if (verbs.find(tokens[i]) != verbs.end()) {
-			verb = tokens[i];
-			verbIndex = i;
+			cmd.verb = tokens[i];
+			cmd.indexMap["verb"] = i;
 			break;
 		}
-		else if (i+1 < tokens.size()) {
-			if (verbs.find(tokens[i] + " " + tokens[i + 1]) != verbs.end()) {
-				verb = tokens[i] + " " + tokens[i + 1];
-				i++;
+	}
+
+	// preposition
+	for (int i = 0; i < tokens.size(); i++) {
+		if (i != cmd.indexMap["verb"]) {
+			if (prepositions.count(tokens[i])) {
+				cmd.preposition = tokens[i];
+				cmd.indexMap["preposition"] = i;
 				break;
 			}
 		}
@@ -95,23 +115,26 @@ void CommandParser::parse(std::string& input, std::unordered_map<std::string, It
 	
 	// object1
 	for (int i = 0; i < tokens.size(); i++) {
-		if (isValidWord(tokens, i, inventory, roomItems, verbIndex)) {
-			object1 = tokens[i];
-			object1Index = i;
+		if (isValidWord(tokens, i, inventory, roomItems, cmd.indexMap["verb"], cmd.indexMap["preposition"])) {
+			cmd.object1 = tokens[i];
+			cmd.indexMap["object1"] = i;
 			break;
 		}
 	}
 
 	// object2
 	for (int i = 0; i < tokens.size(); i++) {
-		if (isValidWord(tokens, i, inventory, roomItems, object1Index, verbIndex)) {
-			object2 = tokens[i];
+		if (isValidWord(tokens, i, inventory, roomItems, cmd.indexMap["verb"], cmd.indexMap["preposition"], cmd.indexMap["object1"])) {
+			cmd.object2 = tokens[i];
+			cmd.indexMap["object2"] = i;
 			break;
 		}
 	}
 
+
+
 	// Set bool to true if verb and object are found   FOR TESTING
-	testSuccess = (!verb.empty() && !object1.empty());
+	testSuccess = (!cmd.verb.empty() && !cmd.object1.empty());
 
 	// write to output file
 	std::ofstream outFile("test", std::ios::app);
@@ -139,9 +162,31 @@ void CommandParser::parse(std::string& input, std::unordered_map<std::string, It
 	outFile2 << "\n";
 	outFile2.close();
 
+	// struct to file output
+	std::ofstream outFile3("testStruct", std::ios::app);
+
+	if (!outFile3) {
+		std::cerr << "Could not open file for writing\n";
+		return;
+	}
+
+	outFile3 << "|struct|\n";
+	outFile3 << "Verb: " << cmd.verb << "|";
+	outFile3 << cmd.indexMap["verb"] << "\n";
+	outFile3 << "Preposition: " << cmd.preposition << "|";
+	outFile3 << cmd.indexMap["preposition"] << "\n";
+	outFile3 << "Object1: " << cmd.object1 << "|";
+	outFile3 << cmd.indexMap["object1"] << "\n";
+	outFile3 << "Object2: " << cmd.object2 << "|";
+	outFile3 << cmd.indexMap["object2"] << "\n";
+	outFile3 << "|\n";
+
+	outFile2.close();
+
 	//                                       END OF TESTING
 
-	(this->*verbs[verb])(object1, object2);
+	// call verb handler function
+	(this->*verbs[cmd.verb])(cmd);
 
 }
 
@@ -163,10 +208,10 @@ void CommandParser::writeMessage(const std::string& msgTemplate, const std::stri
 // VERB HANDLERS
 
 // Use handler
-void CommandParser::handleUse(const std::string& object1, const std::string& object2) {
-	if (object2.empty()) {
+void CommandParser::handleUse(ParsedCommand& cmd) {
+	if (cmd.object2.empty()) {
 		// Handle single-object case
-		if (object1 == "door") {
+		if (cmd.object1 == "door") {
 			if (doorLocked) {
 				writeMessage("The door is locked, you will need to use the key on it first.");
 			}
@@ -185,8 +230,8 @@ void CommandParser::handleUse(const std::string& object1, const std::string& obj
 	}
 	else {
 		// Handle two object case
-		if ((object1 == "key" && object2 == "door") ||
-			(object2 == "key" && object1 == "door")) {
+		if ((cmd.object1 == "key" && cmd.object2 == "door") ||
+			(cmd.object2 == "key" && cmd.object1 == "door")) {
 			if (doorLocked) {
 				writeMessage("You unlock the door.");
 				doorLocked = false;
@@ -202,12 +247,12 @@ void CommandParser::handleUse(const std::string& object1, const std::string& obj
 }
 
 // Open handler
-void CommandParser::handleOpen(const std::string& object1, const std::string& object2)
+void CommandParser::handleOpen(ParsedCommand& cmd)
 {
 }
 
 // Inventory handler
-void CommandParser::handleInventory(const std::string& object1, const std::string& object2)
+void CommandParser::handleInventory(ParsedCommand& cmd)
 {
 	// TODO Replace with inventory print function from player class
 	writeMessage("Here is your inventory.");
@@ -216,27 +261,30 @@ void CommandParser::handleInventory(const std::string& object1, const std::strin
 // PHRASAL VERB HANDLERS
 
 // PickUp handler
-void CommandParser::handlePickUp(std::unordered_map<std::string, Item>& inventory, std::unordered_map<std::string, Item>& roomItems, const std::string& object1)
+void CommandParser::handlePickUp(std::unordered_map<std::string, Item>& inventory, std::unordered_map<std::string, Item>& roomItems, ParsedCommand& cmd)
 {
-	if (roomItems.find(object1) != roomItems.end()) {
-		if (!(inventory.find(object1) != inventory.end())) {
-			inventory[object1] = roomItems.find(object1)->second;
-			roomItems.erase(object1);
-			writeMessage(MSG_PICK_UP, object1);
+	if (roomItems.find(cmd.object1) != roomItems.end()) {
+		if (!(inventory.find(cmd.object1) != inventory.end())) {
+			inventory[cmd.object1] = roomItems.find(cmd.object1)->second;
+			roomItems.erase(cmd.object1);
+			writeMessage(MSG_PICK_UP, cmd.object1);
 		}
 		else {
-			writeMessage(MSG_ALREADY_HAVE, object1);;
+			writeMessage(MSG_ALREADY_HAVE, cmd.object1);;
 		}
 	}
 	else {
-		writeMessage(MSG_DONT_SEE, object1);
+		writeMessage(MSG_DONT_SEE, cmd.object1);
 	}
 }
 
-void CommandParser::handlePickUpWrapper(const std::string& object1, const std::string& object2)
+void CommandParser::handlePick(ParsedCommand& cmd)
 {
-	std::cout << "Entering handlePickUpWrapper with object1 = " << object1 << "\n";
+	std::cout << "Entering handlePick with object1 = " << cmd.object1 << "\n";
+	std::cout << "Preposition: " + cmd.preposition + "\n";
 	std::cout << "inventoryMap = " << inventoryMap << ", roomItemsMap = " << roomItemsMap << "\n";
 
-	handlePickUp(*inventoryMap, *roomItemsMap, object1);
+	if (cmd.preposition == "up") {
+		handlePickUp(*inventoryMap, *roomItemsMap, cmd);
+	}
 }

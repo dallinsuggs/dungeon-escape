@@ -2,6 +2,7 @@
 
 #include <string>
 #include <unordered_map>
+#include <unordered_set>
 #include <iostream>
 #include <fstream>
 #include <sstream>
@@ -11,7 +12,23 @@
 
 class CommandParser {
 private:
-	std::unordered_map<std::string, void (CommandParser::*)(const std::string&, const std::string&)> verbs;
+	// struct
+	struct ParsedCommand {
+		std::string verb;
+		std::string preposition;
+		std::string object1;
+		std::string object2;
+
+		std::unordered_map<std::string, int> indexMap{
+		{"verb", -1},
+		{"preposition", -1},
+		{"object1", -1},
+		{"object2", -1}
+		};
+	};
+
+	std::unordered_map<std::string, void (CommandParser::*)(ParsedCommand&)> verbs;
+	std::unordered_set<std::string> prepositions;
 
 	// Pointers for inventory and roomItems
 	std::unordered_map<std::string, Item>* inventoryMap;
@@ -38,7 +55,8 @@ private:
 		const std::unordered_map<std::string, Item>& inventory,
 		const std::unordered_map<std::string, Item>& roomItems,
 		int ignoreIndex1 = -1,                    // default -1 if no index needs to be ignored
-		int ignoreIndex2 = -1
+		int ignoreIndex2 = -1,
+		int ignoreIndex3 = -1
 	);
 
 public:
@@ -62,15 +80,15 @@ public:
 	// VERB HANDLERS
 
 	// Use handler
-	void handleUse(const std::string& object1, const std::string& object2 = "");
+	void handleUse(ParsedCommand& cmd);
 	// Open handler
-	void handleOpen(const std::string& object1, const std::string& object2 = "");
+	void handleOpen(ParsedCommand& cmd);
 	// Inventory handler
-	void handleInventory(const std::string& object1, const std::string& object2 = "");
+	void handleInventory(ParsedCommand& cmd);
 
 	// PHRASAL VERB HANDLERS
 
 	// PickUp handler
-	void handlePickUp(std::unordered_map<std::string, Item>& inventory, std::unordered_map<std::string, Item>& roomItems, const std::string& object1);
-	void handlePickUpWrapper(const std::string& object1, const std::string& object2 = "");  // wrapper for the handler
+	void handlePickUp(std::unordered_map<std::string, Item>& inventory, std::unordered_map<std::string, Item>& roomItems, ParsedCommand& cmd);
+	void handlePick(ParsedCommand& cmd);  // wrapper for the handler
 };
