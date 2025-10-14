@@ -181,7 +181,7 @@ void CommandParser::parse(std::string& input, std::unordered_map<std::string, It
 	outFile3 << cmd.indexMap["object2"] << "\n";
 	outFile3 << "|\n";
 
-	outFile2.close();
+	outFile3.close();
 
 	//                                       END OF TESTING
 
