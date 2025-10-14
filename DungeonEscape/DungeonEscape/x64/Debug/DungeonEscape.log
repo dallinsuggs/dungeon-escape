@@ -1,2 +1,7 @@
 ﻿  CommandParser.cpp
+C:\CppProjects\ConsolePrograms\DungeonEscape\DungeonEscape\CommandParser.cpp(147,69): warning C4267: 'argument': conversion from 'size_t' to 'int', possible loss of data
+C:\CppProjects\ConsolePrograms\DungeonEscape\DungeonEscape\CommandParser.cpp(158,69): warning C4267: 'argument': conversion from 'size_t' to 'int', possible loss of data
+  Game.cpp
+  test-parser.cpp
+  Generating Code...
   DungeonEscape.vcxproj -> C:\CppProjects\ConsolePrograms\DungeonEscape\DungeonEscape\x64\Debug\DungeonEscape.exe

@@ -10,13 +10,12 @@
 class Player {
 private:
 	std::string name;
-	int health;
 	Room* currentRoom;
 	std::unordered_map<std::string, Item> inventory; //map item name to Item object for easy lookup
 
 public:
 	// Constructor
-	Player(const std::string& name, int health, std::unordered_map<std::string, Item> inventory);
+	Player(const std::string& name);
 
 	// Place the player into a starting room
 	void setCurrentRoom(Room* room);
@@ -29,4 +28,10 @@ public:
 
 	// Overload << operator so we can print a Player with std::cout << player;
 	friend std::ostream& operator<<(std::ostream& os, const Player& player);
+
+
+	// VERB FUNCTIONS
+
+	// Return inventory output as string
+	std::string printInventory();
 };

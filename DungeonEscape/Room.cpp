@@ -1,6 +1,12 @@
 #include "Room.hpp"
 
-Room::Room(const std::string& description, std::unordered_map<std::string, Item> roomItems) : description(description), roomItems(roomItems) {}
+Room::Room(const std::string& name, const std::string& description, std::unordered_map<std::string, Item> roomItems) : description(description), roomItems(roomItems) {}
+
+// Return the room's item list
+std::unordered_map<std::string, Item>& Room::getRoomItems() {
+	return roomItems;
+}
+std::string Room::getDescription() const { return description; }
 
 // Store a pointer to another room in the exits map
 void Room::connectRoom(const std::string& direction, Room* otherRoom) {

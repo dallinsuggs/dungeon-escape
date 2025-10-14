@@ -25,28 +25,57 @@ std::vector<std::string> CommandParser::splitString(std::string& input, char del
 }
 
 // Is valid word bool checks if a word is present in an unordered map of items or objects
-bool CommandParser::isValidWord(const std::vector<std::string>& tokens, int index, const std::unordered_map<std::string, Item>& inventory, const std::unordered_map<std::string, Item>& roomItems, int ignoreIndex1, int ignoreIndex2, int ignoreIndex3)
+bool CommandParser::isValidWord(const std::unordered_map<std::string, Item>& inventory, const std::unordered_map<std::string, Item>& roomItems, std::string word)
 {
-	if (index == ignoreIndex1 || index == ignoreIndex2 || index == ignoreIndex3)
-		return false;
-	if (inventory.find(tokens[index]) != inventory.end())
+	if (inventory.find(word) != inventory.end())
 		return true;
-	if (roomItems.find(tokens[index]) != roomItems.end())
+	if (roomItems.find(word) != roomItems.end())
 		return true;
 	return false;
 }
+
+// Find longest matching object in a vector of tokens
+CommandParser::ObjectMatch CommandParser::findLongestMatchingObject(int startIndex, int tokensLength, const std::vector<std::string>& tokens, const std::unordered_map<std::string, Item>& inventory, const std::unordered_map<std::string, Item>& roomItems, int ignoreIndex1, int ignoreIndex2, int ignoreIndex3) {
+	std::string longestMatch = "";
+	int tokensUsed = 0;
+	std::string currentObject = tokens[startIndex];
+
+	// Check for single-word object:
+	if (isValidWord(inventory, roomItems, currentObject)) {
+		longestMatch = currentObject;
+		tokensUsed = 1;
+	}
+	
+	// Check for multi-word objects:
+	for (int i = startIndex + 1; i < tokensLength; i++) {
+		if (i != ignoreIndex1 && i != ignoreIndex2 && i != ignoreIndex3) {
+			currentObject = currentObject + " " + tokens[i];
+			if (isValidWord(inventory, roomItems, currentObject)) {
+				longestMatch = currentObject;
+				tokensUsed = i - startIndex + 1;;
+			}
+		}
+	}
+
+	return { longestMatch, tokensUsed };
+}
+
 //                END HELPER FUNCTIONS
 
 
 // CLASS METHOD DEFINITIONS
 
 // Constructor
-CommandParser::CommandParser() {
+CommandParser::CommandParser(Player* p, Room* r, bool& runningFlag) 
+	: player(p), room(r), running(runningFlag) {
 
 	// Initialize verbs umap
 	verbs["use"] = &CommandParser::handleUse;
 	verbs["open"] = &CommandParser::handleOpen;
 	verbs["pick"] = &CommandParser::handlePick;
+	verbs["quit"] = &CommandParser::handleQuit;
+	verbs["exit"] = &CommandParser::handleQuit;
+	verbs["inventory"] = &CommandParser::handleInventory;
 	// later: verbs["look"] = &CommandParser::handleLook;
 
 	// Initialize prepositions set
@@ -61,7 +90,7 @@ CommandParser::CommandParser() {
 }
 
 // Parse function (primary function to interpret player input and delegate work to handler functions)
-void CommandParser::parse(std::string& input, std::unordered_map<std::string, Item>& inventory, std::unordered_map<std::string, Item>& roomItems, bool& testSuccess) {
+void CommandParser::parse(std::string& input, bool& testSuccess) {
 
 	// Declare variables
 	std::string verb = "";
@@ -71,8 +100,8 @@ void CommandParser::parse(std::string& input, std::unordered_map<std::string, It
 	int verbIndex = -1;
 	int prepIndex = -1;
 	int object1Index = -1;
-	inventoryMap = &inventory;
-	roomItemsMap = &roomItems;
+	int object1TokenCount = 0;
+	int object1TokensUsed = 0;
 
 	// Declare command struct
 
@@ -115,20 +144,20 @@ void CommandParser::parse(std::string& input, std::unordered_map<std::string, It
 	
 	// object1
 	for (int i = 0; i < tokens.size(); i++) {
-		if (isValidWord(tokens, i, inventory, roomItems, cmd.indexMap["verb"], cmd.indexMap["preposition"])) {
-			cmd.object1 = tokens[i];
+		ObjectMatch objectMatch = findLongestMatchingObject(i, tokens.size(), tokens, player->getInventory(), room->getRoomItems(), cmd.indexMap["verb"], cmd.indexMap["preposition"]);
+		if (!objectMatch.name.empty()) {
+			cmd.object1 = objectMatch.name;
 			cmd.indexMap["object1"] = i;
+			object1TokensUsed = objectMatch.tokenCount;
 			break;
 		}
 	}
 
 	// object2
-	for (int i = 0; i < tokens.size(); i++) {
-		if (isValidWord(tokens, i, inventory, roomItems, cmd.indexMap["verb"], cmd.indexMap["preposition"], cmd.indexMap["object1"])) {
-			cmd.object2 = tokens[i];
-			cmd.indexMap["object2"] = i;
-			break;
-		}
+	for (int i = cmd.indexMap["object1"] + object1TokensUsed; i < tokens.size(); i++) {
+		ObjectMatch objectMatch = findLongestMatchingObject(i, tokens.size(), tokens, player->getInventory(), room->getRoomItems(), cmd.indexMap["verb"], cmd.indexMap["preposition"]);
+		cmd.object2 = objectMatch.name;
+		break;
 	}
 
 
@@ -255,7 +284,13 @@ void CommandParser::handleOpen(ParsedCommand& cmd)
 void CommandParser::handleInventory(ParsedCommand& cmd)
 {
 	// TODO Replace with inventory print function from player class
-	writeMessage("Here is your inventory.");
+	writeMessage(player->printInventory());
+}
+
+// Quit handler
+void CommandParser::handleQuit(ParsedCommand& cmd)
+{
+	running = false;
 }
 
 // PHRASAL VERB HANDLERS
@@ -282,9 +317,11 @@ void CommandParser::handlePick(ParsedCommand& cmd)
 {
 	std::cout << "Entering handlePick with object1 = " << cmd.object1 << "\n";
 	std::cout << "Preposition: " + cmd.preposition + "\n";
-	std::cout << "inventoryMap = " << inventoryMap << ", roomItemsMap = " << roomItemsMap << "\n";
+	std::cout << "inventoryMap = " << &player->getInventory() << ", roomItemsMap = " << &room->getRoomItems() << "\n";
 
+
+	// TODO make handlePickUp not require inventory and roomItems parameters since it already has access to player and room
 	if (cmd.preposition == "up") {
-		handlePickUp(*inventoryMap, *roomItemsMap, cmd);
+		handlePickUp(player->getInventory(), room->getRoomItems(), cmd);
 	}
 }

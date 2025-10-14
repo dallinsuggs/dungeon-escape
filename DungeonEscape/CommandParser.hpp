@@ -9,6 +9,8 @@
 #include <algorithm>
 
 #include "Item.hpp"
+#include "Player.hpp"
+#include "Room.hpp"
 
 class CommandParser {
 private:
@@ -30,9 +32,10 @@ private:
 	std::unordered_map<std::string, void (CommandParser::*)(ParsedCommand&)> verbs;
 	std::unordered_set<std::string> prepositions;
 
-	// Pointers for inventory and roomItems
-	std::unordered_map<std::string, Item>* inventoryMap;
-	std::unordered_map<std::string, Item>* roomItemsMap;
+	// Pointers for inventory, roomItems
+	Player* player;
+	Room* room;
+	bool& running;
 
 	// const string messages no object
 	const std::string MSG_DONT_KNOW_HOW = "I don't know how to do that.";
@@ -50,25 +53,36 @@ private:
 	std::vector<std::string> splitString(std::string& input, char delimiter = ' ');
 
 	bool isValidWord(
+		const std::unordered_map<std::string, Item>& inventory, 
+		const std::unordered_map<std::string, Item>& roomItems, 
+		std::string word
+	);
+
+	struct ObjectMatch {
+		std::string name;
+		int tokenCount;
+		int objectIndex;
+	};
+
+	ObjectMatch findLongestMatchingObject(int startIndex,
+		int tokensLength,
 		const std::vector<std::string>& tokens,
-		int index,                                // index of token I want to check
 		const std::unordered_map<std::string, Item>& inventory,
 		const std::unordered_map<std::string, Item>& roomItems,
-		int ignoreIndex1 = -1,                    // default -1 if no index needs to be ignored
+		int ignoreIndex1 = -1,
 		int ignoreIndex2 = -1,
-		int ignoreIndex3 = -1
-	);
+		int ignoreIndex3 = -1);
+
+
 
 public:
 
 	// Constructor
-	CommandParser();
+	CommandParser(Player* p, Room* r, bool& runningFlag);
 
 	// Parse function (primary function to interpret player input and delegate work to handler functions)
 	void parse(
 		std::string& input, 
-		std::unordered_map<std::string, Item>& inventory, 
-		std::unordered_map<std::string, Item>& roomItems,
 		bool& testSuccess
 	);
 
@@ -85,6 +99,9 @@ public:
 	void handleOpen(ParsedCommand& cmd);
 	// Inventory handler
 	void handleInventory(ParsedCommand& cmd);
+
+	// Quit handler
+	void handleQuit(ParsedCommand& cmd);
 
 	// PHRASAL VERB HANDLERS
 
