@@ -77,6 +77,7 @@ CommandParser::CommandParser(Player* p, Room* r, bool& runningFlag)
 	verbs["grab"] = &CommandParser::handleTake;
 	verbs["get"] = &CommandParser::handleTake;
 	verbs["drop"] = &CommandParser::handleDrop;
+	verbs["put"] = &CommandParser::handlePut;
 	verbs["quit"] = &CommandParser::handleQuit;
 	verbs["exit"] = &CommandParser::handleQuit;
 	verbs["inventory"] = &CommandParser::handleInventory;
@@ -214,7 +215,14 @@ void CommandParser::parse(std::string& input, bool& testSuccess) {
 	//                                       END OF TESTING
 
 	// call verb handler function
-	(this->*verbs[cmd.verb])(cmd);
+	auto it = verbs.find(cmd.verb);
+	if (it != verbs.end()) {
+		(this->*verbs[cmd.verb])(cmd);
+	}
+	else {
+		writeMessage(MSG_DONT_KNOW_HOW);
+	}
+	
 
 }
 
@@ -290,9 +298,13 @@ void CommandParser::handleInventory(ParsedCommand& cmd)
 
 void CommandParser::handleDrop(ParsedCommand& cmd)
 {
-	if (player->getInventory().find(cmd.object1) != player->getInventory().end()) {
-		room->getRoomItems()[cmd.object1] = player->getInventory().find(cmd.object1)->second;
-		player->getInventory().erase(cmd.object1);
+	auto& inventory = player->getInventory();
+	auto invIt = inventory.find(cmd.object1);
+	auto& roomItems = room->getRoomItems();
+	auto roomIt = roomItems.find(cmd.object1);
+	if (invIt != inventory.end()) {
+		roomItems[cmd.object1] = invIt->second;
+		inventory.erase(cmd.object1);
 		writeMessage(MSG_DROP, cmd.object1);
 	}
 	else {
@@ -300,13 +312,24 @@ void CommandParser::handleDrop(ParsedCommand& cmd)
 	}
 }
 
+void CommandParser::handlePut(ParsedCommand& cmd)
+{
+	if (cmd.preposition == "down") {
+		handleDrop(cmd);
+	}
+}
+
 // Take handler
 void CommandParser::handleTake(ParsedCommand& cmd)
 {
-	if (room->getRoomItems().find(cmd.object1) != room->getRoomItems().end()) {
-		if (!(player->getInventory().find(cmd.object1) != player->getInventory().end())) {
-			player->getInventory()[cmd.object1] = room->getRoomItems().find(cmd.object1)->second;
-			room->getRoomItems().erase(cmd.object1);
+	auto& inventory = player->getInventory();
+	auto invIt = inventory.find(cmd.object1);
+	auto& roomItems = room->getRoomItems();
+	auto roomIt = roomItems.find(cmd.object1);
+	if (roomIt != roomItems.end()) {
+		if (!(invIt != inventory.end())) {
+			inventory[cmd.object1] = roomIt->second;
+			roomItems.erase(cmd.object1);
 			writeMessage(MSG_TAKE, cmd.object1);
 		}
 		else {

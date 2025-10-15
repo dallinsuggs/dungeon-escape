@@ -29,3 +29,14 @@ look
 look|brick
 pick|up|chamber|pot
 exit
+kick|brick
+sit|mattress
+exit
+pick|up|sheet
+put|down|sheet
+inventory
+get|brick
+inventory
+drop|brick
+inventory
+quit

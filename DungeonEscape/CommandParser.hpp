@@ -103,6 +103,8 @@ public:
 	void handleInventory(ParsedCommand& cmd);
 	// Drop handler
 	void handleDrop(ParsedCommand& cmd);
+	// Put handler
+	void handlePut(ParsedCommand& cmd);
 	// Take handler
 	void handleTake(ParsedCommand& cmd);
 	// Pick handler
