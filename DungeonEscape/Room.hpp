@@ -21,7 +21,9 @@ public:
 
 	// getters
 	std::unordered_map<std::string, Item>& getRoomItems();
+
 	std::string getDescription() const;
+	std::string getName() const;
 
 	// Connect this room to another in a given direction
 	void connectRoom(const std::string& direction, Room* otherRoom);

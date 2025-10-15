@@ -73,10 +73,15 @@ CommandParser::CommandParser(Player* p, Room* r, bool& runningFlag)
 	verbs["use"] = &CommandParser::handleUse;
 	verbs["open"] = &CommandParser::handleOpen;
 	verbs["pick"] = &CommandParser::handlePick;
+	verbs["take"] = &CommandParser::handleTake;
+	verbs["grab"] = &CommandParser::handleTake;
+	verbs["get"] = &CommandParser::handleTake;
+	verbs["drop"] = &CommandParser::handleDrop;
 	verbs["quit"] = &CommandParser::handleQuit;
 	verbs["exit"] = &CommandParser::handleQuit;
 	verbs["inventory"] = &CommandParser::handleInventory;
-	// later: verbs["look"] = &CommandParser::handleLook;
+	verbs["look"] = &CommandParser::handleLook;
+	verbs["examine"] = &CommandParser::handleExamine;
 
 	// Initialize prepositions set
 	prepositions.insert("up");
@@ -113,10 +118,6 @@ void CommandParser::parse(std::string& input, bool& testSuccess) {
 
 	// Add each separate word to tokens vector
 	std::vector<std::string> tokens = splitString(input, ' ');
-
-	// DEBUGGING:
-	//std::cout << "Tokens: ";
-	//for (auto& t : tokens) std::cout << t << "|";
 	
 
 
@@ -139,12 +140,10 @@ void CommandParser::parse(std::string& input, bool& testSuccess) {
 			}
 		}
 	}
-
-	//std::cout << "\nVerb found: " << verb << "\n"; // DEBUGGING
 	
 	// object1
 	for (int i = 0; i < tokens.size(); i++) {
-		ObjectMatch objectMatch = findLongestMatchingObject(i, tokens.size(), tokens, player->getInventory(), room->getRoomItems(), cmd.indexMap["verb"], cmd.indexMap["preposition"]);
+		ObjectMatch objectMatch = findLongestMatchingObject(i, static_cast<int>(tokens.size()), tokens, player->getInventory(), room->getRoomItems(), cmd.indexMap["verb"], cmd.indexMap["preposition"]);
 		if (!objectMatch.name.empty()) {
 			cmd.object1 = objectMatch.name;
 			cmd.indexMap["object1"] = i;
@@ -155,7 +154,7 @@ void CommandParser::parse(std::string& input, bool& testSuccess) {
 
 	// object2
 	for (int i = cmd.indexMap["object1"] + object1TokensUsed; i < tokens.size(); i++) {
-		ObjectMatch objectMatch = findLongestMatchingObject(i, tokens.size(), tokens, player->getInventory(), room->getRoomItems(), cmd.indexMap["verb"], cmd.indexMap["preposition"]);
+		ObjectMatch objectMatch = findLongestMatchingObject(i, static_cast<int>(tokens.size()), tokens, player->getInventory(), room->getRoomItems(), cmd.indexMap["verb"], cmd.indexMap["preposition"]);
 		cmd.object2 = objectMatch.name;
 		break;
 	}
@@ -222,6 +221,8 @@ void CommandParser::parse(std::string& input, bool& testSuccess) {
 // Message writer function takes a message template and optionally an object variable
 void CommandParser::writeMessage(const std::string& msgTemplate, const std::string& objectName)
 {
+	std::cout << "\n";
+
 	std::string output = msgTemplate;
 	if (!objectName.empty()) {
 		size_t pos = output.find("{object}");
@@ -287,25 +288,29 @@ void CommandParser::handleInventory(ParsedCommand& cmd)
 	writeMessage(player->printInventory());
 }
 
-// Quit handler
-void CommandParser::handleQuit(ParsedCommand& cmd)
+void CommandParser::handleDrop(ParsedCommand& cmd)
 {
-	running = false;
+	if (player->getInventory().find(cmd.object1) != player->getInventory().end()) {
+		room->getRoomItems()[cmd.object1] = player->getInventory().find(cmd.object1)->second;
+		player->getInventory().erase(cmd.object1);
+		writeMessage(MSG_DROP, cmd.object1);
+	}
+	else {
+		writeMessage(MSG_DONT_HAVE, cmd.object1);
+	}
 }
 
-// PHRASAL VERB HANDLERS
-
-// PickUp handler
-void CommandParser::handlePickUp(std::unordered_map<std::string, Item>& inventory, std::unordered_map<std::string, Item>& roomItems, ParsedCommand& cmd)
+// Take handler
+void CommandParser::handleTake(ParsedCommand& cmd)
 {
-	if (roomItems.find(cmd.object1) != roomItems.end()) {
-		if (!(inventory.find(cmd.object1) != inventory.end())) {
-			inventory[cmd.object1] = roomItems.find(cmd.object1)->second;
-			roomItems.erase(cmd.object1);
-			writeMessage(MSG_PICK_UP, cmd.object1);
+	if (room->getRoomItems().find(cmd.object1) != room->getRoomItems().end()) {
+		if (!(player->getInventory().find(cmd.object1) != player->getInventory().end())) {
+			player->getInventory()[cmd.object1] = room->getRoomItems().find(cmd.object1)->second;
+			room->getRoomItems().erase(cmd.object1);
+			writeMessage(MSG_TAKE, cmd.object1);
 		}
 		else {
-			writeMessage(MSG_ALREADY_HAVE, cmd.object1);;
+			writeMessage(MSG_ALREADY_HAVE, cmd.object1);
 		}
 	}
 	else {
@@ -313,15 +318,53 @@ void CommandParser::handlePickUp(std::unordered_map<std::string, Item>& inventor
 	}
 }
 
+// Pick handler
 void CommandParser::handlePick(ParsedCommand& cmd)
 {
-	std::cout << "Entering handlePick with object1 = " << cmd.object1 << "\n";
-	std::cout << "Preposition: " + cmd.preposition + "\n";
-	std::cout << "inventoryMap = " << &player->getInventory() << ", roomItemsMap = " << &room->getRoomItems() << "\n";
-
-
-	// TODO make handlePickUp not require inventory and roomItems parameters since it already has access to player and room
 	if (cmd.preposition == "up") {
-		handlePickUp(player->getInventory(), room->getRoomItems(), cmd);
+		handleTake(cmd);
 	}
+}
+
+void CommandParser::handleLook(ParsedCommand& cmd)
+{
+	if (cmd.preposition.empty() || cmd.preposition == "at") {
+		handleExamine(cmd);
+	}
+}
+
+void CommandParser::handleExamine(ParsedCommand& cmd) {
+	std::string target = cmd.object1;
+
+	// No object specified - look around the room
+	static const std::unordered_set<std::string> roomWords = { "room", "around", "area" };
+	if (target.empty() || roomWords.count(target) || target == room->getName()) {
+		writeMessage(room->getDescription());
+		return;
+	}
+
+	// Check if player has the target
+	auto& inventory = player->getInventory();
+	auto invIt = inventory.find(target);
+	if (invIt != inventory.end()) {
+		writeMessage(invIt->second.getDescription());
+		return;
+	}
+
+	// Check if target is in the room
+	auto& roomItems = room->getRoomItems();
+	auto roomIt = roomItems.find(target);
+	if (roomIt != roomItems.end()) {
+		writeMessage(roomIt->second.getDescription());
+		return;
+	}
+
+	// If target couldn't be located
+	writeMessage(MSG_DONT_SEE, target);
+}
+
+// Quit handler
+void CommandParser::handleQuit(ParsedCommand& cmd)
+{
+	running = false;
 }

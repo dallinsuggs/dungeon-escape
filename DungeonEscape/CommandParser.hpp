@@ -41,9 +41,11 @@ private:
 	const std::string MSG_DONT_KNOW_HOW = "I don't know how to do that.";
 
 	// const string messages with object
-	const std::string MSG_PICK_UP = "You now possess a {object}.";
+	const std::string MSG_TAKE = "You now possess a {object}.";
 	const std::string MSG_ALREADY_HAVE = "You already have a {object} in your inventory.";
-	const std::string MSG_DONT_SEE = "I don't see a {object} here.";
+	const std::string MSG_DONT_SEE = "You don't see a {object} here.";
+	const std::string MSG_DROP = "You drop the {object}.";
+	const std::string MSG_DONT_HAVE = "You don't have a {object}.";
 
 	// booleans
 	bool doorLocked = true;
@@ -99,13 +101,20 @@ public:
 	void handleOpen(ParsedCommand& cmd);
 	// Inventory handler
 	void handleInventory(ParsedCommand& cmd);
+	// Drop handler
+	void handleDrop(ParsedCommand& cmd);
+	// Take handler
+	void handleTake(ParsedCommand& cmd);
+	// Pick handler
+	void handlePick(ParsedCommand& cmd);
+	// Look handler
+	void handleLook(ParsedCommand& cmd);
+	// Examine handler
+	void handleExamine(ParsedCommand& cmd);
 
 	// Quit handler
 	void handleQuit(ParsedCommand& cmd);
 
-	// PHRASAL VERB HANDLERS
-
-	// PickUp handler
-	void handlePickUp(std::unordered_map<std::string, Item>& inventory, std::unordered_map<std::string, Item>& roomItems, ParsedCommand& cmd);
-	void handlePick(ParsedCommand& cmd);  // wrapper for the handler
+	
+	
 };

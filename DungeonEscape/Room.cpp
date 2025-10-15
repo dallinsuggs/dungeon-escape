@@ -7,6 +7,7 @@ std::unordered_map<std::string, Item>& Room::getRoomItems() {
 	return roomItems;
 }
 std::string Room::getDescription() const { return description; }
+std::string Room::getName() const { return name; }
 
 // Store a pointer to another room in the exits map
 void Room::connectRoom(const std::string& direction, Room* otherRoom) {

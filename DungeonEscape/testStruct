@@ -46,3 +46,141 @@ Preposition: |-1
 Object1: |-1
 Object2: |-1
 |
+|struct|
+Verb: get|0
+Preposition: |-1
+Object1: chamber pot|1
+Object2: |-1
+|
+|struct|
+Verb: inventory|0
+Preposition: |-1
+Object1: |-1
+Object2: |-1
+|
+|struct|
+Verb: drop|0
+Preposition: |-1
+Object1: chamber pot|1
+Object2: |-1
+|
+|struct|
+Verb: inventory|0
+Preposition: |-1
+Object1: |-1
+Object2: |-1
+|
+|struct|
+Verb: take|0
+Preposition: |-1
+Object1: chamber pot|1
+Object2: |-1
+|
+|struct|
+Verb: inventory|0
+Preposition: |-1
+Object1: |-1
+Object2: |-1
+|
+|struct|
+Verb: quit|0
+Preposition: |-1
+Object1: |-1
+Object2: |-1
+|
+|struct|
+Verb: look|0
+Preposition: |-1
+Object1: |-1
+Object2: |-1
+|
+|struct|
+Verb: examine|0
+Preposition: |-1
+Object1: |-1
+Object2: |-1
+|
+|struct|
+Verb: look|0
+Preposition: |-1
+Object1: |-1
+Object2: |-1
+|
+|struct|
+Verb: look|0
+Preposition: |-1
+Object1: chamber pot|1
+Object2: |-1
+|
+|struct|
+Verb: get|0
+Preposition: |-1
+Object1: chamber pot|1
+Object2: |-1
+|
+|struct|
+Verb: examine|0
+Preposition: |-1
+Object1: chamber pot|1
+Object2: |-1
+|
+|struct|
+Verb: look|0
+Preposition: |-1
+Object1: |-1
+Object2: |-1
+|
+|struct|
+Verb: exit|0
+Preposition: |-1
+Object1: |-1
+Object2: |-1
+|
+|struct|
+Verb: look|0
+Preposition: |-1
+Object1: brick|1
+Object2: |-1
+|
+|struct|
+Verb: look|0
+Preposition: |-1
+Object1: chamber pot|1
+Object2: |-1
+|
+|struct|
+Verb: pick|0
+Preposition: up|1
+Object1: brick|2
+Object2: |-1
+|
+|struct|
+Verb: quit|0
+Preposition: |-1
+Object1: |-1
+Object2: |-1
+|
+|struct|
+Verb: look|0
+Preposition: |-1
+Object1: |-1
+Object2: |-1
+|
+|struct|
+Verb: look|0
+Preposition: |-1
+Object1: brick|1
+Object2: |-1
+|
+|struct|
+Verb: pick|0
+Preposition: up|1
+Object1: chamber pot|2
+Object2: |-1
+|
+|struct|
+Verb: exit|0
+Preposition: |-1
+Object1: |-1
+Object2: |-1
+|
