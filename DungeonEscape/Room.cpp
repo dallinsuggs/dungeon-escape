@@ -15,7 +15,6 @@ std::string Room::getName() const { return name; }
 std::string Room::describeSelf() const
 {
 	std::string fullDesc = description;
-	bool addSentence = true;
 	static const std::unordered_set<char> vowels = { 'a', 'e', 'i', 'o', 'u'};
 	std::vector<std::string> moveableItems;
 

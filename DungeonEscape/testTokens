@@ -126,3 +126,10 @@ q
 look|sheet
 look|brick
 q
+get|brick
+get|chamber|pot
+get|sheet
+look
+drop|chamber|pot
+look
+q
