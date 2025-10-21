@@ -628,3 +628,141 @@ Preposition: |-1
 Object1: |-1
 Object2: |-1
 |
+|struct|
+Verb: look|0
+Preposition: |-1
+Object1: chamber pot|0
+Object2: pot|2
+|
+|struct|
+Verb: get|0
+Preposition: |-1
+Object1: chamber pot|0
+Object2: pot|2
+|
+|struct|
+Verb: drop|0
+Preposition: |-1
+Object1: chamber pot|0
+Object2: pot|2
+|
+|struct|
+Verb: q|0
+Preposition: |-1
+Object1: |-1
+Object2: |-1
+|
+|struct|
+Verb: look|0
+Preposition: |-1
+Object1: |-1
+Object2: |-1
+|
+|struct|
+Verb: look|0
+Preposition: |-1
+Object1: chamber|0
+Object2: chamber|1
+|
+|struct|
+Verb: q|0
+Preposition: |-1
+Object1: |-1
+Object2: |-1
+|
+|struct|
+Verb: look|0
+Preposition: |-1
+Object1: room|0
+Object2: room|1
+|
+|struct|
+Verb: get|0
+Preposition: |-1
+Object1: brick|0
+Object2: brick|1
+|
+|struct|
+Verb: get|0
+Preposition: |-1
+Object1: brick|0
+Object2: brick|1
+|
+|struct|
+Verb: q|0
+Preposition: |-1
+Object1: |-1
+Object2: |-1
+|
+|struct|
+Verb: |-1
+Preposition: |-1
+Object1: |-1
+Object2: |-1
+|
+|struct|
+Verb: q|0
+Preposition: |-1
+Object1: |-1
+Object2: |-1
+|
+|struct|
+Verb: look|0
+Preposition: |-1
+Object1: |-1
+Object2: |-1
+|
+|struct|
+Verb: q|0
+Preposition: |-1
+Object1: |-1
+Object2: |-1
+|
+|struct|
+Verb: look|0
+Preposition: |-1
+Object1: |-1
+Object2: |-1
+|
+|struct|
+Verb: q|0
+Preposition: |-1
+Object1: |-1
+Object2: |-1
+|
+|struct|
+Verb: q|0
+Preposition: |-1
+Object1: |-1
+Object2: |-1
+|
+|struct|
+Verb: q|0
+Preposition: |-1
+Object1: |-1
+Object2: |-1
+|
+|struct|
+Verb: q|0
+Preposition: |-1
+Object1: |-1
+Object2: |-1
+|
+|struct|
+Verb: look|0
+Preposition: |-1
+Object1: sheet|0
+Object2: sheet|1
+|
+|struct|
+Verb: look|0
+Preposition: |-1
+Object1: brick|0
+Object2: brick|1
+|
+|struct|
+Verb: q|0
+Preposition: |-1
+Object1: |-1
+Object2: |-1
+|

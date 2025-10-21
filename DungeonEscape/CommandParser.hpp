@@ -56,8 +56,8 @@ private:
 	std::vector<std::string> splitString(std::string& input, char delimiter = ' ');
 
 	bool isValidWord(
-		const std::unordered_map<std::string, Item>& inventory, 
-		const std::unordered_map<std::string, Item>& roomItems, 
+		const std::unordered_map<std::string, Item*>& inventory, 
+		const std::unordered_map<std::string, Item*>& roomItems, 
 		std::string word
 	);
 
@@ -70,8 +70,8 @@ private:
 	ObjectMatch findLongestMatchingObject(int startIndex,
 		int tokensLength,
 		const std::vector<std::string>& tokens,
-		const std::unordered_map<std::string, Item>& inventory,
-		const std::unordered_map<std::string, Item>& roomItems,
+		const std::unordered_map<std::string, Item*>& inventory,
+		const std::unordered_map<std::string, Item*>& roomItems,
 		int ignoreIndex1 = -1,
 		int ignoreIndex2 = -1,
 		int ignoreIndex3 = -1);

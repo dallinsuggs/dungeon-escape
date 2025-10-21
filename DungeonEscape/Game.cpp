@@ -6,28 +6,52 @@
 #include <unordered_map>
 #include <iostream>
 
-// ITEMS
+// Function that reads data from item file and returns unordered map with all the items
+std::unordered_map<std::string, Item> loadItems(const std::string& filename)
+{
+	std::unordered_map<std::string, Item> items;
+	std::ifstream inFile(filename);
 
-Item chamberPot("chamber pot", "It is a smelly, stained, ceramic chamber pot with blue and white flower designs on the outside.", true);
-Item brick{"brick", "It is a crumbling, dusty old brick.", true };
-Item sheet{"sheet", "It is an odorous, soiled bedsheet that looks like it might have been white at some point.", true };
-Item door{ "door", "It is a grimy wooden door with horizontal and vertical iron strips reinforcing it.", false };
+	if (!inFile) {
+		std::cerr << "Could not open file for writing\n";
+	}
+
+	std::string line;
+	while (std::getline(inFile, line)) {
+		std::stringstream ss(line);
+		std::string name, description, moveable;
+
+		if (std::getline(ss, name, '|') && std::getline(ss, description, '|') && std::getline(ss, moveable)) {
+			bool isMoveable = (moveable == "1");
+			items.emplace(name, Item(name, description, isMoveable));
+		}
+
+	}
+	return items;
+}
+
+// Sets up cell's item list
+std::unordered_map<std::string, Item*> createCellItems(std::unordered_map<std::string, Item>& allItems) {
+	return {
+		{allItems["chamber pot"].getName(), &allItems["chamber pot"]},
+		{allItems["brick"].getName(), &allItems["brick"]},
+		{allItems["sheet"].getName(), &allItems["sheet"]},
+		{allItems["door"].getName(), &allItems["door"]}
+	};
+}
 
 
-// ROOM VARIABLES
-
-// CELL
-
-const std::string CELL_NAME = "cell";
-const std::string CELL_DESC = "You are in a small, dank dungeon cell with an iron-reinforced wooden door and a simple straw mattress.";
-std::unordered_map<std::string, Item> cellItems = {
-	{chamberPot.getName(), chamberPot},
-	{brick.getName(), brick},
-	{sheet.getName(), sheet},
-	{door.getName(), door}
-};
 
 int main() {
+
+	// Items setup
+	std::unordered_map<std::string, Item> allItems = loadItems("game_items.txt");
+	
+	// Cell room setup
+	const std::string CELL_NAME = "cell";
+	const std::string CELL_DESC = "You are in a small, dank dungeon cell with an iron-reinforced wooden door and a simple straw mattress.";
+	std::unordered_map<std::string, Item*> cellItems = createCellItems(allItems);
+
 	// Initial setup
 	Player player("Ferengate");
 	Room roomCell(CELL_NAME, CELL_DESC, cellItems);

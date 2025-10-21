@@ -12,15 +12,15 @@ class Room {
 private:
 	std::string name;
 	std::string description; // Text describing the room
-	std::unordered_map<std::string, Item> roomItems; // Items lying around in the room
+	std::unordered_map<std::string, Item*> roomItems; // Items lying around in the room
 	std::map<std::string, Room*> exits; // Maps directions ("north") to connected rooms
 
 public:
 	// Constructor
-	Room(const std::string& name, const std::string& description, std::unordered_map<std::string, Item> roomItems);
+	Room(const std::string& name, const std::string& description, std::unordered_map<std::string, Item*> roomItems);
 
 	// getters
-	std::unordered_map<std::string, Item>& getRoomItems();
+	std::unordered_map<std::string, Item*>& getRoomItems();
 
 	std::string getDescription() const;
 	std::string getName() const;

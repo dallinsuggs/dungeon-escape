@@ -25,7 +25,7 @@ std::vector<std::string> CommandParser::splitString(std::string& input, char del
 }
 
 // Is valid word bool checks if a word is present in an unordered map of items or objects
-bool CommandParser::isValidWord(const std::unordered_map<std::string, Item>& inventory, const std::unordered_map<std::string, Item>& roomItems, std::string word)
+bool CommandParser::isValidWord(const std::unordered_map<std::string, Item*>& inventory, const std::unordered_map<std::string, Item*>& roomItems, std::string word)
 {
 	if (inventory.find(word) != inventory.end())
 		return true;
@@ -35,7 +35,7 @@ bool CommandParser::isValidWord(const std::unordered_map<std::string, Item>& inv
 }
 
 // Find longest matching object in a vector of tokens
-CommandParser::ObjectMatch CommandParser::findLongestMatchingObject(int startIndex, int tokensLength, const std::vector<std::string>& tokens, const std::unordered_map<std::string, Item>& inventory, const std::unordered_map<std::string, Item>& roomItems, int ignoreIndex1, int ignoreIndex2, int ignoreIndex3) {
+CommandParser::ObjectMatch CommandParser::findLongestMatchingObject(int startIndex, int tokensLength, const std::vector<std::string>& tokens, const std::unordered_map<std::string, Item*>& inventory, const std::unordered_map<std::string, Item*>& roomItems, int ignoreIndex1, int ignoreIndex2, int ignoreIndex3) {
 	
 
 	// Set startIndex to the first non-ignored index
@@ -343,7 +343,7 @@ void CommandParser::handleTake(ParsedCommand& cmd)
 	// If moveable and presently accessible to player, take item
 	if (roomIt != roomItems.end()) {
 		if (!(invIt != inventory.end())) {
-			if (roomIt->second.isMoveable()) {
+			if (roomIt->second->isMoveable()) {
 				inventory[cmd.object1] = roomIt->second;
 				roomItems.erase(cmd.object1);
 				writeMessage(MSG_TAKE, cmd.object1);
@@ -392,7 +392,7 @@ void CommandParser::handleExamine(ParsedCommand& cmd) {
 	auto& inventory = player->getInventory();
 	auto invIt = inventory.find(target);
 	if (invIt != inventory.end()) {
-		writeMessage(invIt->second.getDescription());
+		writeMessage(invIt->second->getDescription());
 		return;
 	}
 
@@ -400,7 +400,7 @@ void CommandParser::handleExamine(ParsedCommand& cmd) {
 	auto& roomItems = room->getRoomItems();
 	auto roomIt = roomItems.find(target);
 	if (roomIt != roomItems.end()) {
-		writeMessage(roomIt->second.getDescription());
+		writeMessage(roomIt->second->getDescription());
 		return;
 	}
 

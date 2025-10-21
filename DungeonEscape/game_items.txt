@@ -1,0 +1,4 @@
+chamber pot|It is a smelly, stained, ceramic chamber pot with blue and white flower designs on the outside|1
+brick|It is a crumbling, dusty old brick.|1
+sheet|It is an odorous, soiled bedsheet that looks like it might have been white at some point|1
+door|It is a grimy wooden door with horizontal and vertical iron strips reinforcing it|0

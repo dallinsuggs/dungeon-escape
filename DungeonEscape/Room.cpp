@@ -3,10 +3,10 @@
 #include <unordered_set>
 #include <vector>
 
-Room::Room(const std::string& name, const std::string& description, std::unordered_map<std::string, Item> roomItems) : description(description), roomItems(roomItems) {}
+Room::Room(const std::string& name, const std::string& description, std::unordered_map<std::string, Item*> roomItems) : description(description), roomItems(roomItems) {}
 
 // Return the room's item list
-std::unordered_map<std::string, Item>& Room::getRoomItems() {
+std::unordered_map<std::string, Item*>& Room::getRoomItems() {
 	return roomItems;
 }
 std::string Room::getDescription() const { return description; }
@@ -21,8 +21,8 @@ std::string Room::describeSelf() const
 
 	// Iterate through roomItems and add each moveable item into moveableItems
 	for (const auto& pair : roomItems) {
-		if (pair.second.isMoveable()) {
-			moveableItems.push_back(pair.second.getName());
+		if (pair.second->isMoveable()) {
+			moveableItems.push_back(pair.second->getName());
 		}
 	}
 

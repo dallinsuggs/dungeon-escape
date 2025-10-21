@@ -11,7 +11,7 @@ class Player {
 private:
 	std::string name;
 	Room* currentRoom;
-	std::unordered_map<std::string, Item> inventory; //map item name to Item object for easy lookup
+	std::unordered_map<std::string, Item*> inventory; //map item name to Item object for easy lookup
 
 public:
 	// Constructor
@@ -21,7 +21,7 @@ public:
 	void setCurrentRoom(Room* room);
 
 	// get the player's inventory
-	std::unordered_map<std::string, Item>& getInventory();
+	std::unordered_map<std::string, Item*>& getInventory();
 
 	// Move to another room if there is an exit in that direction
 	//void move(const std::string& direction);
