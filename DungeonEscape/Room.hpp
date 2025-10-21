@@ -25,6 +25,9 @@ public:
 	std::string getDescription() const;
 	std::string getName() const;
 
+	// describeSelf dynamically describes the actual state of the room given a room description and a list of items present
+	std::string describeSelf() const;
+
 	// Connect this room to another in a given direction
 	void connectRoom(const std::string& direction, Room* otherRoom);
 

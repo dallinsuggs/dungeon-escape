@@ -250,3 +250,381 @@ Preposition: |-1
 Object1: |-1
 Object2: |-1
 |
+|struct|
+Verb: look|0
+Preposition: |-1
+Object1: |-1
+Object2: |-1
+|
+|struct|
+Verb: look|0
+Preposition: |-1
+Object1: |-1
+Object2: |-1
+|
+|struct|
+Verb: look|0
+Preposition: |-1
+Object1: |-1
+Object2: |-1
+|
+|struct|
+Verb: examine|0
+Preposition: |-1
+Object1: brick|1
+Object2: |-1
+|
+|struct|
+Verb: examine|0
+Preposition: |-1
+Object1: sheet|1
+Object2: |-1
+|
+|struct|
+Verb: exit|0
+Preposition: |-1
+Object1: |-1
+Object2: |-1
+|
+|struct|
+Verb: inventory|0
+Preposition: |-1
+Object1: |-1
+Object2: |-1
+|
+|struct|
+Verb: pick|0
+Preposition: up|1
+Object1: sheet|2
+Object2: |-1
+|
+|struct|
+Verb: inventory|0
+Preposition: |-1
+Object1: |-1
+Object2: |-1
+|
+|struct|
+Verb: get|0
+Preposition: |-1
+Object1: brick|1
+Object2: |-1
+|
+|struct|
+Verb: inventory|0
+Preposition: |-1
+Object1: |-1
+Object2: |-1
+|
+|struct|
+Verb: pick|0
+Preposition: up|1
+Object1: chamber pot|3
+Object2: |-1
+|
+|struct|
+Verb: |-1
+Preposition: |-1
+Object1: |-1
+Object2: |-1
+|
+|struct|
+Verb: inventory|0
+Preposition: |-1
+Object1: |-1
+Object2: |-1
+|
+|struct|
+Verb: drop|0
+Preposition: |-1
+Object1: brick|1
+Object2: |-1
+|
+|struct|
+Verb: put|0
+Preposition: down|1
+Object1: brick|2
+Object2: |-1
+|
+|struct|
+Verb: grab|0
+Preposition: |-1
+Object1: brick|1
+Object2: |-1
+|
+|struct|
+Verb: look|0
+Preposition: |-1
+Object1: |-1
+Object2: |-1
+|
+|struct|
+Verb: quit|0
+Preposition: |-1
+Object1: |-1
+Object2: |-1
+|
+|struct|
+Verb: look|0
+Preposition: |-1
+Object1: |-1
+Object2: |-1
+|
+|struct|
+Verb: quit|0
+Preposition: |-1
+Object1: |-1
+Object2: |-1
+|
+|struct|
+Verb: look|0
+Preposition: |-1
+Object1: |-1
+Object2: |-1
+|
+|struct|
+Verb: quit|0
+Preposition: |-1
+Object1: |-1
+Object2: |-1
+|
+|struct|
+Verb: look|0
+Preposition: |-1
+Object1: |-1
+Object2: |-1
+|
+|struct|
+Verb: quit|0
+Preposition: |-1
+Object1: |-1
+Object2: |-1
+|
+|struct|
+Verb: get|0
+Preposition: |-1
+Object1: chamber pot|1
+Object2: |-1
+|
+|struct|
+Verb: look|0
+Preposition: |-1
+Object1: |-1
+Object2: |-1
+|
+|struct|
+Verb: q|0
+Preposition: |-1
+Object1: |-1
+Object2: |-1
+|
+|struct|
+Verb: q|0
+Preposition: |-1
+Object1: |-1
+Object2: |-1
+|
+|struct|
+Verb: look|0
+Preposition: |-1
+Object1: door|1
+Object2: |-1
+|
+|struct|
+Verb: pick|0
+Preposition: up|1
+Object1: door|2
+Object2: |-1
+|
+|struct|
+Verb: inventory|0
+Preposition: |-1
+Object1: |-1
+Object2: |-1
+|
+|struct|
+Verb: q|0
+Preposition: |-1
+Object1: |-1
+Object2: |-1
+|
+|struct|
+Verb: pick|0
+Preposition: up|1
+Object1: door|2
+Object2: |-1
+|
+|struct|
+Verb: look|0
+Preposition: |-1
+Object1: |-1
+Object2: |-1
+|
+|struct|
+Verb: get|0
+Preposition: |-1
+Object1: brick|1
+Object2: |-1
+|
+|struct|
+Verb: i|0
+Preposition: |-1
+Object1: |-1
+Object2: |-1
+|
+|struct|
+Verb: examine|0
+Preposition: |-1
+Object1: |-1
+Object2: |-1
+|
+|struct|
+Verb: look|0
+Preposition: |-1
+Object1: |-1
+Object2: |-1
+|
+|struct|
+Verb: q|0
+Preposition: |-1
+Object1: |-1
+Object2: |-1
+|
+|struct|
+Verb: look|0
+Preposition: |-1
+Object1: look|0
+Object2: desk|-1
+|
+|struct|
+Verb: q|0
+Preposition: |-1
+Object1: q|0
+Object2: |-1
+|
+|struct|
+Verb: look|0
+Preposition: |-1
+Object1: look|0
+Object2: chamber pot|-1
+|
+|struct|
+Verb: q|0
+Preposition: |-1
+Object1: q|0
+Object2: |-1
+|
+|struct|
+Verb: look|0
+Preposition: |-1
+Object1: chamber pot|1
+Object2: |-1
+|
+|struct|
+Verb: look|0
+Preposition: |-1
+Object1: |-1
+Object2: |-1
+|
+|struct|
+Verb: q|0
+Preposition: |-1
+Object1: |-1
+Object2: |-1
+|
+|struct|
+Verb: look|0
+Preposition: |-1
+Object1: chamber pot|0
+Object2: pot|2
+|
+|struct|
+Verb: look|0
+Preposition: |-1
+Object1: desk|0
+Object2: desk|1
+|
+|struct|
+Verb: look|0
+Preposition: |-1
+Object1: |-1
+Object2: |-1
+|
+|struct|
+Verb: get|0
+Preposition: |-1
+Object1: brick|0
+Object2: brick|1
+|
+|struct|
+Verb: get|0
+Preposition: |-1
+Object1: chamber pot|0
+Object2: pot|2
+|
+|struct|
+Verb: look|0
+Preposition: |-1
+Object1: |-1
+Object2: |-1
+|
+|struct|
+Verb: q|0
+Preposition: |-1
+Object1: |-1
+Object2: |-1
+|
+|struct|
+Verb: look|0
+Preposition: |-1
+Object1: desk|0
+Object2: desk|1
+|
+|struct|
+Verb: get|0
+Preposition: |-1
+Object1: desk|0
+Object2: desk|1
+|
+|struct|
+Verb: look|0
+Preposition: |-1
+Object1: sheet|0
+Object2: sheet|1
+|
+|struct|
+Verb: get|0
+Preposition: |-1
+Object1: sheet|0
+Object2: sheet|1
+|
+|struct|
+Verb: look|0
+Preposition: |-1
+Object1: room|0
+Object2: room|1
+|
+|struct|
+Verb: i|0
+Preposition: |-1
+Object1: |-1
+Object2: |-1
+|
+|struct|
+Verb: look|0
+Preposition: |-1
+Object1: door|0
+Object2: door|1
+|
+|struct|
+Verb: q|0
+Preposition: |-1
+Object1: |-1
+Object2: |-1
+|
+|struct|
+Verb: q|0
+Preposition: |-1
+Object1: |-1
+Object2: |-1
+|

@@ -46,6 +46,7 @@ private:
 	const std::string MSG_DONT_SEE = "You don't see a {object} here.";
 	const std::string MSG_DROP = "You drop the {object}.";
 	const std::string MSG_DONT_HAVE = "You don't have a {object}.";
+	const std::string MSG_CANT_TAKE = "You can't pick up the {object}, it's either too heavy or securely attached.";
 
 	// booleans
 	bool doorLocked = true;
@@ -63,7 +64,7 @@ private:
 	struct ObjectMatch {
 		std::string name;
 		int tokenCount;
-		int objectIndex;
+		bool valid = false;
 	};
 
 	ObjectMatch findLongestMatchingObject(int startIndex,
@@ -83,10 +84,7 @@ public:
 	CommandParser(Player* p, Room* r, bool& runningFlag);
 
 	// Parse function (primary function to interpret player input and delegate work to handler functions)
-	void parse(
-		std::string& input, 
-		bool& testSuccess
-	);
+	void parse(std::string& input);
 
 	// Message writer function takes a message template and optionally an object variable
 	void writeMessage(const std::string& messageTemplate, const std::string& objectName = "");
