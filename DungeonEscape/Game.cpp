@@ -45,16 +45,17 @@ std::unordered_map<std::string, Item*> createCellItems(std::unordered_map<std::s
 int main() {
 
 	// Items setup
-	std::unordered_map<std::string, Item> allItems = loadItems("game_items.txt");
+	std::unordered_map<std::string, Item> allItems = loadItems("items.txt");
 	
 	// Cell room setup
+	const std::string CELL_ID = "cell_1";
 	const std::string CELL_NAME = "cell";
 	const std::string CELL_DESC = "You are in a small, dank dungeon cell with an iron-reinforced wooden door and a simple straw mattress.";
 	std::unordered_map<std::string, Item*> cellItems = createCellItems(allItems);
 
 	// Initial setup
 	Player player("Ferengate");
-	Room roomCell(CELL_NAME, CELL_DESC, cellItems);
+	Room roomCell(CELL_ID, CELL_NAME, CELL_DESC, cellItems);
 	bool running = true;
 	std::string userInput = "";
 

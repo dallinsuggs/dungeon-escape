@@ -3,12 +3,13 @@
 #include <unordered_set>
 #include <vector>
 
-Room::Room(const std::string& name, const std::string& description, std::unordered_map<std::string, Item*> roomItems) : description(description), roomItems(roomItems) {}
+Room::Room(const std::string& id, const std::string& name, const std::string& description, std::unordered_map<std::string, Item*> roomItems) : id(id), name(name), description(description), roomItems(roomItems) {}
 
 // Return the room's item list
 std::unordered_map<std::string, Item*>& Room::getRoomItems() {
 	return roomItems;
 }
+std::string Room::getId() const { return id; }
 std::string Room::getDescription() const { return description; }
 std::string Room::getName() const { return name; }
 

@@ -808,3 +808,15 @@ Preposition: |-1
 Object1: |-1
 Object2: |-1
 |
+|struct|
+Verb: look|0
+Preposition: |-1
+Object1: cell|0
+Object2: cell|1
+|
+|struct|
+Verb: q|0
+Preposition: |-1
+Object1: |-1
+Object2: |-1
+|

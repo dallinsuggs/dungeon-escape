@@ -55,6 +55,7 @@
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <Text Include="game_items.txt" />
+    <Text Include="items.txt" />
+    <Text Include="rooms.txt" />
   </ItemGroup>
 </Project>

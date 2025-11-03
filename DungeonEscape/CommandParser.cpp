@@ -98,6 +98,8 @@ CommandParser::CommandParser(Player* p, Room* r, bool& runningFlag)
 	// tear (sheet?)
 	// throw
 	// punch
+	// go (north, west, door)
+	// enter
 
 
 	// Initialize prepositions set

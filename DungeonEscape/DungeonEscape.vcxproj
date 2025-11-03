@@ -139,7 +139,8 @@
     <ClInclude Include="Room.hpp" />
   </ItemGroup>
   <ItemGroup>
-    <Text Include="game_items.txt" />
+    <Text Include="items.txt" />
+    <Text Include="rooms.txt" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

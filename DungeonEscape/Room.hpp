@@ -10,6 +10,7 @@
 // It has a description, may contain items, and has exits leading to other rooms.
 class Room {
 private:
+	std::string id;
 	std::string name;
 	std::string description; // Text describing the room
 	std::unordered_map<std::string, Item*> roomItems; // Items lying around in the room
@@ -17,11 +18,12 @@ private:
 
 public:
 	// Constructor
-	Room(const std::string& name, const std::string& description, std::unordered_map<std::string, Item*> roomItems);
+	Room(const std::string& id, const std::string& name, const std::string& description, std::unordered_map<std::string, Item*> roomItems);
 
 	// getters
 	std::unordered_map<std::string, Item*>& getRoomItems();
 
+	std::string getId() const;
 	std::string getDescription() const;
 	std::string getName() const;
 
