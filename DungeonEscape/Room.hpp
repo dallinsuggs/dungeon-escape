@@ -17,6 +17,10 @@ private:
 	std::map<std::string, Room*> exits; // Maps directions ("north") to connected rooms
 
 public:
+
+	// Default constructor
+	Room() = default;
+
 	// Constructor
 	Room(const std::string& id, const std::string& name, const std::string& description, std::unordered_map<std::string, Item*> roomItems);
 

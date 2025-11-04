@@ -307,7 +307,7 @@ void CommandParser::handleOpen(ParsedCommand& cmd)
 // Inventory handler
 void CommandParser::handleInventory(ParsedCommand& cmd)
 {
-	// TODO Replace with inventory print function from player class
+	// Inventory print function from player class
 	writeMessage(player->printInventory());
 }
 

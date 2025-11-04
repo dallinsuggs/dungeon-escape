@@ -820,3 +820,135 @@ Preposition: |-1
 Object1: |-1
 Object2: |-1
 |
+|struct|
+Verb: look|0
+Preposition: |-1
+Object1: brick|0
+Object2: brick|1
+|
+|struct|
+Verb: get|0
+Preposition: |-1
+Object1: brick|0
+Object2: brick|1
+|
+|struct|
+Verb: pick|0
+Preposition: up|1
+Object1: pot|0
+Object2: pot|1
+|
+|struct|
+Verb: pick|0
+Preposition: up|1
+Object1: chamber pot|0
+Object2: chamber pot|2
+|
+|struct|
+Verb: look|0
+Preposition: |-1
+Object1: |-1
+Object2: |-1
+|
+|struct|
+Verb: inventory|0
+Preposition: |-1
+Object1: |-1
+Object2: |-1
+|
+|struct|
+Verb: q|0
+Preposition: |-1
+Object1: |-1
+Object2: |-1
+|
+|struct|
+Verb: q|0
+Preposition: |-1
+Object1: |-1
+Object2: |-1
+|
+|struct|
+Verb: look|0
+Preposition: |-1
+Object1: |-1
+Object2: |-1
+|
+|struct|
+Verb: get|0
+Preposition: |-1
+Object1: brick|0
+Object2: brick|1
+|
+|struct|
+Verb: get|0
+Preposition: |-1
+Object1: door|0
+Object2: door|1
+|
+|struct|
+Verb: q|0
+Preposition: |-1
+Object1: |-1
+Object2: |-1
+|
+|struct|
+Verb: look|0
+Preposition: |-1
+Object1: brick|0
+Object2: brick|1
+|
+|struct|
+Verb: get|0
+Preposition: |-1
+Object1: brick|0
+Object2: brick|1
+|
+|struct|
+Verb: look|0
+Preposition: |-1
+Object1: door|0
+Object2: door|1
+|
+|struct|
+Verb: get|0
+Preposition: |-1
+Object1: door|0
+Object2: door|1
+|
+|struct|
+Verb: |-1
+Preposition: |-1
+Object1: inv|0
+Object2: |-1
+|
+|struct|
+Verb: i|0
+Preposition: |-1
+Object1: |-1
+Object2: |-1
+|
+|struct|
+Verb: q|0
+Preposition: |-1
+Object1: |-1
+Object2: |-1
+|
+|struct|
+Verb: pick|0
+Preposition: up|1
+Object1: sheet|0
+Object2: sheet|1
+|
+|struct|
+Verb: look|0
+Preposition: |-1
+Object1: |-1
+Object2: |-1
+|
+|struct|
+Verb: q|0
+Preposition: |-1
+Object1: |-1
+Object2: |-1
+|
