@@ -135,3 +135,16 @@ look
 q
 look|cell
 q
+grab|sheet
+drop|sheet
+exit
+grab|sheet
+drop|sheet
+grab|sheet
+drop|sheet
+grab|door
+grab|mattress
+pick|up|sheet
+drop|sheet
+leave
+go|crazy

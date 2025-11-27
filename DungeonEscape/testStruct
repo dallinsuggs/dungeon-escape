@@ -820,3 +820,81 @@ Preposition: |-1
 Object1: |-1
 Object2: |-1
 |
+|struct|
+Verb: grab|0
+Preposition: |-1
+Object1: sheet|0
+Object2: sheet|1
+|
+|struct|
+Verb: drop|0
+Preposition: |-1
+Object1: sheet|0
+Object2: sheet|1
+|
+|struct|
+Verb: exit|0
+Preposition: |-1
+Object1: |-1
+Object2: |-1
+|
+|struct|
+Verb: grab|0
+Preposition: |-1
+Object1: sheet|0
+Object2: sheet|1
+|
+|struct|
+Verb: drop|0
+Preposition: |-1
+Object1: sheet|0
+Object2: sheet|1
+|
+|struct|
+Verb: grab|0
+Preposition: |-1
+Object1: sheet|0
+Object2: sheet|1
+|
+|struct|
+Verb: drop|0
+Preposition: |-1
+Object1: sheet|0
+Object2: sheet|1
+|
+|struct|
+Verb: grab|0
+Preposition: |-1
+Object1: door|0
+Object2: door|1
+|
+|struct|
+Verb: grab|0
+Preposition: |-1
+Object1: mattress|0
+Object2: mattress|1
+|
+|struct|
+Verb: pick|0
+Preposition: up|1
+Object1: sheet|0
+Object2: sheet|1
+|
+|struct|
+Verb: drop|0
+Preposition: |-1
+Object1: sheet|0
+Object2: sheet|1
+|
+|struct|
+Verb: |-1
+Preposition: |-1
+Object1: leave|0
+Object2: |-1
+|
+|struct|
+Verb: |-1
+Preposition: |-1
+Object1: go|0
+Object2: crazy|1
+|

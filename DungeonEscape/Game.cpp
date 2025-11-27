@@ -1,10 +1,19 @@
-#include "CommandParser.hpp"
+﻿#include "CommandParser.hpp"
 #include "Player.hpp"
 #include "Item.hpp"
 #include "Room.hpp"
 
 #include <unordered_map>
 #include <iostream>
+
+// For the window
+#include "raylib.h"
+#include <chrono> // for time tracking
+#include <sstream> // for capture
+#include <vector> // for lines
+#include <functional> // for lambda
+#include <cmath> // for sinf
+
 
 // Function that reads data from item file and returns unordered map with all the items
 std::unordered_map<std::string, Item> loadItems(const std::string& filename)
@@ -40,9 +49,33 @@ std::unordered_map<std::string, Item*> createCellItems(std::unordered_map<std::s
 	};
 }
 
+// Capture cout to lines for Raylib display
+std::vector<std::string> captureOutput(std::function<void()> func) {
+	std::ostringstream oss;
+	std::streambuf* old = std::cout.rdbuf(oss.rdbuf()); // Redirect cout to oss
+	func(); // Call the function that produces output
+	std::cout.rdbuf(old); // Restore original cout buffer
+	std::istringstream iss(oss.str());  // Fixed: 'iss' not 'isspace'
+	std::vector<std::string> lines;
+	std::string line;
+	while (std::getline(iss, line)) {  // Now uses 'iss'
+		if (!line.empty()) lines.push_back(line);
+	}
+	return lines;
+}
+
 
 
 int main() {
+	// Window setup
+	const int screenWidth = 800;
+	const int screenHeight = 600;
+	InitWindow(screenWidth, screenHeight, "Dungeon Escape");
+	SetTargetFPS(60);
+
+	// Time tracking for day cycle
+	auto startTime = std::chrono::steady_clock::now();
+	float dayProgress = 0.0f;
 
 	// Items setup
 	std::unordered_map<std::string, Item> allItems = loadItems("items.txt");
@@ -52,28 +85,114 @@ int main() {
 	const std::string CELL_NAME = "cell";
 	const std::string CELL_DESC = "You are in a small, dank dungeon cell with an iron-reinforced wooden door and a simple straw mattress.";
 	std::unordered_map<std::string, Item*> cellItems = createCellItems(allItems);
+	
+
 
 	// Initial setup
 	Player player("Ferengate");
 	Room roomCell(CELL_ID, CELL_NAME, CELL_DESC, cellItems);
 	bool running = true;
 	std::string userInput = "";
+	std::vector<std::string> displayLines;
+
+	// Input buffer for Raylib (replaces console getline)
+	char inputBuffer[256] = "\0";
+	int letterCount = 0;
 
 	CommandParser parser(&player, &roomCell, running);
 
-	parser.writeMessage(roomCell.describeSelf());
+	// parser.writeMessage(roomCell.describeSelf());
+	displayLines = captureOutput([&]() { parser.writeMessage(roomCell.describeSelf()); });
 
+	
+
+	//////////////////////* GAME LOOP HERE */////////////////////
 	// Enter game loop
-	while (running) {
+	while (!WindowShouldClose() && running) {
+		/* THIS IS THE BACKGROUND DESIGN */
+		// Update day progress (30-min cycle)
+		auto currentTime = std::chrono::steady_clock::now();
+		float elapsedSeconds = std::chrono::duration<float>(currentTime - startTime).count();
+		dayProgress = fmod(elapsedSeconds / 1800.0f, 1.0f); // 1800 seconds = 30 minutes
+
+		// Raylib input: Builds string non-blockingly
+		int key = GetCharPressed();
+		while (key > 0) {
+			if (key >= 32 && key <= 125 && letterCount < 255) {  // Printable keys only (includes space)
+				inputBuffer[letterCount++] = (char)key;
+				inputBuffer[letterCount] = '\0';  // Null-terminate
+			}
+			key = GetCharPressed();  // Next char in queue
+		}
+
+		// Handle special keys (Enter, Backspace)
+		if (IsKeyPressed(KEY_ENTER) && letterCount > 0) {
+			userInput = std::string(inputBuffer);
+			auto newLines = captureOutput([&]() { parser.parse(userInput); });
+			for (const auto& line : newLines) {
+				if (!line.empty()) displayLines.push_back(line);
+			}
+			if (displayLines.size() > 20) {  // Trim to last 20 lines
+				displayLines.erase(displayLines.begin(), displayLines.begin() + (displayLines.size() - 20));
+			}
+			letterCount = 0;
+			inputBuffer[0] = '\0';
+			userInput.clear();
+		}
+		else if (IsKeyPressed(KEY_BACKSPACE) && letterCount > 0) {
+			letterCount--;
+			inputBuffer[letterCount] = '\0';
+		}
+
+		BeginDrawing();
+		ClearBackground(SKYBLUE);
+
+	
+		// Sky fade from dawn to dusk
+		if (dayProgress > 0.5f) {
+			DrawRectangle(0, 0, screenWidth, screenHeight / 2,
+				Color{ 255, 165, 0,(unsigned char)(255 * (dayProgress - 0.5f) * 2) });
+		}
+		// Castle silhouette (bottom)
+		DrawRectangle(screenWidth / 2 - 100, screenHeight - 150, 200, 150, GRAY);
+		DrawRectangle(screenWidth / 2 - 50, screenHeight - 250, 100, 100, DARKGRAY);
+		
+		// Sun arc and color change
+		float sunX = screenWidth * (dayProgress * 2.0f);
+		if (sunX > screenWidth) sunX = 2 * screenWidth - sunX; // Reflect for setting sun
+		float sunY = screenHeight * (0.5f - 0.3f * sinf(dayProgress * PI * 2.0f)); // Arc path
+		Color sunColor = (dayProgress < 0.3f) ? YELLOW : ((dayProgress > 0.7f) ? ORANGE : GOLD); // Change color at dawn/dusk
+		DrawCircle(sunX, sunY, 30, sunColor);
+
+		// Set semi-transparent overlay for game text (readable against background)
+		DrawRectangle(20, 20, screenWidth - 40, screenHeight - 100, Fade(BLACK, 0.2f));
+		// Draw room description text
+		int yPos = 50;
+		for (const auto& line : displayLines) {
+			if (yPos < screenHeight - 100) {
+				DrawText(line.c_str(), 40, yPos, 16, WHITE);
+				yPos += 20;
+			}
+		}
+		// Input prompt
+		DrawText("> ", 40, screenHeight - 60, 20, WHITE);
+		DrawText(inputBuffer, 80, screenHeight - 60, 20, WHITE);
+
+
+		EndDrawing();
+
+
 
 		// Prompt player input
-		std::cout << ">";
-		std::getline(std::cin, userInput);
+		// std::cout << ">";
+		// std::getline(std::cin, userInput);
 
 		// Send input to parser
-		parser.parse(userInput);
+		// parser.parse(userInput);
 
 		// Display output
 
 	}
+	CloseWindow();
+	return 0;
 }
