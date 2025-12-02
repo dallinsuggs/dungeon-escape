@@ -64,7 +64,32 @@ std::vector<std::string> captureOutput(std::function<void()> func) {
 	return lines;
 }
 
-
+// Wrap text in window width, draw multiple lines, update currentY position
+void DrawWrappedText(const char* text, int x, int y, int maxWidth, int fontSize, Color color, int& currentY) {
+	std::string fullText(text);
+	std::istringstream iss(fullText);
+	std::string word;
+	std::string currentLine;
+	int lineY = currentY;
+	while (iss >> word) {
+		std::string testLine = currentLine.empty() ? word : currentLine + " " + word;
+		if (MeasureText(testLine.c_str(), fontSize) <= maxWidth) {
+			currentLine = testLine;
+		}
+		else {
+			if (!currentLine.empty()) {
+				DrawText(currentLine.c_str(), x, lineY, fontSize, color);
+				lineY += fontSize + 2;  // Advance to next wrapped line
+			}
+			currentLine = word;
+		}
+	}
+	if (!currentLine.empty()) {
+		DrawText(currentLine.c_str(), x, lineY, fontSize, color);
+		lineY += fontSize + 2;  // Advance after last line
+	}
+	currentY = lineY + 6;  // Gap to next entry (tweak if needed)
+}
 
 int main() {
 	// Window setup
@@ -144,6 +169,9 @@ int main() {
 			inputBuffer[letterCount] = '\0';
 		}
 
+
+
+		//////////////////////* BEGIN DRAWING HERE */////////////////////
 		BeginDrawing();
 		ClearBackground(SKYBLUE);
 
@@ -166,12 +194,12 @@ int main() {
 
 		// Set semi-transparent overlay for game text (readable against background)
 		DrawRectangle(20, 20, screenWidth - 40, screenHeight - 100, Fade(BLACK, 0.2f));
-		// Draw room description text
+		// Draw wrapped output lines
 		int yPos = 50;
+		const int textAreaWidth = screenWidth - 80;
 		for (const auto& line : displayLines) {
 			if (yPos < screenHeight - 100) {
-				DrawText(line.c_str(), 40, yPos, 16, WHITE);
-				yPos += 20;
+				DrawWrappedText(line.c_str(), 40, yPos, textAreaWidth, 16, WHITE, yPos);
 			}
 		}
 		// Input prompt

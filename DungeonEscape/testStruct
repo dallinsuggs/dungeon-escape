@@ -898,3 +898,99 @@ Preposition: |-1
 Object1: go|0
 Object2: crazy|1
 |
+|struct|
+Verb: grab|0
+Preposition: |-1
+Object1: brick|0
+Object2: brick|1
+|
+|struct|
+Verb: drop|0
+Preposition: |-1
+Object1: brick|0
+Object2: brick|1
+|
+|struct|
+Verb: grab|0
+Preposition: |-1
+Object1: sheet|0
+Object2: sheet|1
+|
+|struct|
+Verb: drop|0
+Preposition: |-1
+Object1: sheet|0
+Object2: sheet|1
+|
+|struct|
+Verb: grab|0
+Preposition: |-1
+Object1: brick|0
+Object2: brick|1
+|
+|struct|
+Verb: grab|0
+Preposition: |-1
+Object1: sheet|0
+Object2: sheet|1
+|
+|struct|
+Verb: drop|0
+Preposition: |-1
+Object1: sheet|0
+Object2: sheet|1
+|
+|struct|
+Verb: use|0
+Preposition: |-1
+Object1: brick|0
+Object2: brick|1
+|
+|struct|
+Verb: |-1
+Preposition: |-1
+Object1: lay|0
+Object2: mattress|1
+|
+|struct|
+Verb: open|0
+Preposition: |-1
+Object1: door|0
+Object2: door|1
+|
+|struct|
+Verb: look|0
+Preposition: at|1
+Object1: door|0
+Object2: door|1
+|
+|struct|
+Verb: look|0
+Preposition: at|1
+Object1: mattress|0
+Object2: mattress|1
+|
+|struct|
+Verb: look|0
+Preposition: at|1
+Object1: chamber pot|0
+Object2: chamber pot|2
+|
+|struct|
+Verb: grab|0
+Preposition: |-1
+Object1: chamber pot|0
+Object2: pot|2
+|
+|struct|
+Verb: drop|0
+Preposition: |-1
+Object1: pot|0
+Object2: pot|1
+|
+|struct|
+Verb: drop|0
+Preposition: |-1
+Object1: chamber pot|0
+Object2: pot|2
+|
