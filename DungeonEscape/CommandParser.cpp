@@ -1,7 +1,96 @@
 #include "CommandParser.hpp"
+#include <algorithm>
+#include <cctype>
+#include <string>
 
+std::string normalize(const std::string& s) {
+	std::string out = s;
+	out.erase(out.begin(), std::find_if(out.begin(), out.end(), [](unsigned char c) { return !std::isspace(c); }));
+	out.erase(std::find_if(out.rbegin(), out.rend(), [](unsigned char c) { return !std::isspace(c); }).base(), out.end());
+	std::transform(out.begin(), out.end(), out.begin(), [](unsigned char c) { return std::tolower(c); });
+	return out;
+}
 
 // INTERNAL HELPERS
+
+
+std::vector<std::string> CommandParser::getItemIdsByName(const std::unordered_map<std::string, Item*>& itemList, const std::string& objectName)
+{
+	std::vector<std::string> matches;
+
+	for (const auto& pair : itemList) {
+		if (normalize(pair.second->getName()) == objectName) {
+			matches.push_back(pair.first);
+		}
+	}
+
+	return matches; // empty if no matches
+}
+
+std::vector<std::string> CommandParser::getAllItemIdsByName(const std::unordered_map<std::string, Item*>& inventory, const std::unordered_map<std::string, Item*>& roomItems, const std::string& objectName)
+{
+	// Get all matching IDs by name (from room and inventory)
+	std::vector<std::string> matches;
+
+	// Check room items
+	auto roomMatches = getItemIdsByName(roomItems, objectName);
+	matches.insert(matches.end(), roomMatches.begin(), roomMatches.end());
+
+	// Check player inventory
+	auto inventoryMatches = getItemIdsByName(inventory, objectName);
+	matches.insert(matches.end(), inventoryMatches.begin(), inventoryMatches.end());
+
+	return matches;
+}
+
+std::string CommandParser::resolveSingleItemId(const std::unordered_map<std::string, Item*>& itemList, const std::string& objectName)
+{
+	auto matches = getItemIdsByName(itemList, objectName);
+
+	if (matches.empty()) {
+		return "";
+	}
+
+	if (matches.size() == 1) {
+		return matches[0];
+	}
+
+	// Multiple matches found
+	std::string options;
+	for (auto& id : matches) {
+		options += itemList.at(id)->getName() + " (" + id + "), ";
+	}
+	if (!options.empty()) {
+		options.pop_back(); options.pop_back(); // remove trailing ", "
+		writeMessage("Multiple {object}s found: {object}", options);
+	}
+	return "";
+}
+
+std::string CommandParser::resolveAllSingleItemId(const std::unordered_map<std::string, Item*>& inventory, const std::unordered_map<std::string, Item*>& roomItems, const std::string& objectName)
+{
+	auto matches = getAllItemIdsByName(inventory, roomItems, objectName);
+
+	if (matches.empty()) {
+		return "";
+	}
+
+	if (matches.size() == 1) {
+		return matches[0];
+	}
+
+	// Multiple matches: prompt player
+	std::string options;
+	for (auto& id : matches) {
+		Item* itemPtr = roomItems.count(id) ? roomItems.at(id) : inventory.at(id);
+		options += itemPtr->getName() + " (" + id + "), ";
+	}
+	if (!options.empty()) {
+		options.pop_back(); options.pop_back(); // remove trailing ", "
+		writeMessage("Multiple {object}s found: {object}", options);
+	}
+	return "";
+}
 
 // Split string helper
 std::vector<std::string> CommandParser::splitString(std::string& input, char delimiter)
@@ -25,12 +114,20 @@ std::vector<std::string> CommandParser::splitString(std::string& input, char del
 }
 
 // Is valid word bool checks if a word is present in an unordered map of items or objects
-bool CommandParser::isValidWord(const std::unordered_map<std::string, Item*>& inventory, const std::unordered_map<std::string, Item*>& roomItems, std::string word)
+bool CommandParser::isValidWord(const std::unordered_map<std::string, Item*>& inventory, const std::unordered_map<std::string, Item*>& roomItems, const std::string& word)
 {
-	if (inventory.find(word) != inventory.end())
-		return true;
-	if (roomItems.find(word) != roomItems.end())
-		return true;
+
+
+	for (const auto& pair : roomItems) {
+		if (normalize(pair.second->getName()) == word) {
+			return true;
+		}
+	}
+	for (const auto& pair : inventory) {
+		if (normalize(pair.second->getName()) == word) {
+			return true;
+		}
+	}
 	return false;
 }
 
@@ -46,6 +143,7 @@ CommandParser::ObjectMatch CommandParser::findLongestMatchingObject(int startInd
 
 	if (startIndex >= tokensLength) {
 		return { "", 0, false };
+
 	}
 
 	std::string longestMatch = tokens[startIndex];
@@ -307,24 +405,25 @@ void CommandParser::handleOpen(ParsedCommand& cmd)
 // Inventory handler
 void CommandParser::handleInventory(ParsedCommand& cmd)
 {
-	// TODO Replace with inventory print function from player class
 	writeMessage(player->printInventory());
 }
 
+// Drop handler
 void CommandParser::handleDrop(ParsedCommand& cmd)
 {
 	auto& inventory = player->getInventory();
-	auto invIt = inventory.find(cmd.object1);
 	auto& roomItems = room->getRoomItems();
-	auto roomIt = roomItems.find(cmd.object1);
-	if (invIt != inventory.end()) {
-		roomItems[cmd.object1] = invIt->second;
-		inventory.erase(cmd.object1);
-		writeMessage(MSG_DROP, cmd.object1);
-	}
-	else {
+	
+	std::string targetId = resolveSingleItemId(inventory, cmd.object1);
+	if (targetId.empty()) {
 		writeMessage(MSG_DONT_HAVE, cmd.object1);
+		return; // either not found or multiple matches
 	}
+
+	// Drop the item
+	roomItems[targetId] = inventory.at(targetId);
+	inventory.erase(targetId);
+	writeMessage(MSG_DROP, cmd.object1);
 }
 
 void CommandParser::handlePut(ParsedCommand& cmd)
@@ -338,29 +437,30 @@ void CommandParser::handlePut(ParsedCommand& cmd)
 void CommandParser::handleTake(ParsedCommand& cmd)
 {
 	auto& inventory = player->getInventory();
-	auto invIt = inventory.find(cmd.object1);
 	auto& roomItems = room->getRoomItems();
-	auto roomIt = roomItems.find(cmd.object1);
 
-	// If moveable and presently accessible to player, take item
-	if (roomIt != roomItems.end()) {
-		if (!(invIt != inventory.end())) {
-			if (roomIt->second->isMoveable()) {
-				inventory[cmd.object1] = roomIt->second;
-				roomItems.erase(cmd.object1);
-				writeMessage(MSG_TAKE, cmd.object1);
-			}
-			else {
-				writeMessage(MSG_CANT_TAKE, cmd.object1);
-			}
-		}
-		else {
-			writeMessage(MSG_ALREADY_HAVE, cmd.object1);
-		}
-	}
-	else {
+	std::string targetId = resolveSingleItemId(roomItems, cmd.object1);
+	if (targetId.empty()) {
 		writeMessage(MSG_DONT_SEE, cmd.object1);
+		return; // either not found or multiple matches
 	}
+	// Now proceed with taking the item from the room
+
+	//// If moveable and presently accessible to player, take item
+	auto roomIt = roomItems.find(targetId);
+	if (!roomIt->second->isMoveable()) {
+		writeMessage(MSG_CANT_TAKE, cmd.object1);
+		return;
+	}
+
+	if (inventory.count(targetId)) {
+		writeMessage(MSG_ALREADY_HAVE, cmd.object1);
+		return;
+	}
+
+	inventory[targetId] = roomIt->second;
+	roomItems.erase(roomIt);
+	writeMessage(MSG_TAKE, cmd.object1);
 }
 
 // Pick handler
@@ -390,24 +490,15 @@ void CommandParser::handleExamine(ParsedCommand& cmd) {
 		return;
 	}
 
-	// Check if player has the target
 	auto& inventory = player->getInventory();
-	auto invIt = inventory.find(target);
-	if (invIt != inventory.end()) {
-		writeMessage(invIt->second->getDescription());
-		return;
-	}
-
-	// Check if target is in the room
 	auto& roomItems = room->getRoomItems();
-	auto roomIt = roomItems.find(target);
-	if (roomIt != roomItems.end()) {
-		writeMessage(roomIt->second->getDescription());
-		return;
-	}
 
-	// If target couldn't be located
-	writeMessage(MSG_DONT_SEE, target);
+	std::string targetId = resolveAllSingleItemId(inventory, roomItems, target);
+	if (targetId.empty()) return; // either not found or multiple matches
+
+	// Now we know exactly which item to describe
+	Item* itemPtr = roomItems.count(targetId) ? roomItems.at(targetId) : inventory.at(targetId);
+	writeMessage(itemPtr->getDescription());
 }
 
 // Quit handler

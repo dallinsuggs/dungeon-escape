@@ -3,13 +3,14 @@
 #include <unordered_set>
 #include <vector>
 
-Room::Room(const std::string& id, const std::string& name, const std::string& description, std::unordered_map<std::string, Item*> roomItems) : id(id), name(name), description(description), roomItems(roomItems) {}
+Room::Room(const std::string& name, const std::string& description, const std::unordered_map<std::string, Item*>& roomItems, const std::map<std::string, std::vector<ExitOption>>& exits) : name(name), description(description), roomItems(roomItems), exits(exits) {}
+
+
 
 // Return the room's item list
 std::unordered_map<std::string, Item*>& Room::getRoomItems() {
 	return roomItems;
 }
-std::string Room::getId() const { return id; }
 std::string Room::getDescription() const { return description; }
 std::string Room::getName() const { return name; }
 
@@ -53,16 +54,16 @@ std::string Room::describeSelf() const
 }
 
 // Store a pointer to another room in the exits map
-void Room::connectRoom(const std::string& direction, Room* otherRoom) {
-	exits[direction] = otherRoom;
+void Room::connectRoom(const std::string& direction, Room* otherRoom, const std::string& label) {
+	exits[direction].push_back({ otherRoom, label });
 }
 
 // Try to find an exit in a direction (returns null pointer if none exists)
-Room* Room::getExit(const std::string& direction) const {
+const std::vector<Room::ExitOption>* Room::getExits(const std::string& direction) const {
 	// https:// stackoverflow.com/questions/15451287/what-does-iterator-second-mean
-	auto it = exits.find(direction);
-	if (it != exits.end()) {
-		return it->second; // found a connected room, second is the value of the map
+	auto i = exits.find(direction);
+	if (i != exits.end()) {
+		return &(i->second); // found a connected room, second is the value of the map
 	} 
 	return nullptr; // no room in that direction
 }

@@ -10,6 +10,7 @@
 class Player {
 private:
 	std::string name;
+	std::string currentRoomId;
 	Room* currentRoom;
 	std::unordered_map<std::string, Item*> inventory; //map item name to Item object for easy lookup
 
@@ -24,7 +25,7 @@ public:
 	std::unordered_map<std::string, Item*>& getInventory();
 
 	// Move to another room if there is an exit in that direction
-	//void move(const std::string& direction);
+	void moveToRoom(const std::string& newRoomId, Room* newRoom);
 
 	// Overload << operator so we can print a Player with std::cout << player;
 	friend std::ostream& operator<<(std::ostream& os, const Player& player);

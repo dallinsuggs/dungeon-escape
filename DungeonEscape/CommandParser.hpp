@@ -53,12 +53,17 @@ private:
 	bool doorOpen = false;
 
 	// Internal helpers
+	std::vector<std::string> getItemIdsByName(const std::unordered_map<std::string, Item*>& itemList, const std::string& objectName);
+	std::vector<std::string> getAllItemIdsByName(const std::unordered_map<std::string, Item*>& inventory, const std::unordered_map<std::string, Item*>& roomItems, const std::string& objectName);
+	std::string resolveSingleItemId(const std::unordered_map<std::string, Item*>& itemList, const std::string& objectName);
+	std::string resolveAllSingleItemId(const std::unordered_map<std::string, Item*>& inventory, const std::unordered_map<std::string, Item*>& roomItems, const std::string& objectName);
+
 	std::vector<std::string> splitString(std::string& input, char delimiter = ' ');
 
 	bool isValidWord(
 		const std::unordered_map<std::string, Item*>& inventory, 
 		const std::unordered_map<std::string, Item*>& roomItems, 
-		std::string word
+		const std::string& word
 	);
 
 	struct ObjectMatch {

@@ -14,21 +14,12 @@ std::unordered_map<std::string, Item*>& Player::getInventory() {
 	return inventory;
 }
 
-// Attempt to move in a direction.
-// We ask the current room for the exit and update currentRoom if it exists. 
-//void Player::move(const std::string& direction) {
-//	if (currentRoom) {
-//		Room* next = currentRoom->getExit(direction);
-//		if (next) {
-//			currentRoom = next;
-//			std::cout << "You move " << direction << ".\n";
-//		} else {
-//			std::cout << "No exit that way.\n";
-//		}
-//	} else {
-//		std::cout << "You are not in any room yet!\n";
-//	}
-//}
+void Player::moveToRoom(const std::string& newRoomId, Room* newRoom)
+{
+	currentRoomId = newRoomId;
+	currentRoom = newRoom;
+}
+
 
 // Define how a Player prints itself when used with std::cout << player;
 std::ostream& operator<<(std::ostream& os, const Player& player) {
@@ -52,7 +43,7 @@ std::string Player::printInventory()
 	else {
 		output += "You are carrying the following items: \n";
 		for (const auto& pair : this->inventory) {
-			output = output + "- " + pair.first + "\n";
+			output = output + "- " + pair.second->getName() + "\n";
 		}
 	}
 	return output;

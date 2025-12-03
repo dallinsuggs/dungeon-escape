@@ -55,7 +55,10 @@
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <Text Include="items.txt" />
-    <Text Include="rooms.txt" />
+    <Text Include="items.json" />
+    <Text Include="rooms.json" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="packages.config" />
   </ItemGroup>
 </Project>

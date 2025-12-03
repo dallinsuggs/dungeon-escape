@@ -1,0 +1,63 @@
+
+{
+	"cell_1": {
+		"name": "cell",
+		"description": "You are in a small, dank dungeon cell with a door facing north and a simple straw mattress.",
+		"items": [
+			{
+				"template": "door",
+				"id": "cell_1_door"
+			},
+			{
+				"template": "brick",
+				"id": "cell_1_brick"
+			},
+			{
+				"template": "sheet",
+				"id": "cell_1_sheet"
+			},
+			{
+				"template": "chamber pot",
+				"id": "cell_1_chamber_pot"
+			}
+		],
+		"exits": {
+			"north": [ { "id": "gallery" } ]
+		}
+	},
+	"cell_2": {
+		"name": "cell",
+		"description": "You are in a dirty dungeon cell even smaller than the first, but you don't see any furniture. This cell also has a wooden door facing north.",
+		"items": [
+			{
+				"template": "door",
+				"id": "cell_2_door"
+			},
+			{
+				"template": "animal bone",
+				"id": "cell_2_animal_bone"
+			}
+		],
+		"exits": {
+			"north": [ { "id": "gallery" } ]
+		}
+	},
+	"gallery": {
+		"name": "gallery",
+		"description": "You are in a medium-length gallery with two doors on the south wall, one on the left, one on the right. There is an open doorway leading north, and an open doorway leading east.",
+		"items": [],
+		"exits": {
+			"south": [ { "id": "cell_1" }, { "id": "cell_2" } ]
+		}
+	},
+	"guardroom": {
+		"name": "guardroom",
+		"description": "You are in a large foyer-style room with a big desk in the center, a shelf against the west wall, and sprawling landscape painting hanging from the north wall.",
+		"items": []
+	},
+	"armory": {
+		"name": "armory",
+		"description": "You are in a dimly lit storage room with several sets of armor hanging on mannequins against the north wall. There is a weapon rack next to it, and in the northwest corner there is what appears to be a torture table.",
+		"items": []
+	}
+}

@@ -1,5 +1,0 @@
-cell_1|cell|You are in a small, dank dungeon cell with a door facing north and a simple straw mattress.|chamber pot,brick,sheet,door|north=gallery
-cell_2|cell|You are in a dirty dungeon cell even smaller than the first, but you don't see any furniture. This cell also has a wooden door facing north.|animal bone,door|north=gallery
-gallery|gallery|You are in a medium-length gallery with two doors on the south wall, one on the left, one on the right. There is an open doorway leading north, and an open doorway leading east||north=armory,east=guardroom
-guardroom|guardroom|You are in a large foyer-style room with a big desk in the center, a shelf against the west wall, and sprawling landscape painting hanging from the north wall.||west=gallery
-armory|armory|You are in a dimly lit storage room with several sets of armor hanging on mannequins against the north wall. There is a weapon rack next to it, and in the northwest corner there is what appears to be a torture table.||south=gallery

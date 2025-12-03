@@ -1,0 +1,27 @@
+{
+	"chamber pot": {
+		"name": "chamber pot",
+		"description": "It is a smelly, stained, ceramic chamber pot with blue and white flower designs on the outside.",
+		"moveable": true
+	},
+	"brick": {
+		"name": "brick",
+		"description": "It is a crumbling, dusty old brick.",
+		"moveable": true
+	},
+	"sheet": {
+		"name": "sheet",
+		"description": "It is an odorous, soiled bedsheet that looks like it might have been white at some point.",
+		"moveable": true
+	},
+	"door": {
+		"name": "door",
+		"description": "It is a grimy wooden door with horizontal and vertical iron strips reinforcing it",
+		"moveable": false
+	},
+	"animal bone": {
+		"name": "animal bone",
+		"description": "It is a short yet sturdy animal bone, possibly from some kind of rodent that died in here.",
+		"moveable": true
+	}
+}

@@ -2,6 +2,7 @@
 #include "Player.hpp"
 #include "Item.hpp"
 #include "Room.hpp"
+#include "FileManager.hpp"
 
 #include <unordered_map>
 #include <iostream>
@@ -14,30 +15,35 @@
 #include <functional> // for lambda
 #include <cmath> // for sinf
 
+// For json parsing
+#include "rapidjson/document.h"      // Core DOM parser
+#include "rapidjson/filereadstream.h" // For reading JSON from a FILE*
+#include "rapidjson/error/en.h"       // Optional: human-readable parse errors
 
-// Function that reads data from item file and returns unordered map with all the items
-std::unordered_map<std::string, Item> loadItems(const std::string& filename)
-{
-	std::unordered_map<std::string, Item> items;
-	std::ifstream inFile(filename);
 
-	if (!inFile) {
-		std::cerr << "Could not open file for writing\n";
-	}
-
-	std::string line;
-	while (std::getline(inFile, line)) {
-		std::stringstream ss(line);
-		std::string name, description, moveable;
-
-		if (std::getline(ss, name, '|') && std::getline(ss, description, '|') && std::getline(ss, moveable)) {
-			bool isMoveable = (moveable == "1");
-			items.emplace(name, Item(name, description, isMoveable));
-		}
-
-	}
-	return items;
-}
+//// Function that reads data from item file and returns unordered map with all the items
+//std::unordered_map<std::string, Item> loadItems(const std::string& filename)
+//{
+//	std::unordered_map<std::string, Item> items;
+//	std::ifstream inFile(filename);
+//
+//	if (!inFile) {
+//		std::cerr << "Could not open file for writing\n";
+//	}
+//
+//	std::string line;
+//	while (std::getline(inFile, line)) {
+//		std::stringstream ss(line);
+//		std::string name, description, moveable;
+//
+//		if (std::getline(ss, name, '|') && std::getline(ss, description, '|') && std::getline(ss, moveable)) {
+//			bool isMoveable = (moveable == "1");
+//			items.emplace(name, Item(name, description, isMoveable));
+//		}
+//
+//	}
+//	return items;
+//}
 
 // Sets up cell's item list
 std::unordered_map<std::string, Item*> createCellItems(std::unordered_map<std::string, Item>& allItems) {
@@ -92,6 +98,9 @@ void DrawWrappedText(const char* text, int x, int y, int maxWidth, int fontSize,
 }
 
 int main() {
+	// Set up file manager
+	FileManager fm;
+
 	// Window setup
 	const int screenWidth = 800;
 	const int screenHeight = 600;
@@ -103,19 +112,21 @@ int main() {
 	float dayProgress = 0.0f;
 
 	// Items setup
-	std::unordered_map<std::string, Item> allItems = loadItems("items.txt");
+	std::unordered_map<std::string, Item> allItems = fm.loadItems("items.json");
 	
-	// Cell room setup
-	const std::string CELL_ID = "cell_1";
-	const std::string CELL_NAME = "cell";
-	const std::string CELL_DESC = "You are in a small, dank dungeon cell with an iron-reinforced wooden door and a simple straw mattress.";
-	std::unordered_map<std::string, Item*> cellItems = createCellItems(allItems);
+	// Load rooms
+	std::unordered_map<std::string, Room> allRooms = fm.loadRooms("rooms.json", allItems);
+
+	//// Cell room setup
+	//const std::string CELL_ID = "cell_1";
+	//const std::string CELL_NAME = "cell";
+	//const std::string CELL_DESC = "You are in a small, dank dungeon cell with an iron-reinforced wooden door and a simple straw mattress.";
+	//std::unordered_map<std::string, Item*> cellItems = createCellItems(allItems);
 	
 
 
 	// Initial setup
 	Player player("Ferengate");
-	Room roomCell(CELL_ID, CELL_NAME, CELL_DESC, cellItems);
 	bool running = true;
 	std::string userInput = "";
 	std::vector<std::string> displayLines;
@@ -124,10 +135,10 @@ int main() {
 	char inputBuffer[256] = "\0";
 	int letterCount = 0;
 
-	CommandParser parser(&player, &roomCell, running);
+	CommandParser parser(&player, &allRooms.at("cell_1"), running);
 
 	// parser.writeMessage(roomCell.describeSelf());
-	displayLines = captureOutput([&]() { parser.writeMessage(roomCell.describeSelf()); });
+	displayLines = captureOutput([&]() { parser.writeMessage(allRooms.at("cell_1").describeSelf()); });
 
 	
 
