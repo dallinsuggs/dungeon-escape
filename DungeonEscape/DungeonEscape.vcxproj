@@ -132,16 +132,20 @@
     <ClCompile Include="CommandParser.cpp" />
     <ClCompile Include="FileManager.cpp" />
     <ClCompile Include="Game.cpp" />
+    <ClCompile Include="InputHandler.cpp" />
     <ClCompile Include="Item.cpp" />
     <ClCompile Include="Player.cpp" />
+    <ClCompile Include="Renderer.cpp" />
     <ClCompile Include="Room.cpp" />
     <ClCompile Include="test-parser.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="CommandParser.hpp" />
     <ClInclude Include="FileManager.hpp" />
+    <ClInclude Include="InputHandler.h" />
     <ClInclude Include="Item.hpp" />
     <ClInclude Include="Player.hpp" />
+    <ClInclude Include="Renderer.h" />
     <ClInclude Include="Room.hpp" />
   </ItemGroup>
   <ItemGroup>

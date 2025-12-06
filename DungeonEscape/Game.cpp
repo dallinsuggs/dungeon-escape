@@ -2,17 +2,20 @@
 #include "Player.hpp"
 #include "Item.hpp"
 #include "Room.hpp"
+<<<<<<< Updated upstream
 #include "FileManager.hpp"
 
+=======
+>>>>>>> Stashed changes
 #include <unordered_map>
 #include <iostream>
-
 // For the window
-#include "raylib.h"
+#include "Renderer.h"
 #include <chrono> // for time tracking
 #include <sstream> // for capture
 #include <vector> // for lines
 #include <functional> // for lambda
+<<<<<<< Updated upstream
 #include <cmath> // for sinf
 
 // For json parsing
@@ -44,60 +47,59 @@
 //	}
 //	return items;
 //}
+=======
+#include <fstream> // for file reading
+// For Input Handling
+#include "InputHandler.h"
+
+// Function that reads data from item file and returns unordered map with all the items
+std::unordered_map<std::string, Item> loadItems(const std::string& filename) {
+    std::unordered_map<std::string, Item> items;
+    std::ifstream inFile(filename);
+    if (!inFile) {
+        std::cerr << "Could not open file for writing\n";
+    }
+    std::string line;
+    while (std::getline(inFile, line)) {
+        std::stringstream ss(line);
+        std::string name, description, moveable;
+        if (std::getline(ss, name, '|') && std::getline(ss, description, '|') && std::getline(ss, moveable)) {
+            bool isMoveable = (moveable == "1");
+            items.emplace(name, Item(name, description, isMoveable));
+        }
+    }
+    return items;
+}
+>>>>>>> Stashed changes
 
 // Sets up cell's item list
 std::unordered_map<std::string, Item*> createCellItems(std::unordered_map<std::string, Item>& allItems) {
-	return {
-		{allItems["chamber pot"].getName(), &allItems["chamber pot"]},
-		{allItems["brick"].getName(), &allItems["brick"]},
-		{allItems["sheet"].getName(), &allItems["sheet"]},
-		{allItems["door"].getName(), &allItems["door"]}
-	};
+    return {
+        {allItems["chamber pot"].getName(), &allItems["chamber pot"]},
+        {allItems["brick"].getName(), &allItems["brick"]},
+        {allItems["sheet"].getName(), &allItems["sheet"]},
+        {allItems["door"].getName(), &allItems["door"]}
+    };
 }
 
 // Capture cout to lines for Raylib display
 std::vector<std::string> captureOutput(std::function<void()> func) {
-	std::ostringstream oss;
-	std::streambuf* old = std::cout.rdbuf(oss.rdbuf()); // Redirect cout to oss
-	func(); // Call the function that produces output
-	std::cout.rdbuf(old); // Restore original cout buffer
-	std::istringstream iss(oss.str());  // Fixed: 'iss' not 'isspace'
-	std::vector<std::string> lines;
-	std::string line;
-	while (std::getline(iss, line)) {  // Now uses 'iss'
-		if (!line.empty()) lines.push_back(line);
-	}
-	return lines;
+    std::ostringstream oss;
+    std::streambuf* old = std::cout.rdbuf(oss.rdbuf()); // Redirect cout to oss
+    func(); // Call the function that produces output
+    std::cout.rdbuf(old); // Restore original cout buffer
+    std::istringstream iss(oss.str()); // Fixed: 'iss' not 'isspace'
+    std::vector<std::string> lines;
+    std::string line;
+    while (std::getline(iss, line)) { // Now uses 'iss'
+        if (!line.empty()) lines.push_back(line);
+    }
+    return lines;
 }
 
-// Wrap text in window width, draw multiple lines, update currentY position
-void DrawWrappedText(const char* text, int x, int y, int maxWidth, int fontSize, Color color, int& currentY) {
-	std::string fullText(text);
-	std::istringstream iss(fullText);
-	std::string word;
-	std::string currentLine;
-	int lineY = currentY;
-	while (iss >> word) {
-		std::string testLine = currentLine.empty() ? word : currentLine + " " + word;
-		if (MeasureText(testLine.c_str(), fontSize) <= maxWidth) {
-			currentLine = testLine;
-		}
-		else {
-			if (!currentLine.empty()) {
-				DrawText(currentLine.c_str(), x, lineY, fontSize, color);
-				lineY += fontSize + 2;  // Advance to next wrapped line
-			}
-			currentLine = word;
-		}
-	}
-	if (!currentLine.empty()) {
-		DrawText(currentLine.c_str(), x, lineY, fontSize, color);
-		lineY += fontSize + 2;  // Advance after last line
-	}
-	currentY = lineY + 6;  // Gap to next entry (tweak if needed)
-}
-
+//////////////////////* MAIN */////////////////////
 int main() {
+<<<<<<< Updated upstream
 	// Set up file manager
 	FileManager fm;
 
@@ -234,4 +236,58 @@ int main() {
 	}
 	CloseWindow();
 	return 0;
+=======
+    // Renderer setup
+    Renderer renderer(800, 600);
+    // Items setup
+    std::unordered_map<std::string, Item> allItems = loadItems("items.txt");
+    // Cell room setup
+    const std::string CELL_ID = "cell_1";
+    const std::string CELL_NAME = "cell";
+    const std::string CELL_DESC = "You are in a small, dank dungeon cell with an iron-reinforced wooden door and a simple straw mattress.";
+    std::unordered_map<std::string, Item*> cellItems = createCellItems(allItems);
+    // Initial setup
+    Player player("Ferengate");
+    Room roomCell(CELL_ID, CELL_NAME, CELL_DESC, cellItems);
+    bool running = true;
+    std::string userInput = "";
+    std::vector<std::string> displayLines;
+    CommandParser parser(&player, &roomCell, running);
+    // parser.writeMessage(roomCell.describeSelf());
+    displayLines = captureOutput([&]() { parser.writeMessage(roomCell.describeSelf()); });
+    // Input handler
+    InputHandler inputHandler;
+
+
+    //////////////////////* GAME LOOP HERE */////////////////////
+    // Enter game loop
+    while (!renderer.WindowShouldClose() && running) {
+        /* THIS IS THE BACKGROUND DESIGN */
+        // Update day progress (30-min cycle)
+        renderer.UpdateDayProgress();
+        // Handle input
+        if (inputHandler.UpdateInput(userInput)) {
+            auto newLines = captureOutput([&]() { parser.parse(userInput); });
+            for (const auto& line : newLines) {
+                if (!line.empty()) displayLines.push_back(line);
+            }
+            if (displayLines.size() > 20) { // Trim to last 20 lines
+                displayLines.erase(displayLines.begin(), displayLines.begin() + (displayLines.size() - 20));
+            }
+            userInput.clear(); // Reset for next
+        }
+        // Draw everything
+        BeginDrawing();
+        renderer.DrawBackground();
+        renderer.DrawTextOverlay(displayLines, inputHandler.GetBuffer());  // Pass handler's buffer
+        EndDrawing();
+        // Prompt player input
+        // std::cout << ">";
+        // std::getline(std::cin, userInput);
+        // Send input to parser
+        // parser.parse(userInput);
+        // Display output
+    }
+    return 0;
+>>>>>>> Stashed changes
 }
