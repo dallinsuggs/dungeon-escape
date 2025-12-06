@@ -1,8 +1,19 @@
-<<<<<<< Updated upstream
 ﻿  CommandParser.cpp
+  FileManager.cpp
+C:\Users\kelle\source\repos\dungeon-escape\DungeonEscape\FileManager.cpp(108,8): warning C4101: 'moveable': unreferenced local variable
+  Game.cpp
+  InputHandler.cpp
+  Item.cpp
+  Player.cpp
+  Renderer.cpp
+C:\Users\kelle\source\repos\dungeon-escape\DungeonEscape\Renderer.cpp(5,9): warning C4005: 'PI': macro redefinition
+      C:\Users\kelle\source\repos\dungeon-escape\DungeonEscape\packages\raylib.5.5.0\build\native\include\raylib.h(121,13):
+      see previous definition of 'PI'
+  
+C:\Users\kelle\source\repos\dungeon-escape\DungeonEscape\Renderer.cpp(35,22): warning C4244: 'argument': conversion from 'float' to 'int', possible loss of data
+C:\Users\kelle\source\repos\dungeon-escape\DungeonEscape\Renderer.cpp(35,16): warning C4244: 'argument': conversion from 'float' to 'int', possible loss of data
+  Room.cpp
+  test-parser.cpp
+  Generating Code...
 LINK : warning LNK4098: defaultlib 'MSVCRT' conflicts with use of other libs; use /NODEFAULTLIB:library
-  DungeonEscape.vcxproj -> C:\CppProjects\ConsolePrograms\DungeonEscape\DungeonEscape\x64\Debug\DungeonEscape.exe
-=======
-﻿  Game.cpp
   DungeonEscape.vcxproj -> C:\Users\kelle\Source\Repos\dungeon-escape\DungeonEscape\x64\Debug\DungeonEscape.exe
->>>>>>> Stashed changes

@@ -1,4 +1,4 @@
-# Visual Studio temporary files
+﻿# Visual Studio temporary files
 *.VC.db
 *.VC.db-shm
 *.VC.db-wal
@@ -13,3 +13,12 @@ DocumentLayout.json
 /ToDo/.vs/ToDo/v17/DocumentLayout.backup.json
 /ToDo/toDoList.txt
 /DungeonEscape/.vs/DungeonEscape/v17/DocumentLayout.backup.json
+
+# Visual Studio
+.vs/
+*.obj
+*.pdb
+*.ipch
+*.tlog
+*.lastbuildstate
+DungeonEscape.log
