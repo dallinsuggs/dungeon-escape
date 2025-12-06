@@ -16,6 +16,7 @@
     },
     {
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
       "AbsoluteMoniker": "D:0:0:{4A969EED-384E-4B79-AADF-A91356519391}|DungeonEscape.vcxproj|C:\\CppProjects\\ConsolePrograms\\DungeonEscape\\DungeonEscape\\Player.cpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}",
       "RelativeMoniker": "D:0:0:{4A969EED-384E-4B79-AADF-A91356519391}|DungeonEscape.vcxproj|solutionrelative:Player.cpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}"
     },
@@ -59,6 +60,8 @@
       "AbsoluteMoniker": "D:0:0:{4A969EED-384E-4B79-AADF-A91356519391}|DungeonEscape.vcxproj|C:\\CppProjects\\ConsolePrograms\\DungeonEscape\\DungeonEscape\\Item.cpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}",
       "RelativeMoniker": "D:0:0:{4A969EED-384E-4B79-AADF-A91356519391}|DungeonEscape.vcxproj|solutionrelative:Item.cpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}"
 =======
+=======
+>>>>>>> Stashed changes
       "AbsoluteMoniker": "D:0:0:{4A969EED-384E-4B79-AADF-A91356519391}|DungeonEscape.vcxproj|C:\\Users\\kelle\\source\\repos\\dungeon-escape\\DungeonEscape\\Renderer.cpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}",
       "RelativeMoniker": "D:0:0:{4A969EED-384E-4B79-AADF-A91356519391}|DungeonEscape.vcxproj|solutionrelative:Renderer.cpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}"
     },
@@ -69,6 +72,9 @@
     {
       "AbsoluteMoniker": "D:0:0:{4A969EED-384E-4B79-AADF-A91356519391}|DungeonEscape.vcxproj|C:\\Users\\kelle\\source\\repos\\dungeon-escape\\DungeonEscape\\InputHandler.cpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}",
       "RelativeMoniker": "D:0:0:{4A969EED-384E-4B79-AADF-A91356519391}|DungeonEscape.vcxproj|solutionrelative:InputHandler.cpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}"
+<<<<<<< Updated upstream
+>>>>>>> Stashed changes
+=======
 >>>>>>> Stashed changes
     }
   ],
@@ -80,7 +86,11 @@
         {
           "DockedWidth": 200,
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
           "SelectedChildIndex": 5,
+=======
+          "SelectedChildIndex": 3,
+>>>>>>> Stashed changes
 =======
           "SelectedChildIndex": 3,
 >>>>>>> Stashed changes
@@ -130,6 +140,45 @@
               "ViewState": "AgIAAAAAAAAAAAAAAAAAAB0AAABLAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000680|",
               "WhenOpened": "2025-12-03T01:41:02.099Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 1,
+              "Title": "Renderer.cpp",
+              "DocumentMoniker": "C:\\Users\\kelle\\source\\repos\\dungeon-escape\\DungeonEscape\\Renderer.cpp",
+              "RelativeDocumentMoniker": "Renderer.cpp",
+              "ToolTip": "C:\\Users\\kelle\\source\\repos\\dungeon-escape\\DungeonEscape\\Renderer.cpp",
+              "RelativeToolTip": "Renderer.cpp",
+              "ViewState": "AgIAABsAAAAAAAAAAAAYwCwAAAAwAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000677|",
+              "WhenOpened": "2025-12-06T20:38:38.897Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 3,
+              "Title": "InputHandler.cpp",
+              "DocumentMoniker": "C:\\Users\\kelle\\source\\repos\\dungeon-escape\\DungeonEscape\\InputHandler.cpp",
+              "RelativeDocumentMoniker": "InputHandler.cpp",
+              "ToolTip": "C:\\Users\\kelle\\source\\repos\\dungeon-escape\\DungeonEscape\\InputHandler.cpp",
+              "RelativeToolTip": "InputHandler.cpp",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAACAAAAABAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000677|",
+              "WhenOpened": "2025-12-06T20:27:57.812Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 2,
+              "Title": "InputHandler.h",
+              "DocumentMoniker": "C:\\Users\\kelle\\source\\repos\\dungeon-escape\\DungeonEscape\\InputHandler.h",
+              "RelativeDocumentMoniker": "InputHandler.h",
+              "ToolTip": "C:\\Users\\kelle\\source\\repos\\dungeon-escape\\DungeonEscape\\InputHandler.h",
+              "RelativeToolTip": "InputHandler.h",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAA0AAAACAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000680|",
+              "WhenOpened": "2025-12-06T20:27:37.926Z",
               "EditorCaption": ""
             },
             {
@@ -322,6 +371,9 @@
               "ViewState": "AgIAAAAAAAAAAAAAAAAAAEsAAAAfAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000677|",
               "WhenOpened": "2025-12-06T20:21:20.793Z",
+<<<<<<< Updated upstream
+>>>>>>> Stashed changes
+=======
 >>>>>>> Stashed changes
               "EditorCaption": ""
             }

@@ -165,6 +165,7 @@ grab|chamber|pot
 drop|pot
 drop|chamber|pot
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
 look
 look|door
 get|door
@@ -263,6 +264,8 @@ i
 drop|pot
 q
 =======
+=======
+>>>>>>> Stashed changes
 grab|sheet
 grab|sheet
 look|at|door
@@ -280,4 +283,7 @@ grab|sheet
 exit
 grab|sheet
 exit
+<<<<<<< Updated upstream
+>>>>>>> Stashed changes
+=======
 >>>>>>> Stashed changes

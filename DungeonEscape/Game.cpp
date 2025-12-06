@@ -3,8 +3,11 @@
 #include "Item.hpp"
 #include "Room.hpp"
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
 #include "FileManager.hpp"
 
+=======
+>>>>>>> Stashed changes
 =======
 >>>>>>> Stashed changes
 #include <unordered_map>
@@ -15,6 +18,7 @@
 #include <sstream> // for capture
 #include <vector> // for lines
 #include <functional> // for lambda
+<<<<<<< Updated upstream
 <<<<<<< Updated upstream
 #include <cmath> // for sinf
 
@@ -48,6 +52,8 @@
 //	return items;
 //}
 =======
+=======
+>>>>>>> Stashed changes
 #include <fstream> // for file reading
 // For Input Handling
 #include "InputHandler.h"
@@ -99,6 +105,7 @@ std::vector<std::string> captureOutput(std::function<void()> func) {
 
 //////////////////////* MAIN */////////////////////
 int main() {
+<<<<<<< Updated upstream
 <<<<<<< Updated upstream
 	// Set up file manager
 	FileManager fm;
@@ -259,6 +266,30 @@ int main() {
     InputHandler inputHandler;
 
 
+=======
+    // Renderer setup
+    Renderer renderer(800, 600);
+    // Items setup
+    std::unordered_map<std::string, Item> allItems = loadItems("items.txt");
+    // Cell room setup
+    const std::string CELL_ID = "cell_1";
+    const std::string CELL_NAME = "cell";
+    const std::string CELL_DESC = "You are in a small, dank dungeon cell with an iron-reinforced wooden door and a simple straw mattress.";
+    std::unordered_map<std::string, Item*> cellItems = createCellItems(allItems);
+    // Initial setup
+    Player player("Ferengate");
+    Room roomCell(CELL_ID, CELL_NAME, CELL_DESC, cellItems);
+    bool running = true;
+    std::string userInput = "";
+    std::vector<std::string> displayLines;
+    CommandParser parser(&player, &roomCell, running);
+    // parser.writeMessage(roomCell.describeSelf());
+    displayLines = captureOutput([&]() { parser.writeMessage(roomCell.describeSelf()); });
+    // Input handler
+    InputHandler inputHandler;
+
+
+>>>>>>> Stashed changes
     //////////////////////* GAME LOOP HERE */////////////////////
     // Enter game loop
     while (!renderer.WindowShouldClose() && running) {
@@ -289,5 +320,8 @@ int main() {
         // Display output
     }
     return 0;
+<<<<<<< Updated upstream
+>>>>>>> Stashed changes
+=======
 >>>>>>> Stashed changes
 }

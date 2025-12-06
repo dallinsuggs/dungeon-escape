@@ -996,6 +996,7 @@ Object2: pot|2
 |
 |struct|
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
 Verb: look|0
 Preposition: |-1
 Object1: |-1
@@ -1113,6 +1114,17 @@ Preposition: |-1
 Object1: door|0
 Object2: door|1
 =======
+=======
+>>>>>>> Stashed changes
+Verb: grab|0
+Preposition: |-1
+Object1: sheet|0
+Object2: sheet|1
+<<<<<<< Updated upstream
+>>>>>>> Stashed changes
+=======
+|
+|struct|
 Verb: grab|0
 Preposition: |-1
 Object1: sheet|0
@@ -1122,6 +1134,7 @@ Object2: sheet|1
 |struct|
 Verb: look|0
 Preposition: at|1
+<<<<<<< Updated upstream
 <<<<<<< Updated upstream
 Object1: chamber pot|0
 Object2: chamber pot|2
@@ -1189,6 +1202,10 @@ Object2: pot|2
 Object1: door|0
 Object2: door|1
 >>>>>>> Stashed changes
+=======
+Object1: door|0
+Object2: door|1
+>>>>>>> Stashed changes
 |
 |struct|
 Verb: grab|0
@@ -1204,8 +1221,11 @@ Object2: sheet|1
 |
 |struct|
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
 Verb: q|0
 =======
+=======
+>>>>>>> Stashed changes
 Verb: |-1
 Preposition: |-1
 Object1: end|0
@@ -1213,12 +1233,16 @@ Object2: |-1
 |
 |struct|
 Verb: exit|0
+<<<<<<< Updated upstream
+>>>>>>> Stashed changes
+=======
 >>>>>>> Stashed changes
 Preposition: |-1
 Object1: |-1
 Object2: |-1
 |
 |struct|
+<<<<<<< Updated upstream
 <<<<<<< Updated upstream
 Verb: look|0
 Preposition: |-1
@@ -1254,11 +1278,15 @@ Verb: get|0
 =======
 Verb: grab|0
 >>>>>>> Stashed changes
+=======
+Verb: grab|0
+>>>>>>> Stashed changes
 Preposition: |-1
 Object1: sheet|0
 Object2: sheet|1
 |
 |struct|
+<<<<<<< Updated upstream
 <<<<<<< Updated upstream
 Verb: |-1
 Preposition: |-1
@@ -1412,6 +1440,8 @@ Object2: brick|1
 |struct|
 Verb: i|0
 =======
+=======
+>>>>>>> Stashed changes
 Verb: drop|0
 Preposition: |-1
 Object1: sheet|0
@@ -1419,6 +1449,9 @@ Object2: sheet|1
 |
 |struct|
 Verb: exit|0
+<<<<<<< Updated upstream
+>>>>>>> Stashed changes
+=======
 >>>>>>> Stashed changes
 Preposition: |-1
 Object1: |-1
@@ -1427,6 +1460,7 @@ Object2: |-1
 |struct|
 Verb: |-1
 Preposition: |-1
+<<<<<<< Updated upstream
 <<<<<<< Updated upstream
 Object1: id|0
 Object2: |-1
@@ -1590,17 +1624,23 @@ Object2: |-1
 |struct|
 Verb: get|0
 =======
+=======
+>>>>>>> Stashed changes
 Object1: gragrab|0
 Object2: shdfdext|1
 |
 |struct|
 Verb: grab|0
+<<<<<<< Updated upstream
+>>>>>>> Stashed changes
+=======
 >>>>>>> Stashed changes
 Preposition: |-1
 Object1: sheet|0
 Object2: sheet|1
 |
 |struct|
+<<<<<<< Updated upstream
 <<<<<<< Updated upstream
 Verb: get|0
 Preposition: |-1
@@ -1612,11 +1652,15 @@ Verb: i|0
 =======
 Verb: exit|0
 >>>>>>> Stashed changes
+=======
+Verb: exit|0
+>>>>>>> Stashed changes
 Preposition: |-1
 Object1: |-1
 Object2: |-1
 |
 |struct|
+<<<<<<< Updated upstream
 <<<<<<< Updated upstream
 Verb: drop|0
 Preposition: |-1
@@ -1626,6 +1670,8 @@ Object2: pot|1
 |struct|
 Verb: q|0
 =======
+=======
+>>>>>>> Stashed changes
 Verb: grab|0
 Preposition: |-1
 Object1: sheet|0
@@ -1645,6 +1691,9 @@ Object2: sheet|1
 |
 |struct|
 Verb: exit|0
+<<<<<<< Updated upstream
+>>>>>>> Stashed changes
+=======
 >>>>>>> Stashed changes
 Preposition: |-1
 Object1: |-1
