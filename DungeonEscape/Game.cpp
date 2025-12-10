@@ -41,7 +41,7 @@ int main() {
     FileManager fm;
 
     // Renderer setup
-    Renderer renderer(800, 600);
+    Renderer renderer(1024, 768);
 
     // Items setup
     std::unordered_map<std::string, Item> allItems = fm.loadItems("items.json");
@@ -65,6 +65,19 @@ int main() {
     while (!renderer.WindowShouldClose() && running) {
         // Update day progress (30-min cycle)
         renderer.UpdateDayProgress();
+
+
+
+        // TESTING PURPOSES ONLY COMMENT OUT WHEN DONE
+        if (IsKeyPressed(KEY_LEFT_CONTROL)) {
+            if (renderer.GetTimeSpeed() > 1.0f) { 
+                renderer.SetTimeSpeed(1.0f); // Back to normal speed 
+            } else {
+                renderer.SetTimeSpeed(60.0f); // Speed up time for testing
+            }
+        }
+
+
 
         // Handle input
         if (inputHandler.UpdateInput(userInput)) {
