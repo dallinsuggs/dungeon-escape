@@ -1,13 +1,4 @@
-﻿  Game.cpp
-  Renderer.cpp
-C:\Users\kelle\source\repos\dungeon-escape\DungeonEscape\Renderer.cpp(5,9): warning C4005: 'PI': macro redefinition
-      C:\Users\kelle\source\repos\dungeon-escape\DungeonEscape\packages\raylib.5.5.0\build\native\include\raylib.h(121,13):
-      see previous definition of 'PI'
-  
-C:\Users\kelle\source\repos\dungeon-escape\DungeonEscape\Renderer.cpp(49,60): warning C4244: 'argument': conversion from 'float' to 'int', possible loss of data
-C:\Users\kelle\source\repos\dungeon-escape\DungeonEscape\Renderer.cpp(56,68): warning C4244: 'argument': conversion from 'double' to 'int', possible loss of data
-C:\Users\kelle\source\repos\dungeon-escape\DungeonEscape\Renderer.cpp(56,35): warning C4244: 'argument': conversion from 'double' to 'int', possible loss of data
-C:\Users\kelle\source\repos\dungeon-escape\DungeonEscape\Renderer.cpp(67,22): warning C4244: 'argument': conversion from 'float' to 'int', possible loss of data
-C:\Users\kelle\source\repos\dungeon-escape\DungeonEscape\Renderer.cpp(67,16): warning C4244: 'argument': conversion from 'float' to 'int', possible loss of data
-  Generating Code...
+﻿  Renderer.cpp
+C:\Users\kelle\source\repos\dungeon-escape\DungeonEscape\Renderer.cpp(84,22): warning C4244: 'argument': conversion from 'float' to 'int', possible loss of data
+C:\Users\kelle\source\repos\dungeon-escape\DungeonEscape\Renderer.cpp(84,16): warning C4244: 'argument': conversion from 'float' to 'int', possible loss of data
   DungeonEscape.vcxproj -> C:\Users\kelle\Source\Repos\dungeon-escape\DungeonEscape\x64\Debug\DungeonEscape.exe

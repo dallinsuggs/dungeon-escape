@@ -2,7 +2,6 @@
 #include <cmath>
 #include <sstream>
 #include <functional>
-#define PI 3.14159265f
 
 
 // Simple color lerp (linear interpolation) for smooth transitions
@@ -19,6 +18,7 @@ Color LerpColor(Color a, Color b, float t) {
 Renderer::Renderer(int width = 1024, int height = 768) : screenWidth(width), screenHeight(height) {    
     startTime = std::chrono::steady_clock::now();
     InitWindow(screenWidth, screenHeight, "Dungeon Escape");
+	castleTexture = LoadTexture("8bit_castle.jpg");
     SetTargetFPS(60);
 }
 
@@ -29,36 +29,53 @@ void Renderer::UpdateDayProgress() {
 }
 
 void Renderer::DrawBackground() {
-	// Sky Gradient: Top (zenith) to bottom (horizon), based on dayProgress
+    // Sky gradient (tweaked for misty teal; insert your full phases here if expanded)
     Color skyTop, skyBottom;
-    if (dayProgress < 0.25f) { // Early day: Bright blue
-        skyTop = Color{135, 206, 235, 255}; // Sky blue
-        skyBottom = Color{173, 216, 230, 255}; // Light blue
-    } else if (dayProgress < 0.5f) { // Late day: Warm orange
-        float duskT = (dayProgress - 0.25f) / 0.25f;
-        skyTop = LerpColor(Color{135, 206, 235, 255}, Color{255, 165, 0, 255}, duskT);
-        skyBottom = LerpColor(Color{173, 216, 230, 255}, Color{255, 140, 0, 255}, duskT);
-    } else if (dayProgress < 0.75f) { // Early night: Purple dusk
-        float nightT = (dayProgress - 0.5f) / 0.25f;
-        skyTop = LerpColor(Color{255, 165, 0, 255}, Color{25, 25, 112, 255}, nightT);
-		skyBottom = LerpColor(Color{255, 140, 0, 255}, Color{0, 0, 139, 255}, nightT);
-    } else { // Deep night: Navy with stars
-        skyTop = Color{0, 0, 50, 255}; // Midnight blue
-        skyBottom = Color{25, 25, 112, 255}; // Indigo
+    float tint = (dayProgress < 0.5f) ? 1.0f : 0.7f;
+    if (dayProgress < 0.25f) {
+        skyTop = LerpColor(Color{ 100, 180, 220, 255 }, Color{ 135, 206, 235, 255 }, tint);
+        skyBottom = LerpColor(Color{ 150, 200, 230, 255 }, Color{ 173, 216, 230, 255 }, tint);
     }
-    DrawRectangleGradientV(0, 0, screenWidth, screenHeight * 0.6f, skyTop, skyBottom);
+    else if (dayProgress < 0.5f) {
+        float duskT = (dayProgress - 0.25f) / 0.25f;
+        skyTop = LerpColor(Color{ 135, 206, 235, 255 }, Color{ 255, 165, 0, 255 }, duskT * tint);
+        skyBottom = LerpColor(Color{ 173, 216, 230, 255 }, Color{ 255, 140, 0, 255 }, duskT * tint);
+    }
+    else if (dayProgress < 0.75f) {
+        float nightT = (dayProgress - 0.5f) / 0.25f;
+        skyTop = LerpColor(Color{ 255, 165, 0, 255 }, Color{ 25, 25, 112, 255 }, nightT * tint);
+        skyBottom = LerpColor(Color{ 255, 140, 0, 255 }, Color{ 0, 0, 139, 255 }, nightT * tint);
+    }
+    else {
+        skyTop = LerpColor(Color{ 0, 0, 50, 255 }, Color{ 25, 25, 112, 255 }, tint);
+        skyBottom = LerpColor(Color{ 25, 25, 112, 255 }, Color{ 0, 0, 139, 255 }, tint);
+    }
+    DrawRectangleGradientV(0, 0, (int)screenWidth, (int)(screenHeight * 0.6f), skyTop, skyBottom);
 
-    // Mountains: layered peaks for depth
-    // Back layer (distant, lighter gray)
 
 
-    // Castle: Central, more detailed (towers, roof, windows)
-    DrawRectangle(0, screenHeight * 0.6, screenWidth, screenHeight * 0.4, Color{ 34, 139, 34, 128 }); // Green Hill base, green forest, semi-transparent
-    DrawRectangle(screenWidth / 2 - 120, screenHeight - 200, 240, 200, DARKGRAY); // Castle: Gray stone towers with dark outlines
-    DrawRectangle(screenWidth / 2 - 60, screenHeight - 300, 120, 100, GRAY); // Tower
-    DrawRectangle(screenWidth / 2 - 80, screenHeight - 250, 40, 80, BLACK); // Dark accents
+    //////////////////////////////* CASTLE *//////////////////////////////
+    // Castle texture (centered, scaled)
+	float scale = 0.2f; // %60 of original size
+	int castleWidth = (int)(castleTexture.width * scale);
+	int castleHeight = (int)(castleTexture.height * scale);
+    int castleX = (screenWidth - castleWidth) / 2;
+    int castleY = (int)(screenHeight * 0.2f); // Adjust Y to sit above lake
+    Color tintColor;
+    if (dayProgress < 0.5f) {
+        tintColor = LerpColor(WHITE, GOLD, dayProgress * 0.5f); // Warm day glow
+    }
+    else {
+        tintColor = LerpColor(GOLD, Color{ 200, 200, 255, 255 }, (dayProgress - 0.5f)); // Cool night blue
+    }
+    DrawTexturePro(castleTexture,
+        Rectangle{ 0, 0, (float)castleTexture.width, (float)castleTexture.height },  // Source (full image)
+        Rectangle{ (float)castleX, (float)castleY, (float)castleWidth, (float)castleHeight },  // Dest (scaled/pos)
+        Vector2{ 0, 0 }, 0.0f, tintColor);
 
 
+
+    //////////////////////////////* SUN *//////////////////////////////
     // Sun arc and color change
     float sunX = screenWidth * (dayProgress * 2.0f);
     if (sunX > screenWidth) sunX = 2 * screenWidth - sunX;
@@ -66,6 +83,7 @@ void Renderer::DrawBackground() {
     Color sunColor = (dayProgress < 0.3f) ? YELLOW : ((dayProgress > 0.7f) ? ORANGE : GOLD);
     DrawCircle(sunX, sunY, 30, sunColor);
 }
+
 
 void Renderer::DrawTextOverlay(const std::vector<std::string>& displayLines, const char* inputBuffer) {
     DrawRectangle(20, 20, screenWidth - 40, screenHeight - 100, Fade(BLACK, 0.2f));
@@ -120,5 +138,6 @@ void Renderer::DrawWrappedText(const char* text, int x, int y, int maxWidth, int
 }
 
 Renderer::~Renderer() {
+    UnloadTexture(castleTexture);
     CloseWindow();
 }

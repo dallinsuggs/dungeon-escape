@@ -7,6 +7,7 @@
 
 class Renderer {
 private:
+    Texture2D castleTexture;
     int screenWidth, screenHeight;
     std::chrono::steady_clock::time_point startTime;
     float dayProgress;
