@@ -5,6 +5,14 @@
     {
       "AbsoluteMoniker": "D:0:0:{4A969EED-384E-4B79-AADF-A91356519391}|DungeonEscape.vcxproj|C:\\Users\\kelle\\source\\repos\\dungeon-escape\\DungeonEscape\\Renderer.cpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}",
       "RelativeMoniker": "D:0:0:{4A969EED-384E-4B79-AADF-A91356519391}|DungeonEscape.vcxproj|solutionrelative:Renderer.cpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{4A969EED-384E-4B79-AADF-A91356519391}|DungeonEscape.vcxproj|C:\\Users\\kelle\\source\\repos\\dungeon-escape\\DungeonEscape\\Game.cpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}",
+      "RelativeMoniker": "D:0:0:{4A969EED-384E-4B79-AADF-A91356519391}|DungeonEscape.vcxproj|solutionrelative:Game.cpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{4A969EED-384E-4B79-AADF-A91356519391}|DungeonEscape.vcxproj|C:\\Users\\kelle\\source\\repos\\dungeon-escape\\DungeonEscape\\Renderer.h||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}",
+      "RelativeMoniker": "D:0:0:{4A969EED-384E-4B79-AADF-A91356519391}|DungeonEscape.vcxproj|solutionrelative:Renderer.h||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}"
     }
   ],
   "DocumentGroupContainers": [
@@ -14,8 +22,34 @@
       "DocumentGroups": [
         {
           "DockedWidth": 200,
-          "SelectedChildIndex": 0,
+          "SelectedChildIndex": 2,
           "Children": [
+            {
+              "$type": "Document",
+              "DocumentIndex": 1,
+              "Title": "Game.cpp",
+              "DocumentMoniker": "C:\\Users\\kelle\\source\\repos\\dungeon-escape\\DungeonEscape\\Game.cpp",
+              "RelativeDocumentMoniker": "Game.cpp",
+              "ToolTip": "C:\\Users\\kelle\\source\\repos\\dungeon-escape\\DungeonEscape\\Game.cpp",
+              "RelativeToolTip": "Game.cpp",
+              "ViewState": "AgIAADQAAAAAAAAAAAAgwGAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000677|",
+              "WhenOpened": "2025-12-14T02:56:32.866Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 2,
+              "Title": "Renderer.h",
+              "DocumentMoniker": "C:\\Users\\kelle\\source\\repos\\dungeon-escape\\DungeonEscape\\Renderer.h",
+              "RelativeDocumentMoniker": "Renderer.h",
+              "ToolTip": "C:\\Users\\kelle\\source\\repos\\dungeon-escape\\DungeonEscape\\Renderer.h",
+              "RelativeToolTip": "Renderer.h",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAABMAAABnAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000680|",
+              "WhenOpened": "2025-12-14T02:21:01.16Z",
+              "EditorCaption": ""
+            },
             {
               "$type": "Document",
               "DocumentIndex": 0,
@@ -24,7 +58,7 @@
               "RelativeDocumentMoniker": "Renderer.cpp",
               "ToolTip": "C:\\Users\\kelle\\source\\repos\\dungeon-escape\\DungeonEscape\\Renderer.cpp",
               "RelativeToolTip": "Renderer.cpp",
-              "ViewState": "AgIAACoAAAAAAAAAAAAAAB0AAAAAAAAAAAAAAA==",
+              "ViewState": "AgIAAHMAAAAAAAAAAAAgwJEAAABnAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000677|",
               "WhenOpened": "2025-12-11T03:16:39.437Z",
               "EditorCaption": ""

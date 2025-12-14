@@ -81,6 +81,10 @@ int main() {
 
         // Handle input
         if (inputHandler.UpdateInput(userInput)) {
+            // Echo the input as history
+			std::string inputEcho = "> " + userInput;
+			displayLines.push_back(inputEcho);
+
             auto newLines = captureOutput([&]() { parser.parse(userInput); });
             for (const auto& line : newLines) {
                 if (!line.empty()) displayLines.push_back(line);

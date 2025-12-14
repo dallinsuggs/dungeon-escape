@@ -17,10 +17,11 @@ private:
     float timeSpeed = 1.0f; // Speed multiplier for time progression
 
     // Wrap text in window width, draw multiple lines, update currentY position
-    void DrawWrappedText(const char* text, int x, int y, int maxWidth, int fontSize, Color color, int& currentY);
+    void DrawWrappedText(const char* text, int x, int startY, int maxWidth, int fontSize, Color color);
 
 public:
     Renderer(int width, int height);
+	int GetWrappedHeight(const char* text, int maxWidth, int fontSize);
     void UpdateDayProgress();
     void DrawBackground();
     void DrawTextOverlay(const std::vector<std::string>& displayLines, const char* inputBuffer);

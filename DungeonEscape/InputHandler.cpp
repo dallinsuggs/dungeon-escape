@@ -7,6 +7,11 @@ InputHandler::InputHandler() : letterCount(0) {
 bool InputHandler::UpdateInput(std::string& userInput) {
     bool enterPressed = false;
 
+	// Ensure window is focused to receive input
+    if (!IsWindowFocused()) {
+        SetWindowFocused(); // Ignore input if window is not focused
+	}
+
     // Printable chars
     int key = GetCharPressed();
     while (key > 0) {

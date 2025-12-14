@@ -22,12 +22,70 @@ Renderer::Renderer(int width = 1024, int height = 768) : screenWidth(width), scr
     SetTargetFPS(60);
 }
 
+// Computes height for one wrapped line
+int Renderer::GetWrappedHeight(const char* text, int maxWidth, int fontSize) {
+    std::string fullText(text);
+    std::istringstream iss(fullText);
+    std::string word;
+    std::string currentLine;
+    int numVisualLines = 0;
+    int spacing = 2;  // Consistent with draw logic
+
+    while (iss >> word) {
+        std::string testLine = currentLine.empty() ? word : currentLine + " " + word;
+        if (MeasureText(testLine.c_str(), fontSize) <= maxWidth) {
+            currentLine = testLine;
+        }
+        else {
+            if (!currentLine.empty()) {
+                numVisualLines++;  // Count the line that wrapped
+            }
+            currentLine = word;
+        }
+    }
+    if (!currentLine.empty()) {
+        numVisualLines++;  // Count the final line (was missing!)
+    }
+
+    // Height: lines * fontSize + (lines-1) * spacing (no extra after last)
+    return numVisualLines * fontSize + std::max(0, numVisualLines - 1) * spacing;
+}
+
+// Draw wrapped text and update currentY position
+void Renderer::DrawWrappedText(const char* text, int x, int startY, int maxWidth, int fontSize, Color color) {
+    std::string fullText(text);
+    std::istringstream iss(fullText);
+    std::string word;
+    std::string currentLine;
+    int lineY = startY;
+    int spacing = 2;
+
+    while (iss >> word) {
+        std::string testLine = currentLine.empty() ? word : currentLine + " " + word;
+        if (MeasureText(testLine.c_str(), fontSize) <= maxWidth) {
+            currentLine = testLine;
+        }
+        else {
+            if (!currentLine.empty()) {
+                DrawText(currentLine.c_str(), x, lineY, fontSize, color);
+                lineY += fontSize + spacing;  // Advance for next line
+            }
+            currentLine = word;
+        }
+    }
+    if (!currentLine.empty()) {
+        DrawText(currentLine.c_str(), x, lineY, fontSize, color);
+    }
+}
+
+// Update dayProgress based on simulated time progression
 void Renderer::UpdateDayProgress() {
     float delta = GetFrameTime();  // Raylib's per-frame time
     simulatedElapsed += delta * timeSpeed;
     dayProgress = fmod(simulatedElapsed / 1800.0f, 1.0f);  // 1800s = 30min cycle
 }
 
+// Draw background with Raylib
 void Renderer::DrawBackground() {
     // Sky gradient (tweaked for misty teal; insert your full phases here if expanded)
     Color skyTop, skyBottom;
@@ -86,19 +144,49 @@ void Renderer::DrawBackground() {
 
 
 void Renderer::DrawTextOverlay(const std::vector<std::string>& displayLines, const char* inputBuffer) {
+	// Semi-transparent background for text area
     DrawRectangle(20, 20, screenWidth - 40, screenHeight - 100, Fade(BLACK, 0.2f));
 
-    // Input prompt first (bottom, safe)
-    DrawText("> ", 40, screenHeight - 60, 20, WHITE);
-    DrawText(inputBuffer, 80, screenHeight - 60, 20, WHITE);
+    // Input prompt with bg overdraw for clean clears/backspace
+    int inputY = screenHeight - 60;
+    int inputHeight = 24; // Font 20 + padding
+    Color inputBg = Fade(SKYBLUE, 0.3f); // Blend with bottom of sky
+    DrawRectangle(30, inputY - 2, screenWidth - 60, inputHeight, inputBg); // Covers prompt + buffer space
+	DrawText("> ", 40, inputY, 20, WHITE);
+	DrawText(inputBuffer ? inputBuffer : "", 80, inputY, 20, WHITE); // Always draw input
 
-    // Then wrapped lines (top, with yPos check)
-    int yPos = 50;
-    const int textAreaWidth = screenWidth - 80;
+    // Text area setup
+    int textAreaTop = 50;
+	int textAreaBottom = screenHeight - 120; // Buffer for input
+	int availableHeight = textAreaBottom - textAreaTop;
+	int textAreaWidth = screenWidth - 80;
+	int fontSize = 16;
+    int lineSpacing = fontSize + 4;
+
+	// Precompute height of all lines to determine how many fit
+    std::vector<int> lineHeights;
+    int totalHeight = 0;
     for (const auto& line : displayLines) {
-        if (yPos < screenHeight - 120) {  // Extra buffer for prompt
-            DrawWrappedText(line.c_str(), 40, yPos, textAreaWidth, 16, WHITE, yPos);
+		int h = GetWrappedHeight(line.c_str(), textAreaWidth, fontSize);
+        lineHeights.push_back(h);
+        totalHeight += h + 2;
+    }
+    if (!displayLines.empty()) totalHeight -= 2;  // Avoid double-gap at end
+
+    // Autoscroll to bottom: viewport shows the end of the content
+	int viewportTopContent = (totalHeight > availableHeight) ? totalHeight - availableHeight : 0;
+
+    // Then draw visible lines
+    int currentContentY = 0;
+    for (size_t i = 0; i < displayLines.size(); ++i) {
+		int h = lineHeights[i];
+        // Draw if this line overlaps the viewport
+        if (currentContentY + h > viewportTopContent && currentContentY < viewportTopContent + availableHeight) {
+            // This line is at least partially visible
+            int drawStartY = textAreaTop + (currentContentY - viewportTopContent);
+            DrawWrappedText(displayLines[i].c_str(), 40, drawStartY, textAreaWidth, fontSize, WHITE);
         }
+		currentContentY += h + 2; // GAP BETWEEN MESSAGES
     }
 
     // TESTING PURPOSES ONLY COMMENT OUT WHEN DONE
@@ -109,32 +197,6 @@ void Renderer::DrawTextOverlay(const std::vector<std::string>& displayLines, con
 
 bool Renderer::WindowShouldClose() {
     return ::WindowShouldClose();
-}
-
-void Renderer::DrawWrappedText(const char* text, int x, int y, int maxWidth, int fontSize, Color color, int& currentY) {
-    std::string fullText(text);
-    std::istringstream iss(fullText);
-    std::string word;
-    std::string currentLine;
-    int lineY = currentY;
-    while (iss >> word) {
-        std::string testLine = currentLine.empty() ? word : currentLine + " " + word;
-        if (MeasureText(testLine.c_str(), fontSize) <= maxWidth) {
-            currentLine = testLine;
-        }
-        else {
-            if (!currentLine.empty()) {
-                DrawText(currentLine.c_str(), x, lineY, fontSize, color);
-                lineY += fontSize + 2;
-            }
-            currentLine = word;
-        }
-    }
-    if (!currentLine.empty()) {
-        DrawText(currentLine.c_str(), x, lineY, fontSize, color);
-        lineY += fontSize + 2;
-    }
-    currentY = lineY + 6;
 }
 
 Renderer::~Renderer() {

@@ -1843,3 +1843,465 @@ Preposition: |-1
 Object1: |-1
 Object2: |-1
 |
+|struct|
+Verb: grab|0
+Preposition: |-1
+Object1: brick|0
+Object2: brick|1
+|
+|struct|
+Verb: |-1
+Preposition: |-1
+Object1: gr|0
+Object2: |-1
+|
+|struct|
+Verb: grab|0
+Preposition: |-1
+Object1: brick|0
+Object2: brick|1
+|
+|struct|
+Verb: |-1
+Preposition: |-1
+Object1: brab|0
+Object2: brick|1
+|
+|struct|
+Verb: grab|0
+Preposition: |-1
+Object1: brick|0
+Object2: brick|1
+|
+|struct|
+Verb: |-1
+Preposition: |-1
+Object1: brab|0
+Object2: brick|1
+|
+|struct|
+Verb: |-1
+Preposition: |-1
+Object1: kdafkn|0
+Object2: |-1
+|
+|struct|
+Verb: |-1
+Preposition: |-1
+Object1: akdna;fke|0
+Object2: |-1
+|
+|struct|
+Verb: |-1
+Preposition: |-1
+Object1: knakfe|0
+Object2: |-1
+|
+|struct|
+Verb: grab|0
+Preposition: |-1
+Object1: brick|0
+Object2: brick|1
+|
+|struct|
+Verb: |-1
+Preposition: |-1
+Object1: knkfdladk|0
+Object2: |-1
+|
+|struct|
+Verb: grab|0
+Preposition: |-1
+Object1: brick|0
+Object2: brick|1
+|
+|struct|
+Verb: |-1
+Preposition: |-1
+Object1: knfkndaf|0
+Object2: |-1
+|
+|struct|
+Verb: grab|0
+Preposition: |-1
+Object1: brick|0
+Object2: brick|1
+|
+|struct|
+Verb: grab|0
+Preposition: |-1
+Object1: brick|0
+Object2: brick|1
+|
+|struct|
+Verb: use|0
+Preposition: |-1
+Object1: brick|0
+Object2: brick|1
+|
+|struct|
+Verb: |-1
+Preposition: |-1
+Object1: hello|0
+Object2: brick|1
+|
+|struct|
+Verb: |-1
+Preposition: |-1
+Object1: exitexit|0
+Object2: |-1
+|
+|struct|
+Verb: exit|0
+Preposition: |-1
+Object1: |-1
+Object2: |-1
+|
+|struct|
+Verb: grab|0
+Preposition: |-1
+Object1: brick|0
+Object2: brick|1
+|
+|struct|
+Verb: |-1
+Preposition: |-1
+Object1: hellp|0
+Object2: brick|1
+|
+|struct|
+Verb: drop|0
+Preposition: |-1
+Object1: brick|0
+Object2: brick|1
+|
+|struct|
+Verb: |-1
+Preposition: |-1
+Object1: go|0
+Object2: brick|1
+|
+|struct|
+Verb: |-1
+Preposition: |-1
+Object1: hell|0
+Object2: brick|1
+|
+|struct|
+Verb: |-1
+Preposition: |-1
+Object1: hello|0
+Object2: brick|1
+|
+|struct|
+Verb: |-1
+Preposition: |-1
+Object1: hello|0
+Object2: brick|1
+|
+|struct|
+Verb: |-1
+Preposition: |-1
+Object1: hello|0
+Object2: go|1
+|
+|struct|
+Verb: grab|0
+Preposition: |-1
+Object1: brick|0
+Object2: brick|1
+|
+|struct|
+Verb: |-1
+Preposition: |-1
+Object1: throw|0
+Object2: brick|1
+|
+|struct|
+Verb: grab|0
+Preposition: |-1
+Object1: sheet|0
+Object2: sheet|1
+|
+|struct|
+Verb: drop|0
+Preposition: |-1
+Object1: sheet|0
+Object2: sheet|1
+|
+|struct|
+Verb: i|0
+Preposition: |-1
+Object1: |-1
+Object2: |-1
+|
+|struct|
+Verb: |-1
+Preposition: |-1
+Object1: hello|0
+Object2: |-1
+|
+|struct|
+Verb: |-1
+Preposition: |-1
+Object1: goodbye|0
+Object2: |-1
+|
+|struct|
+Verb: exit|0
+Preposition: |-1
+Object1: |-1
+Object2: |-1
+|
+|struct|
+Verb: |-1
+Preposition: |-1
+Object1: hello|0
+Object2: |-1
+|
+|struct|
+Verb: |-1
+Preposition: |-1
+Object1: test|0
+Object2: |-1
+|
+|struct|
+Verb: |-1
+Preposition: |-1
+Object1: test|0
+Object2: |-1
+|
+|struct|
+Verb: |-1
+Preposition: |-1
+Object1: test|0
+Object2: |-1
+|
+|struct|
+Verb: |-1
+Preposition: |-1
+Object1: test|0
+Object2: |-1
+|
+|struct|
+Verb: |-1
+Preposition: |-1
+Object1: test|0
+Object2: |-1
+|
+|struct|
+Verb: |-1
+Preposition: |-1
+Object1: test|0
+Object2: |-1
+|
+|struct|
+Verb: |-1
+Preposition: |-1
+Object1: test|0
+Object2: |-1
+|
+|struct|
+Verb: |-1
+Preposition: |-1
+Object1: test|0
+Object2: |-1
+|
+|struct|
+Verb: |-1
+Preposition: |-1
+Object1: testaf|0
+Object2: |-1
+|
+|struct|
+Verb: |-1
+Preposition: |-1
+Object1: asdf|0
+Object2: |-1
+|
+|struct|
+Verb: |-1
+Preposition: |-1
+Object1: adf|0
+Object2: |-1
+|
+|struct|
+Verb: |-1
+Preposition: |-1
+Object1: asfd|0
+Object2: |-1
+|
+|struct|
+Verb: |-1
+Preposition: |-1
+Object1: asdf|0
+Object2: |-1
+|
+|struct|
+Verb: |-1
+Preposition: |-1
+Object1: asdf|0
+Object2: |-1
+|
+|struct|
+Verb: |-1
+Preposition: |-1
+Object1: asdf|0
+Object2: |-1
+|
+|struct|
+Verb: |-1
+Preposition: |-1
+Object1: asdf|0
+Object2: |-1
+|
+|struct|
+Verb: |-1
+Preposition: |-1
+Object1: asf|0
+Object2: |-1
+|
+|struct|
+Verb: grab|0
+Preposition: |-1
+Object1: sheet|0
+Object2: sheet|1
+|
+|struct|
+Verb: drop|0
+Preposition: |-1
+Object1: sheet|0
+Object2: sheet|1
+|
+|struct|
+Verb: |-1
+Preposition: |-1
+Object1: asdf|0
+Object2: |-1
+|
+|struct|
+Verb: |-1
+Preposition: |-1
+Object1: asdf|0
+Object2: |-1
+|
+|struct|
+Verb: |-1
+Preposition: |-1
+Object1: adfasdf|0
+Object2: |-1
+|
+|struct|
+Verb: |-1
+Preposition: |-1
+Object1: asdf|0
+Object2: |-1
+|
+|struct|
+Verb: |-1
+Preposition: |-1
+Object1: asdf|0
+Object2: |-1
+|
+|struct|
+Verb: |-1
+Preposition: |-1
+Object1: asdf|0
+Object2: |-1
+|
+|struct|
+Verb: |-1
+Preposition: |-1
+Object1: asdf|0
+Object2: |-1
+|
+|struct|
+Verb: |-1
+Preposition: |-1
+Object1: asdf|0
+Object2: |-1
+|
+|struct|
+Verb: |-1
+Preposition: |-1
+Object1: asdf|0
+Object2: |-1
+|
+|struct|
+Verb: |-1
+Preposition: |-1
+Object1: asdf|0
+Object2: |-1
+|
+|struct|
+Verb: |-1
+Preposition: |-1
+Object1: adsf|0
+Object2: |-1
+|
+|struct|
+Verb: |-1
+Preposition: |-1
+Object1: asdf|0
+Object2: |-1
+|
+|struct|
+Verb: |-1
+Preposition: |-1
+Object1: asdf|0
+Object2: |-1
+|
+|struct|
+Verb: |-1
+Preposition: |-1
+Object1: asdf|0
+Object2: |-1
+|
+|struct|
+Verb: |-1
+Preposition: |-1
+Object1: sadf|0
+Object2: |-1
+|
+|struct|
+Verb: |-1
+Preposition: |-1
+Object1: asdf|0
+Object2: |-1
+|
+|struct|
+Verb: |-1
+Preposition: |-1
+Object1: asdf|0
+Object2: |-1
+|
+|struct|
+Verb: |-1
+Preposition: |-1
+Object1: asdfnvjnagf|0
+Object2: |-1
+|
+|struct|
+Verb: |-1
+Preposition: |-1
+Object1: hello|0
+Object2: |-1
+|
+|struct|
+Verb: drop|0
+Preposition: |-1
+Object1: sheet|0
+Object2: sheet|1
+|
+|struct|
+Verb: grab|0
+Preposition: |-1
+Object1: sheet|0
+Object2: sheet|1
+|
+|struct|
+Verb: exit|0
+Preposition: |-1
+Object1: |-1
+Object2: |-1
+|
