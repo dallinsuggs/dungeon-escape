@@ -13,6 +13,10 @@
 				"id": "cell_1_brick"
 			},
 			{
+				"template": "brick",
+				"id": "cell_1_brick_2"
+			},
+			{
 				"template": "sheet",
 				"id": "cell_1_sheet"
 			},
@@ -22,7 +26,7 @@
 			}
 		],
 		"exits": {
-			"north": [ { "id": "gallery" } ]
+			"north": [ { "id": "gallery", "label":  "cell exit" } ]
 		}
 	},
 	"cell_2": {
@@ -39,7 +43,7 @@
 			}
 		],
 		"exits": {
-			"north": [ { "id": "gallery" } ]
+			"north": [ { "id": "gallery", "label":  "cell exit"  } ]
 		}
 	},
 	"gallery": {
@@ -47,7 +51,7 @@
 		"description": "You are in a medium-length gallery with two doors on the south wall, one on the left, one on the right. There is an open doorway leading north, and an open doorway leading east.",
 		"items": [],
 		"exits": {
-			"south": [ { "id": "cell_1" }, { "id": "cell_2" } ]
+			"south": [ { "id": "cell_1", "label": "left door" }, { "id": "cell_2", "label": "right door" } ]
 		}
 	},
 	"guardroom": {

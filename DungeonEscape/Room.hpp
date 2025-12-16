@@ -11,22 +11,23 @@
 class Room {
 public:
 	struct ExitOption { Room* room; std::string label; };
+	const std::unordered_map<std::string, std::vector<ExitOption>>& getExits() const;
+	std::unordered_map<std::string, std::vector<ExitOption>>& getExits();
 private:
 	std::string name;
 	std::string description; // Text describing the room
 	std::unordered_map<std::string, Item*> roomItems; // Items lying around in the room
 	
-	std::map<std::string, std::vector<ExitOption>> exits; // Maps directions ("north") to connected rooms
+	std::unordered_map<std::string, std::vector<ExitOption>> exits; // Maps directions ("north") to connected rooms
 
 public:
 	// Constructor
-	Room(const std::string& name, const std::string& description, const std::unordered_map<std::string, Item*>& roomItems, const std::map<std::string, std::vector<ExitOption>>& exits = {});
+	Room(const std::string& name, const std::string& description, const std::unordered_map<std::string, Item*>& roomItems);
 
 
 	// getters
 	std::unordered_map<std::string, Item*>& getRoomItems();
 
-	std::string getId() const;
 	std::string getDescription() const;
 	std::string getName() const;
 
@@ -37,7 +38,7 @@ public:
 	void connectRoom(const std::string& direction, Room* otherRoom, const std::string& label);
 
 	// Look up the room in a given direction
-	const std::vector<ExitOption>* getExits(const std::string& direction) const;
+	const std::vector<ExitOption>* getExit(const std::string& direction) const;
 
 	// Overload the << operator so we can print the room with std::cout << room;
 	friend std::ostream& operator<<(std::ostream& os, const Room& room);

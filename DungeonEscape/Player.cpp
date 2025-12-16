@@ -9,6 +9,11 @@ void Player::setCurrentRoom(Room* room) {
 	currentRoom = room;
 }
 
+Room* Player::getCurrentRoom()
+{
+	return currentRoom;
+}
+
 // Return the player's inventory
 std::unordered_map<std::string, Item*>& Player::getInventory() {
 	return inventory;

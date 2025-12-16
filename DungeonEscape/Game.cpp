@@ -51,10 +51,11 @@ int main() {
 
     // Initial setup
     Player player("Ferengate");
+    player.setCurrentRoom(&allRooms.at("cell_1"));
     bool running = true;
     std::string userInput = "";
     std::vector<std::string> displayLines;
-    CommandParser parser(&player, &allRooms.at("cell_1"), running);
+    CommandParser parser(&player, running);
     displayLines = captureOutput([&]() { parser.writeMessage(allRooms.at("cell_1").describeSelf()); });
 
     // Input handler
@@ -62,38 +63,58 @@ int main() {
 
     //////////////////////* GAME LOOP HERE */////////////////////
     // Enter game loop
+    // 
+    // 
     while (!renderer.WindowShouldClose() && running) {
         // Update day progress (30-min cycle)
         renderer.UpdateDayProgress();
-		renderer.UpdateScrollInput(); // handle scroll input
-
-
+        renderer.UpdateScrollInput(); // handle scroll input
 
         // TESTING PURPOSES ONLY COMMENT OUT WHEN DONE
         if (IsKeyPressed(KEY_LEFT_CONTROL)) {
-            if (renderer.GetTimeSpeed() > 1.0f) { 
+            if (renderer.GetTimeSpeed() > 1.0f) {
                 renderer.SetTimeSpeed(1.0f); // Back to normal speed 
-            } else {
+            }
+            else {
                 renderer.SetTimeSpeed(60.0f); // Speed up time for testing
             }
         }
 
-
-
         // Handle input
         if (inputHandler.UpdateInput(userInput)) {
             // Echo the input as history
-			std::string inputEcho = "> " + userInput;
-			displayLines.push_back(inputEcho);
+            std::string inputEcho = "> " + userInput;
+            displayLines.push_back(inputEcho);
 
-            auto newLines = captureOutput([&]() { parser.parse(userInput); });
-            for (const auto& line : newLines) {
-                if (!line.empty()) displayLines.push_back(line);
+            // Check pending exit first
+            if (parser.pendingExit.active) {
+                int choice = -1;
+                try { choice = std::stoi(userInput) - 1; }
+                catch (...) {}
+
+                if (choice >= 0 && choice < parser.pendingExit.options.size()) {
+                    player.setCurrentRoom(parser.pendingExit.options[choice].room);
+                    displayLines.push_back(player.getCurrentRoom()->describeSelf());
+                    parser.pendingExit.active = false;
+                }
+                else {
+                    displayLines.push_back("Invalid choice, enter a number corresponding to your exit.");
+                }
             }
-            //if (displayLines.size() > 20) { // Trim to last 20 lines
-                //displayLines.erase(displayLines.begin(), displayLines.begin() + (displayLines.size() - 20));
-            //}
-			renderer.SnapToBottom(); // Auto-scroll to bottom on new input
+            else {
+                // Normal command parsing
+                auto newLines = captureOutput([&]() { parser.parse(userInput); });
+                for (const auto& line : newLines) {
+                    if (!line.empty()) displayLines.push_back(line);
+                }
+            }
+
+            // Optional: keep only last N lines
+            // if (displayLines.size() > 20) { 
+            //     displayLines.erase(displayLines.begin(), displayLines.begin() + (displayLines.size() - 20));
+            // }
+
+            renderer.SnapToBottom(); // Auto-scroll to bottom on new input
             userInput.clear(); // Reset for next
         }
 

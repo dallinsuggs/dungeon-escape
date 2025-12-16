@@ -21,6 +21,9 @@ public:
 	// Place the player into a starting room
 	void setCurrentRoom(Room* room);
 
+	// Get current room
+	Room* getCurrentRoom();
+
 	// get the player's inventory
 	std::unordered_map<std::string, Item*>& getInventory();
 

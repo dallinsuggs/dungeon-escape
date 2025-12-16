@@ -14,6 +14,7 @@ std::string normalize(const std::string& s) {
 // INTERNAL HELPERS
 
 
+// This function checks a single unordered map of Items and returns the IDs of all Items with names matching a given string
 std::vector<std::string> CommandParser::getItemIdsByName(const std::unordered_map<std::string, Item*>& itemList, const std::string& objectName)
 {
 	std::vector<std::string> matches;
@@ -27,6 +28,7 @@ std::vector<std::string> CommandParser::getItemIdsByName(const std::unordered_ma
 	return matches; // empty if no matches
 }
 
+// This function checks two unordered maps of Items and returns the IDs of all Items with names matching a given string
 std::vector<std::string> CommandParser::getAllItemIdsByName(const std::unordered_map<std::string, Item*>& inventory, const std::unordered_map<std::string, Item*>& roomItems, const std::string& objectName)
 {
 	// Get all matching IDs by name (from room and inventory)
@@ -43,6 +45,7 @@ std::vector<std::string> CommandParser::getAllItemIdsByName(const std::unordered
 	return matches;
 }
 
+// Takes a vector of strings, matches representing the IDs of Items, and if that is empty it returns an empty string. If there is 1 string in matches, it returns that string. If there are multiple it returns a string combining all of them
 std::string CommandParser::resolveSingleItemId(const std::unordered_map<std::string, Item*>& itemList, const std::string& objectName)
 {
 	auto matches = getItemIdsByName(itemList, objectName);
@@ -62,7 +65,7 @@ std::string CommandParser::resolveSingleItemId(const std::unordered_map<std::str
 	}
 	if (!options.empty()) {
 		options.pop_back(); options.pop_back(); // remove trailing ", "
-		writeMessage("Multiple {object}s found: {object}", options);
+		writeMessage("Multiple {object1}s found: {object2}", objectName, options);
 	}
 	return "";
 }
@@ -87,7 +90,7 @@ std::string CommandParser::resolveAllSingleItemId(const std::unordered_map<std::
 	}
 	if (!options.empty()) {
 		options.pop_back(); options.pop_back(); // remove trailing ", "
-		writeMessage("Multiple {object}s found: {object}", options);
+		writeMessage("Multiple {object1}s found: {object2}", options);
 	}
 	return "";
 }
@@ -172,8 +175,8 @@ CommandParser::ObjectMatch CommandParser::findLongestMatchingObject(int startInd
 // CLASS METHOD DEFINITIONS
 
 // Constructor
-CommandParser::CommandParser(Player* p, Room* r, bool& runningFlag) 
-	: player(p), room(r), running(runningFlag) {
+CommandParser::CommandParser(Player* p, bool& runningFlag)
+	: player(p), running(runningFlag) {
 
 	// Initialize verbs umap
 	verbs["use"] = &CommandParser::handleUse;
@@ -191,6 +194,7 @@ CommandParser::CommandParser(Player* p, Room* r, bool& runningFlag)
 	verbs["i"] = &CommandParser::handleInventory;
 	verbs["look"] = &CommandParser::handleLook;
 	verbs["examine"] = &CommandParser::handleExamine;
+	verbs["go"] = &CommandParser::handleGo;
 	// sit
 	// lay
 	// tear (sheet?)
@@ -209,6 +213,36 @@ CommandParser::CommandParser(Player* p, Room* r, bool& runningFlag)
 	prepositions.insert("with");
 	prepositions.insert("at");
 
+}
+
+bool CommandParser::processPendingChoice(const std::string& input, std::vector<std::string>& displayLines)
+{
+	if (!pendingExit.active) return false;
+
+	int choice = -1;
+	try {
+		choice = std::stoi(input) - 1;
+	}
+	catch (...) {
+		displayLines.push_back("Please enter a number corresponding to your choice.");
+		return true; // consumed input
+	}
+
+	if (choice >= 0 && choice < pendingExit.options.size()) {
+		player->setCurrentRoom(pendingExit.options[choice].room);
+
+		// Display new room desc
+		std::string desc = player->getCurrentRoom()->describeSelf();
+		displayLines.push_back(desc);
+	}
+	else {
+		displayLines.push_back("Invalid choice, try again.");
+		return true; // input was consumed
+	}
+
+	pendingExit.active = false;
+
+	return true; // input handled
 }
 
 // Parse function (primary function to interpret player input and delegate work to handler functions)
@@ -260,7 +294,7 @@ void CommandParser::parse(std::string& input) {
 	
 	// object1
 	for (int i = 0; i < tokens.size(); i++) {
-		ObjectMatch objectMatch = findLongestMatchingObject(i, static_cast<int>(tokens.size()), tokens, player->getInventory(), room->getRoomItems(), cmd.indexMap["verb"], cmd.indexMap["preposition"]);
+		ObjectMatch objectMatch = findLongestMatchingObject(i, static_cast<int>(tokens.size()), tokens, player->getInventory(), player->getCurrentRoom()->getRoomItems(), cmd.indexMap["verb"], cmd.indexMap["preposition"]);
 		if (!objectMatch.name.empty()) {
 			cmd.object1 = objectMatch.name;
 			cmd.indexMap["object1"] = i;
@@ -271,60 +305,13 @@ void CommandParser::parse(std::string& input) {
 
 	// object2
 	for (int i = cmd.indexMap["object1"] + object1TokensUsed; i < tokens.size(); i++) {
-		ObjectMatch objectMatch = findLongestMatchingObject(i, static_cast<int>(tokens.size()), tokens, player->getInventory(), room->getRoomItems(), cmd.indexMap["verb"], cmd.indexMap["preposition"]);
+		ObjectMatch objectMatch = findLongestMatchingObject(i, static_cast<int>(tokens.size()), tokens, player->getInventory(), player->getCurrentRoom()->getRoomItems(), cmd.indexMap["verb"], cmd.indexMap["preposition"]);
 		cmd.object2 = objectMatch.name;
 		cmd.indexMap["object2"] = i;
 		break;
 	}
 
-	// write to output file
-	std::ofstream outFile("test", std::ios::app);
-
-	if (!outFile) {
-		std::cerr << "Could not open file for writing\n";
-		return;
-	}
-
-	outFile << verb << "|" << object1 << "|" << object2 << "\n";
-	outFile.close();
-
-	// write tokens to file
-	std::ofstream outFile2("testTokens", std::ios::app);
-
-	if (!outFile2) {
-		std::cerr << "Could not open file for writing\n";
-		return;
-	}
-
-	for (int i = 0; i < tokens.size(); i++) {
-		outFile2 << tokens[i];
-		if (i < tokens.size() - 1) outFile2 << "|";
-	}
-	outFile2 << "\n";
-	outFile2.close();
-
-	// struct to file output
-	std::ofstream outFile3("testStruct", std::ios::app);
-
-	if (!outFile3) {
-		std::cerr << "Could not open file for writing\n";
-		return;
-	}
-
-	outFile3 << "|struct|\n";
-	outFile3 << "Verb: " << cmd.verb << "|";
-	outFile3 << cmd.indexMap["verb"] << "\n";
-	outFile3 << "Preposition: " << cmd.preposition << "|";
-	outFile3 << cmd.indexMap["preposition"] << "\n";
-	outFile3 << "Object1: " << cmd.object1 << "|";
-	outFile3 << cmd.indexMap["object1"] << "\n";
-	outFile3 << "Object2: " << cmd.object2 << "|";
-	outFile3 << cmd.indexMap["object2"] << "\n";
-	outFile3 << "|\n";
-
-	outFile3.close();
-
-	//                                       END OF TESTING
+	
 
 	// call verb handler function
 	auto it = verbs.find(cmd.verb);
@@ -339,15 +326,21 @@ void CommandParser::parse(std::string& input) {
 }
 
 // Message writer function takes a message template and optionally an object variable
-void CommandParser::writeMessage(const std::string& msgTemplate, const std::string& objectName)
+void CommandParser::writeMessage(const std::string& msgTemplate, const std::string& object1Name, const std::string& object2Name)
 {
 	std::cout << "\n";
 
 	std::string output = msgTemplate;
-	if (!objectName.empty()) {
-		size_t pos = output.find("{object}");
+	if (!object1Name.empty()) {
+		size_t pos = output.find("{object1}");
 		if (pos != std::string::npos) {
-			output.replace(pos, 8, objectName);
+			output.replace(pos, 9, object1Name);
+		}
+	}
+	if (!object2Name.empty()) {
+		size_t pos = output.find("{object2}");
+		if (pos != std::string::npos) {
+			output.replace(pos, 9, object2Name);
 		}
 	}
 	std::cout << output << "\n";
@@ -412,7 +405,7 @@ void CommandParser::handleInventory(ParsedCommand& cmd)
 void CommandParser::handleDrop(ParsedCommand& cmd)
 {
 	auto& inventory = player->getInventory();
-	auto& roomItems = room->getRoomItems();
+	auto& roomItems = player->getCurrentRoom()->getRoomItems();
 	
 	std::string targetId = resolveSingleItemId(inventory, cmd.object1);
 	if (targetId.empty()) {
@@ -437,7 +430,7 @@ void CommandParser::handlePut(ParsedCommand& cmd)
 void CommandParser::handleTake(ParsedCommand& cmd)
 {
 	auto& inventory = player->getInventory();
-	auto& roomItems = room->getRoomItems();
+	auto& roomItems = player->getCurrentRoom()->getRoomItems();
 
 	std::string targetId = resolveSingleItemId(roomItems, cmd.object1);
 	if (targetId.empty()) {
@@ -485,13 +478,13 @@ void CommandParser::handleExamine(ParsedCommand& cmd) {
 
 	// No object specified - look around the room
 	static const std::unordered_set<std::string> roomWords = { "room", "around", "area" };
-	if (target.empty() || roomWords.count(target) || target == room->getName()) {
-		writeMessage(room->describeSelf());
+	if (target.empty() || roomWords.count(target) || target == player->getCurrentRoom()->getName()) {
+		writeMessage(player->getCurrentRoom()->describeSelf());
 		return;
 	}
 
 	auto& inventory = player->getInventory();
-	auto& roomItems = room->getRoomItems();
+	auto& roomItems = player->getCurrentRoom()->getRoomItems();
 
 	std::string targetId = resolveAllSingleItemId(inventory, roomItems, target);
 	if (targetId.empty()) return; // either not found or multiple matches
@@ -499,6 +492,63 @@ void CommandParser::handleExamine(ParsedCommand& cmd) {
 	// Now we know exactly which item to describe
 	Item* itemPtr = roomItems.count(targetId) ? roomItems.at(targetId) : inventory.at(targetId);
 	writeMessage(itemPtr->getDescription());
+}
+
+// Go handler
+void CommandParser::handleGo(ParsedCommand& cmd)
+{
+	std::string dir = cmd.object1;
+	// If player entered cardinal direction, and cardinal direction leads to another location, and no locked door, change location to new location
+
+	// Check to see if direction exits
+	auto& exits = player->getCurrentRoom()->getExits();
+
+	auto it = exits.find(dir);
+	if (it == exits.end()) {
+		writeMessage(MSG_NO_EXIT, dir);
+		return;
+	}
+
+	auto& exitList = it->second;
+
+
+	if (exitList.size() == 1) {
+		player->setCurrentRoom(exitList[0].room);
+		writeMessage(player->getCurrentRoom()->describeSelf());
+		return;
+	}
+
+	// Multiple exits: just store pending choice, don’t wait
+	pendingExit.options = exitList;
+	pendingExit.direction = dir;
+	pendingExit.active = true;
+
+	std::string options;
+	for (size_t i = 0; i < exitList.size(); ++i)
+		options += std::to_string(i + 1) + " - " + exitList[i].label + "\n";
+
+	writeMessage("Multiple exits to {object1}: {object2}", dir, options);
+	writeMessage("Type the number of your choice and press enter.");
+
+
+	//if (exitList.size() == 1) {
+	//	// Single exit: move immediately
+	//	player->setCurrentRoom(exitList[0].room); // fix to correctly referent Room* from exitList
+	//	writeMessage(player->getCurrentRoom()->describeSelf());
+	//	return;
+	//}
+
+	//// Multiple exits - set pending choice
+	//pendingExit.options = exitList;
+	//pendingExit.direction = dir;
+	//pendingExit.active = true;
+
+	//std::string options;
+	//for (size_t i = 0; i < exitList.size(); ++i) {
+	//	options += std::to_string(i + 1) + " - " + exitList[i].label + "\n";
+	//}
+
+	//writeMessage("Multiple exits to {object1}: {object2}", dir, options);
 }
 
 // Quit handler

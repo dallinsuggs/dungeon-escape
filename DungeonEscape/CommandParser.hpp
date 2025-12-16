@@ -13,6 +13,14 @@
 #include "Room.hpp"
 
 class CommandParser {
+public:
+	// Pending choice state
+	struct PendingExitChoice {
+		std::vector<Room::ExitOption> options;
+		std::string direction;
+		bool active = false;
+	};
+	PendingExitChoice pendingExit;
 private:
 	// struct
 	struct ParsedCommand {
@@ -29,24 +37,26 @@ private:
 		};
 	};
 
+	
+
 	std::unordered_map<std::string, void (CommandParser::*)(ParsedCommand&)> verbs;
 	std::unordered_set<std::string> prepositions;
 
 	// Pointers for inventory, roomItems
 	Player* player;
-	Room* room;
 	bool& running;
 
 	// const string messages no object
 	const std::string MSG_DONT_KNOW_HOW = "I don't know how to do that.";
 
 	// const string messages with object
-	const std::string MSG_TAKE = "You now possess a {object}.";
-	const std::string MSG_ALREADY_HAVE = "You already have a {object} in your inventory.";
-	const std::string MSG_DONT_SEE = "You don't see a {object} here.";
-	const std::string MSG_DROP = "You drop the {object}.";
-	const std::string MSG_DONT_HAVE = "You don't have a {object}.";
-	const std::string MSG_CANT_TAKE = "You can't pick up the {object}, it's either too heavy or securely attached.";
+	const std::string MSG_TAKE = "You now possess a {object1}.";
+	const std::string MSG_ALREADY_HAVE = "You already have a {object1} in your inventory.";
+	const std::string MSG_DONT_SEE = "You don't see a {object1} here.";
+	const std::string MSG_DROP = "You drop the {object1}.";
+	const std::string MSG_DONT_HAVE = "You don't have a {object1}.";
+	const std::string MSG_CANT_TAKE = "You can't pick up the {object1}, it's either too heavy or securely attached.";
+	const std::string MSG_NO_EXIT = "You don't see any path or exit to the {object1}.";
 
 	// booleans
 	bool doorLocked = true;
@@ -86,13 +96,16 @@ private:
 public:
 
 	// Constructor
-	CommandParser(Player* p, Room* r, bool& runningFlag);
+	CommandParser(Player* p, bool& runningFlag);
+
+	// Process pending choice
+	bool processPendingChoice(const std::string& input, std::vector<std::string>& displayLines);
 
 	// Parse function (primary function to interpret player input and delegate work to handler functions)
 	void parse(std::string& input);
 
 	// Message writer function takes a message template and optionally an object variable
-	void writeMessage(const std::string& messageTemplate, const std::string& objectName = "");
+	void writeMessage(const std::string& messageTemplate, const std::string& object1Name = "", const std::string& object2Name = "");
 
 	
 
@@ -116,6 +129,8 @@ public:
 	void handleLook(ParsedCommand& cmd);
 	// Examine handler
 	void handleExamine(ParsedCommand& cmd);
+	// Go handler
+	void handleGo(ParsedCommand& cmd);
 
 	// Quit handler
 	void handleQuit(ParsedCommand& cmd);
