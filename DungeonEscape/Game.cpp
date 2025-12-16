@@ -65,6 +65,7 @@ int main() {
     while (!renderer.WindowShouldClose() && running) {
         // Update day progress (30-min cycle)
         renderer.UpdateDayProgress();
+		renderer.UpdateScrollInput(); // handle scroll input
 
 
 
@@ -89,9 +90,10 @@ int main() {
             for (const auto& line : newLines) {
                 if (!line.empty()) displayLines.push_back(line);
             }
-            if (displayLines.size() > 20) { // Trim to last 20 lines
-                displayLines.erase(displayLines.begin(), displayLines.begin() + (displayLines.size() - 20));
-            }
+            //if (displayLines.size() > 20) { // Trim to last 20 lines
+                //displayLines.erase(displayLines.begin(), displayLines.begin() + (displayLines.size() - 20));
+            //}
+			renderer.SnapToBottom(); // Auto-scroll to bottom on new input
             userInput.clear(); // Reset for next
         }
 

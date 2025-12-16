@@ -2,6 +2,12 @@
 #include <cmath>
 #include <sstream>
 #include <functional>
+#include <algorithm>
+
+// CONSTANTS
+const float WHEEL_SPEED = 80.0f; // Pixels per wheel notch
+const float ARROW_SPEED = 300.0f; // Pixels per second for arrow keys
+
 
 
 // Simple color lerp (linear interpolation) for smooth transitions
@@ -20,6 +26,7 @@ Renderer::Renderer(int width = 1024, int height = 768) : screenWidth(width), scr
     InitWindow(screenWidth, screenHeight, "Dungeon Escape");
 	castleTexture = LoadTexture("8bit_castle.jpg");
     SetTargetFPS(60);
+    scrollOffset = 0.0f;
 }
 
 // Computes height for one wrapped line
@@ -144,7 +151,7 @@ void Renderer::DrawBackground() {
 
 
 void Renderer::DrawTextOverlay(const std::vector<std::string>& displayLines, const char* inputBuffer) {
-	// Semi-transparent background for text area
+    // Semi-transparent background for text area
     DrawRectangle(20, 20, screenWidth - 40, screenHeight - 100, Fade(BLACK, 0.2f));
 
     // Input prompt with bg overdraw for clean clears/backspace
@@ -152,48 +159,82 @@ void Renderer::DrawTextOverlay(const std::vector<std::string>& displayLines, con
     int inputHeight = 24; // Font 20 + padding
     Color inputBg = Fade(SKYBLUE, 0.3f); // Blend with bottom of sky
     DrawRectangle(30, inputY - 2, screenWidth - 60, inputHeight, inputBg); // Covers prompt + buffer space
-	DrawText("> ", 40, inputY, 20, WHITE);
-	DrawText(inputBuffer ? inputBuffer : "", 80, inputY, 20, WHITE); // Always draw input
+    DrawText("> ", 40, inputY, 20, WHITE);
+    DrawText(inputBuffer ? inputBuffer : "", 80, inputY, 20, WHITE); // Always draw input
 
     // Text area setup
     int textAreaTop = 50;
-	int textAreaBottom = screenHeight - 120; // Buffer for input
-	int availableHeight = textAreaBottom - textAreaTop;
-	int textAreaWidth = screenWidth - 80;
-	int fontSize = 16;
+    int textAreaBottom = screenHeight - 120; // Buffer for input
+    int availableHeight = textAreaBottom - textAreaTop;
+    int textAreaWidth = screenWidth - 80;
+    int fontSize = 16;
     int lineSpacing = fontSize + 4;
 
-	// Precompute height of all lines to determine how many fit
+    // Precompute heights (your code unchanged up to here)
     std::vector<int> lineHeights;
     int totalHeight = 0;
     for (const auto& line : displayLines) {
-		int h = GetWrappedHeight(line.c_str(), textAreaWidth, fontSize);
+        int h = GetWrappedHeight(line.c_str(), textAreaWidth, fontSize);
         lineHeights.push_back(h);
         totalHeight += h + 2;
     }
-    if (!displayLines.empty()) totalHeight -= 2;  // Avoid double-gap at end
+    if (!displayLines.empty()) totalHeight -= 2;  // Avoid double-gap
 
-    // Autoscroll to bottom: viewport shows the end of the content
-	int viewportTopContent = (totalHeight > availableHeight) ? totalHeight - availableHeight : 0;
+    // Scrolling setup (replaces old auto-scroll)
+    float maxScroll = std::max(0.0f, (float)totalHeight - (float)availableHeight);
+
+    // Manual clamp scrollOffset
+    if (scrollOffset < 0.0f) scrollOffset = 0.0f;
+    if (scrollOffset > maxScroll) scrollOffset = maxScroll;
+
+    // Viewport offset: 0 = newest at bottom
+    int viewportTopContent = (int)((float)totalHeight - (float)availableHeight - scrollOffset);
+    viewportTopContent = std::max(0, viewportTopContent);  // Prevent over-scroll top
 
     // Then draw visible lines
     int currentContentY = 0;
     for (size_t i = 0; i < displayLines.size(); ++i) {
-		int h = lineHeights[i];
+        int h = lineHeights[i];
         // Draw if this line overlaps the viewport
         if (currentContentY + h > viewportTopContent && currentContentY < viewportTopContent + availableHeight) {
             // This line is at least partially visible
             int drawStartY = textAreaTop + (currentContentY - viewportTopContent);
             DrawWrappedText(displayLines[i].c_str(), 40, drawStartY, textAreaWidth, fontSize, WHITE);
         }
-		currentContentY += h + 2; // GAP BETWEEN MESSAGES
+        currentContentY += h + 2; // GAP BETWEEN MESSAGES
     }
 
     // TESTING PURPOSES ONLY COMMENT OUT WHEN DONE
     // Speed indicator (top-right, subtle)
     std::string speedText = "Time: " + std::to_string((int)timeSpeed) + "x";  // Use 'timeSpeed' directly (member var)
     DrawText(speedText.c_str(), screenWidth - 150, 20, 16, (timeSpeed > 1.0f ? RED : GRAY));
+
+    // Debug
+    //DrawText(TextFormat("Offset: %.0f / Max: %.0f", scrollOffset, maxScroll), screenWidth - 300, 40, 16, YELLOW);
 }
+
+// Update scrollOffset based on mouse wheel and arrow keys
+void Renderer::UpdateScrollInput() {
+	// Mouse wheel / touchpad (positive = up, negative = down)
+    float wheel = GetMouseWheelMove();
+    if (wheel != 0.0f) {
+        scrollOffset += wheel * WHEEL_SPEED;
+    };
+
+	// Arrow keys (hold to scroll continuously)
+    if (IsKeyDown(KEY_UP)) {
+        scrollOffset += ARROW_SPEED * GetFrameTime(); // UP
+    }
+    if (IsKeyDown(KEY_DOWN)) {
+        scrollOffset -= ARROW_SPEED * GetFrameTime(); // DOWN
+    }
+}
+
+// Snap scroll to bottom (newest output)
+void Renderer::SnapToBottom() {
+    scrollOffset = 0.0f;
+}
+
 
 bool Renderer::WindowShouldClose() {
     return ::WindowShouldClose();
