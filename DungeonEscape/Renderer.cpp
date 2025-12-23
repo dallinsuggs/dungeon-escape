@@ -23,6 +23,7 @@ Color LerpColor(Color a, Color b, float t) {
 
 Renderer::Renderer(int width = 1024, int height = 768) : screenWidth(width), screenHeight(height) {    
     startTime = std::chrono::steady_clock::now();
+	SetConfigFlags(FLAG_WINDOW_RESIZABLE);
     InitWindow(screenWidth, screenHeight, "Dungeon Escape");
 	castleTexture = LoadTexture("8bit_castle.jpg");
     SetTargetFPS(60);
@@ -115,7 +116,7 @@ void Renderer::DrawBackground() {
         skyTop = LerpColor(Color{ 0, 0, 50, 255 }, Color{ 25, 25, 112, 255 }, tint);
         skyBottom = LerpColor(Color{ 25, 25, 112, 255 }, Color{ 0, 0, 139, 255 }, tint);
     }
-    DrawRectangleGradientV(0, 0, (int)screenWidth, (int)(screenHeight * 0.6f), skyTop, skyBottom);
+    DrawRectangleGradientV(0, 0, GetScreenWidth(), (int)(GetScreenHeight() * 0.6f), skyTop, skyBottom);
 
 
 
@@ -124,8 +125,8 @@ void Renderer::DrawBackground() {
 	float scale = 0.2f; // %60 of original size
 	int castleWidth = (int)(castleTexture.width * scale);
 	int castleHeight = (int)(castleTexture.height * scale);
-    int castleX = (screenWidth - castleWidth) / 2;
-    int castleY = (int)(screenHeight * 0.2f); // Adjust Y to sit above lake
+    int castleX = (GetScreenWidth() - castleWidth) / 2;
+    int castleY = (int)(GetScreenHeight() * 0.2f); // Adjust Y to sit above lake
     Color tintColor;
     if (dayProgress < 0.5f) {
         tintColor = LerpColor(WHITE, GOLD, dayProgress * 0.5f); // Warm day glow
@@ -142,9 +143,9 @@ void Renderer::DrawBackground() {
 
     //////////////////////////////* SUN *//////////////////////////////
     // Sun arc and color change
-    float sunX = screenWidth * (dayProgress * 2.0f);
-    if (sunX > screenWidth) sunX = 2 * screenWidth - sunX;
-    float sunY = screenHeight * (0.5f - 0.3f * sinf(dayProgress * PI * 2.0f));
+    float sunX = GetScreenWidth() * (dayProgress * 2.0f);
+    if (sunX > GetScreenWidth()) sunX = 2 * GetScreenWidth() - sunX;
+    float sunY = GetScreenHeight() * (0.5f - 0.3f * sinf(dayProgress * PI * 2.0f));
     Color sunColor = (dayProgress < 0.3f) ? YELLOW : ((dayProgress > 0.7f) ? ORANGE : GOLD);
     DrawCircle(sunX, sunY, 30, sunColor);
 }
@@ -152,21 +153,21 @@ void Renderer::DrawBackground() {
 
 void Renderer::DrawTextOverlay(const std::vector<std::string>& displayLines, const char* inputBuffer) {
     // Semi-transparent background for text area
-    DrawRectangle(20, 20, screenWidth - 40, screenHeight - 100, Fade(BLACK, 0.2f));
+    DrawRectangle(20, 20, GetScreenWidth() - 40, GetScreenHeight() - 100, Fade(BLACK, 0.2f));
 
     // Input prompt with bg overdraw for clean clears/backspace
-    int inputY = screenHeight - 60;
+    int inputY = GetScreenHeight() - 60;
     int inputHeight = 24; // Font 20 + padding
     Color inputBg = Fade(SKYBLUE, 0.3f); // Blend with bottom of sky
-    DrawRectangle(30, inputY - 2, screenWidth - 60, inputHeight, inputBg); // Covers prompt + buffer space
+    DrawRectangle(30, inputY - 2, GetScreenWidth() - 60, inputHeight, inputBg); // Covers prompt + buffer space
     DrawText("> ", 40, inputY, 20, WHITE);
     DrawText(inputBuffer ? inputBuffer : "", 80, inputY, 20, WHITE); // Always draw input
 
     // Text area setup
     int textAreaTop = 50;
-    int textAreaBottom = screenHeight - 120; // Buffer for input
+    int textAreaBottom = GetScreenHeight() - 120; // Buffer for input
     int availableHeight = textAreaBottom - textAreaTop;
-    int textAreaWidth = screenWidth - 80;
+    int textAreaWidth = GetScreenWidth() - 80;
     int fontSize = 16;
     int lineSpacing = fontSize + 4;
 
@@ -207,10 +208,10 @@ void Renderer::DrawTextOverlay(const std::vector<std::string>& displayLines, con
     // TESTING PURPOSES ONLY COMMENT OUT WHEN DONE
     // Speed indicator (top-right, subtle)
     std::string speedText = "Time: " + std::to_string((int)timeSpeed) + "x";  // Use 'timeSpeed' directly (member var)
-    DrawText(speedText.c_str(), screenWidth - 150, 20, 16, (timeSpeed > 1.0f ? RED : GRAY));
+    DrawText(speedText.c_str(), GetScreenWidth() - 150, 20, 16, (timeSpeed > 1.0f ? RED : GRAY));
 
     // Debug
-    //DrawText(TextFormat("Offset: %.0f / Max: %.0f", scrollOffset, maxScroll), screenWidth - 300, 40, 16, YELLOW);
+    //DrawText(TextFormat("Offset: %.0f / Max: %.0f", scrollOffset, maxScroll), GetScreenWidth() - 300, 40, 16, YELLOW);
 }
 
 // Update scrollOffset based on mouse wheel and arrow keys

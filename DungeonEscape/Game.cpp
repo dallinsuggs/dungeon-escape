@@ -85,6 +85,10 @@ int main() {
             }
         }
 
+        if (IsKeyPressed(KEY_F11)) {
+            ToggleFullscreen();
+        }
+
         // Handle input
         if (inputHandler.UpdateInput(userInput)) {
             // Echo the input as history
