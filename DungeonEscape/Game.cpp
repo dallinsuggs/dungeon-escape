@@ -20,6 +20,11 @@
 // For Input Handling
 #include "InputHandler.h"
 
+// so it doesn't open a console window on Windows
+#ifdef _WIN32
+#pragma comment(linker, "/SUBSYSTEM:windows /ENTRY:mainCRTStartup")
+#endif
+
 // Capture cout to lines for Raylib display
 std::vector<std::string> captureOutput(std::function<void()> func) {
     std::ostringstream oss;
