@@ -95,29 +95,49 @@ void Renderer::UpdateDayProgress() {
 
 // Draw background with Raylib
 void Renderer::DrawBackground() {
-    // Sky gradient (tweaked for misty teal; insert your full phases here if expanded)
+    // Sky gradient 
+    float cycle = dayProgress; // 0.0  = sunrise/start, 0.5 = sunset/midnioght, 1.0 = next sunrise
+
+    Color dayTop = Color{ 100, 180, 220, 255 }; // Morning bright sky
+    Color dayBottom = Color{ 150, 200, 230, 255 };
+    Color duskTop = Color{ 255, 165, 100, 255 }; // Warm sunset
+    Color duskBottom = Color{ 255, 140, 80, 255 };
+    Color nightTop = Color{ 10, 10, 50, 255 }; // Deep midnight
+    Color nightBottom = Color{ 0, 0, 30, 255 };
+    Color dawnTop = Color{ 255, 200, 150, 255 }; // Soft dawn glow
+    Color dawnBottom = Color{ 200, 150, 120, 255 };
+
+    // Determine sky colors based on time of day
     Color skyTop, skyBottom;
-    float tint = (dayProgress < 0.5f) ? 1.0f : 0.7f;
-    if (dayProgress < 0.25f) {
-        skyTop = LerpColor(Color{ 100, 180, 220, 255 }, Color{ 135, 206, 235, 255 }, tint);
-        skyBottom = LerpColor(Color{ 150, 200, 230, 255 }, Color{ 173, 216, 230, 255 }, tint);
+    if (cycle < 0.25f) {
+        // Morning > Day (bright)
+        float tint = cycle / 0.25f;
+        skyTop = LerpColor(dawnTop, dayTop, tint);
+        skyBottom = LerpColor(dawnBottom, dayBottom, tint);
     }
-    else if (dayProgress < 0.5f) {
-        float duskT = (dayProgress - 0.25f) / 0.25f;
-        skyTop = LerpColor(Color{ 135, 206, 235, 255 }, Color{ 255, 165, 0, 255 }, duskT * tint);
-        skyBottom = LerpColor(Color{ 173, 216, 230, 255 }, Color{ 255, 140, 0, 255 }, duskT * tint);
+    else if (cycle < 0.5f) {
+        // Day > Dusk (warm)
+        float tint = (cycle - 0.25f) / 0.25f;
+        skyTop = LerpColor(dayTop, duskTop, tint);
+        skyBottom = LerpColor(dayBottom, duskBottom, tint);
     }
-    else if (dayProgress < 0.75f) {
-        float nightT = (dayProgress - 0.5f) / 0.25f;
-        skyTop = LerpColor(Color{ 255, 165, 0, 255 }, Color{ 25, 25, 112, 255 }, nightT * tint);
-        skyBottom = LerpColor(Color{ 255, 140, 0, 255 }, Color{ 0, 0, 139, 255 }, nightT * tint);
+    else if (cycle < 0.75f) {
+        // Dusk > Night (darken)
+        float tint = (cycle - 0.5f) / 0.25f;
+        skyTop = LerpColor(duskTop, nightTop, tint);
+        skyBottom = LerpColor(duskBottom, nightBottom, tint);
     }
     else {
-        skyTop = LerpColor(Color{ 0, 0, 50, 255 }, Color{ 25, 25, 112, 255 }, tint);
-        skyBottom = LerpColor(Color{ 25, 25, 112, 255 }, Color{ 0, 0, 139, 255 }, tint);
+        // Night > Dawn (lighten)
+        float tint = (cycle - 0.75f) / 0.25f;
+        skyTop = LerpColor(nightTop, dawnTop, tint);
+        skyBottom = LerpColor(nightBottom, dawnBottom, tint);
     }
-    DrawRectangleGradientV(0, 0, GetScreenWidth(), (int)(GetScreenHeight() * 0.6f), skyTop, skyBottom);
-
+    // Dim during full night
+    float nightDim = (cycle >= 0.5f && cycle < 0.75f) ? 0.8f : 1.0f;
+    skyTop = Fade(skyTop, nightDim);
+    skyBottom = Fade(skyBottom, nightDim);
+    DrawRectangleGradientV(0, 0, GetScreenWidth(), GetScreenHeight(), skyTop, skyBottom);
 
 
     //////////////////////////////* SUN *//////////////////////////////
@@ -127,6 +147,31 @@ void Renderer::DrawBackground() {
     float sunY = GetScreenHeight() * (0.5f - 0.3f * sinf(dayProgress * PI * 2.0f));
     Color sunColor = (dayProgress < 0.3f) ? YELLOW : ((dayProgress > 0.7f) ? ORANGE : GOLD);
     DrawCircle(sunX, sunY, 30, sunColor);
+
+
+    //////////////////////////////* MOON *//////////////////////////////
+    // Moon arc and color change (opposite sun)
+    float moonProgress = fmod(dayProgress + 0.5f, 1.0f); // opposite side of day
+    float moonX = GetScreenWidth() * (moonProgress * 2.0f);
+    if (moonX > GetScreenWidth()) moonX = 2 * GetScreenWidth() - moonX; // Mirror on right side
+    float moonY = GetScreenHeight() * (0.5f + 0.3f * sinf(dayProgress * PI * 2.0f)); // Same arc height as sun, inverted
+
+    // Smooth height transition: 0 at horizon, 1 at peak
+    float heightSin = sinf(moonProgress * PI); // -1 to 1 over arc
+    float heightFactor = (heightSin + 1.0f) / 2.0f; // 0 (low) to 1 (peak) to 0
+
+    // Moon color: bright white at top, warm orange-red near horizon
+    Color horizonMoon = Color{ 255, 200, 140, 255 }; // tweak redder: {255, 160, 100}
+    Color peakMoon = WHITE;
+    Color moonColor = LerpColor(horizonMoon, peakMoon, heightFactor);
+
+    // Scale radius of moon with window for consistency
+    float moonRadius = 20.0f * (GetScreenHeight() / 768.0f); // Base radius 20 at 768 height
+
+    // Draw moon
+    float glowRadius = moonRadius * 1.7f;
+    DrawCircle((int)moonX, (int)moonY, (int)glowRadius, Fade(moonColor, 0.2f)); // Soft halo
+    DrawCircle((int)moonX, (int)moonY, (int)moonRadius, moonColor); // Main moon
 
 
     //////////////////////////////* CASTLE *//////////////////////////////
@@ -149,6 +194,59 @@ void Renderer::DrawBackground() {
             Vector2{ 0, 0 },  // origin (top-left pivot)
             0.0f,           // rotation
             fgTint);        // tint
+    }
+
+    //////////////////////////////* CASTLE LANTERNS AT NIGHT *//////////////////////////////
+    // Lanterns glow during night, tied to foreground position
+    if (dayProgress >= 0.35f && dayProgress < 2.0f)
+    {
+        float nightIntensity = 1.0f - fabsf(dayProgress - 0.625f) * 4.0f; // Fade in/out, peaks at 0.625, midnight
+        float pulseBase = 0.9f + 0.2f * sinf(simulatedElapsed * 4.0f); // Pulsing effect
+
+        // Reuse the same scaling/position as foreground (from above)
+        float fgScale = std::max((float)GetScreenWidth() / castleTexture.width,
+            (float)GetScreenHeight() / castleTexture.height);
+        float fgX = (GetScreenWidth() - castleTexture.width * fgScale) / 2.0f;
+        float fgY = (GetScreenHeight() - castleTexture.height * fgScale) / 2.0f;
+
+        // Helper: position relative to image (0-1 inside texture), converted to screen
+        auto DrawGlowLightRelative = [&](float relX, float relY, float radiusScale = 1.0f) {
+            // relX/relY = fraction inside the original image (e.g., 0.5,0.5 = center of castle)
+            float x = fgX + relX * (castleTexture.width * fgScale);
+            float y = fgY + relY * (castleTexture.height * fgScale);
+            float baseRadius = 8.0f * fgScale * radiusScale;  // Scales with image
+
+            static float phases[20] = { 0 };
+            static int lightCount = 0;
+            float phase = phases[lightCount % 20];
+            if (phase == 0.0f) phase = phases[lightCount % 20] = (float)rand() / RAND_MAX * PI * 2;
+            lightCount++;
+
+
+            float flickerSpeed = 2.0f + (lightCount % 4) * 0.5f;  // 2-3.5 Hz per light
+            float flicker = 0.85f + 0.15f * sinf(simulatedElapsed * flickerSpeed + phase);
+            float intensity = nightIntensity * pulseBase * flicker;
+
+            Color warmCore = Color{ 255, 180, 80, 255 };
+			Color warmGlow = Color{ 255, 160, 60, 255 };
+
+            DrawCircle((int)x, (int)y, (int)(baseRadius * 2.5f), Fade(warmGlow, 0.1f * intensity));  // Outer
+            DrawCircle((int)x, (int)y, (int)(baseRadius * 1.6f), Fade(warmGlow, 0.2f * intensity));  // Mid
+            DrawCircle((int)x, (int)y, (int)baseRadius, Fade(warmCore, intensity));                // Core
+            };
+
+		// Example lantern positions on castle (as % of screen)
+		// Use a lamda counter for a few lights
+        // MAX: 10-15 lights
+        // (Run, see where they land, adjust percentX/Y—e.g., 0.3 = 30% from left, 0.4 = 40% from top)
+        DrawGlowLightRelative(0.2f, 0.5f, 2.5f); // Far left mid tower outside castle walls
+        DrawGlowLightRelative(0.33f, 0.54f, 2.5f); // Far left castle window
+		DrawGlowLightRelative(0.425f, 0.47f, 2.0f); // Upper left castle window
+        DrawGlowLightRelative(0.465f, 0.675f, 2.0f); // Left castle door tower
+        DrawGlowLightRelative(0.557f, 0.675f, 2.0f); // Right castle door tower
+        DrawGlowLightRelative(0.565f, 0.52f, 2.0f); // Upper right castle window
+        DrawGlowLightRelative(0.64f, 0.23f, 2.3f); // Tall upper right tower inside castle walls
+        DrawGlowLightRelative(0.86f, 0.61f, 2.5f); // Far right wide tower on castle walls
     }
 }
 
