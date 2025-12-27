@@ -254,12 +254,22 @@ void Renderer::DrawBackground() {
 
 void Renderer::DrawTextOverlay(const std::vector<std::string>& displayLines, const char* inputBuffer) {
     // Semi-transparent background for text area
-    DrawRectangle(20, 20, GetScreenWidth() - 40, GetScreenHeight() - 100, Fade(BLACK, 0.2f));
+    // DrawRectangle(20, 20, GetScreenWidth() - 40, GetScreenHeight() - 100, Fade(BLACK, 0.2f));
+
+    //////////////////////////////* TEXT AREA *//////////////////////////////
+	Color panelColor = Fade(BLACK, 0.65f); // Semi-transparent black
+    if (dayProgress > 0.5f) {
+		panelColor = Fade(Color{ 15, 10, 35, 255 }, 0.7f); // Indogo at night
+    }
+    DrawRectangle(20, 20, GetScreenWidth() - 40, GetScreenHeight() - 100, panelColor);
+    DrawRectangleLinesEx(Rectangle{ 18, 18, (float)GetScreenWidth() - 36, (float)GetScreenHeight() - 96 }, 2.0f, Fade(WHITE, 0.15f));
+
 
     // Input prompt with bg overdraw for clean clears/backspace
     int inputY = GetScreenHeight() - 60;
     int inputHeight = 24; // Font 20 + padding
-    Color inputBg = Fade(SKYBLUE, 0.3f); // Blend with bottom of sky
+	Color inputBg = Fade(BLACK, 0.7f); // solid for input area
+	if (dayProgress > 0.5f) inputBg = Fade(Color{ 20, 15, 40, 255 }, 0.75f); // indigo at night
     DrawRectangle(30, inputY - 2, GetScreenWidth() - 60, inputHeight, inputBg); // Covers prompt + buffer space
     DrawText("> ", 40, inputY, 20, WHITE);
     DrawText(inputBuffer ? inputBuffer : "", 80, inputY, 20, WHITE); // Always draw input
@@ -272,7 +282,7 @@ void Renderer::DrawTextOverlay(const std::vector<std::string>& displayLines, con
     int fontSize = 16;
     int lineSpacing = fontSize + 4;
 
-    // Precompute heights (your code unchanged up to here)
+    // Precompute heights
     std::vector<int> lineHeights;
     int totalHeight = 0;
     for (const auto& line : displayLines) {
@@ -323,13 +333,14 @@ void Renderer::UpdateScrollInput() {
         scrollOffset += wheel * WHEEL_SPEED;
     };
 
-	// Arrow keys (hold to scroll continuously)
-    if (IsKeyDown(KEY_UP)) {
-        scrollOffset += ARROW_SPEED * GetFrameTime(); // UP
-    }
-    if (IsKeyDown(KEY_DOWN)) {
-        scrollOffset -= ARROW_SPEED * GetFrameTime(); // DOWN
-    }
+    //CHANGE THIS TO GET HISTORY OF INPUTS NOT SCROLL UP/DOWN
+	// Arrow keys (hold to scroll continuously) 
+ //   if (IsKeyDown(KEY_UP)) {
+ //       scrollOffset += ARROW_SPEED * GetFrameTime(); // UP
+ //   }
+ //   if (IsKeyDown(KEY_DOWN)) {
+ //       scrollOffset -= ARROW_SPEED * GetFrameTime(); // DOWN
+ //   }
 }
 
 // Snap scroll to bottom (newest output)
