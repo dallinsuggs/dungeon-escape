@@ -3,8 +3,8 @@
   "WorkspaceRootPath": "C:\\Users\\kelle\\source\\repos\\dungeon-escape\\DungeonEscape\\",
   "Documents": [
     {
-      "AbsoluteMoniker": "D:0:0:{4A969EED-384E-4B79-AADF-A91356519391}|DungeonEscape.vcxproj|C:\\Users\\kelle\\source\\repos\\dungeon-escape\\DungeonEscape\\Game.cpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}",
-      "RelativeMoniker": "D:0:0:{4A969EED-384E-4B79-AADF-A91356519391}|DungeonEscape.vcxproj|solutionrelative:Game.cpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}"
+      "AbsoluteMoniker": "D:0:0:{4A969EED-384E-4B79-AADF-A91356519391}|DungeonEscape.vcxproj|C:\\Users\\kelle\\source\\repos\\dungeon-escape\\DungeonEscape\\Renderer.cpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}",
+      "RelativeMoniker": "D:0:0:{4A969EED-384E-4B79-AADF-A91356519391}|DungeonEscape.vcxproj|solutionrelative:Renderer.cpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}"
     }
   ],
   "DocumentGroupContainers": [
@@ -19,14 +19,14 @@
             {
               "$type": "Document",
               "DocumentIndex": 0,
-              "Title": "Game.cpp",
-              "DocumentMoniker": "C:\\Users\\kelle\\source\\repos\\dungeon-escape\\DungeonEscape\\Game.cpp",
-              "RelativeDocumentMoniker": "Game.cpp",
-              "ToolTip": "C:\\Users\\kelle\\source\\repos\\dungeon-escape\\DungeonEscape\\Game.cpp",
-              "RelativeToolTip": "Game.cpp",
-              "ViewState": "AgIAADoAAAAAAAAAAAAiwFkAAAAJAAAAAAAAAA==",
+              "Title": "Renderer.cpp",
+              "DocumentMoniker": "C:\\Users\\kelle\\source\\repos\\dungeon-escape\\DungeonEscape\\Renderer.cpp",
+              "RelativeDocumentMoniker": "Renderer.cpp",
+              "ToolTip": "C:\\Users\\kelle\\source\\repos\\dungeon-escape\\DungeonEscape\\Renderer.cpp",
+              "RelativeToolTip": "Renderer.cpp",
+              "ViewState": "AgIAAGsAAAAAAAAAAAAYwIQAAABKAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000677|",
-              "WhenOpened": "2025-12-23T06:41:05.799Z",
+              "WhenOpened": "2025-12-24T04:55:50.082Z",
               "EditorCaption": ""
             }
           ]

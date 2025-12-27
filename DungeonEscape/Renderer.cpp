@@ -25,7 +25,7 @@ Renderer::Renderer(int width = 1024, int height = 768) : screenWidth(width), scr
     startTime = std::chrono::steady_clock::now();
 	SetConfigFlags(FLAG_WINDOW_RESIZABLE);
     InitWindow(screenWidth, screenHeight, "Dungeon Escape");
-	castleTexture = LoadTexture("8bit_castle.jpg");
+	castleTexture = LoadTexture("foreground.png");
     SetTargetFPS(60);
     scrollOffset = 0.0f;
 }
@@ -120,27 +120,6 @@ void Renderer::DrawBackground() {
 
 
 
-    //////////////////////////////* CASTLE *//////////////////////////////
-    // Castle texture (centered, scaled)
-	float scale = 0.2f; // %60 of original size
-	int castleWidth = (int)(castleTexture.width * scale);
-	int castleHeight = (int)(castleTexture.height * scale);
-    int castleX = (GetScreenWidth() - castleWidth) / 2;
-    int castleY = (int)(GetScreenHeight() * 0.2f); // Adjust Y to sit above lake
-    Color tintColor;
-    if (dayProgress < 0.5f) {
-        tintColor = LerpColor(WHITE, GOLD, dayProgress * 0.5f); // Warm day glow
-    }
-    else {
-        tintColor = LerpColor(GOLD, Color{ 200, 200, 255, 255 }, (dayProgress - 0.5f)); // Cool night blue
-    }
-    DrawTexturePro(castleTexture,
-        Rectangle{ 0, 0, (float)castleTexture.width, (float)castleTexture.height },  // Source (full image)
-        Rectangle{ (float)castleX, (float)castleY, (float)castleWidth, (float)castleHeight },  // Dest (scaled/pos)
-        Vector2{ 0, 0 }, 0.0f, tintColor);
-
-
-
     //////////////////////////////* SUN *//////////////////////////////
     // Sun arc and color change
     float sunX = GetScreenWidth() * (dayProgress * 2.0f);
@@ -148,7 +127,31 @@ void Renderer::DrawBackground() {
     float sunY = GetScreenHeight() * (0.5f - 0.3f * sinf(dayProgress * PI * 2.0f));
     Color sunColor = (dayProgress < 0.3f) ? YELLOW : ((dayProgress > 0.7f) ? ORANGE : GOLD);
     DrawCircle(sunX, sunY, 30, sunColor);
+
+
+    //////////////////////////////* CASTLE *//////////////////////////////
+    // Foreground image, sun passes behind all of this but in front of sky
+    // Foreground image (your edited one) - cover scaling to fill screen
+    if (castleTexture.id > 0) {
+        float fgScale = std::max((float)GetScreenWidth() / castleTexture.width,
+            (float)GetScreenHeight() / castleTexture.height);
+        float fgWidth = castleTexture.width * fgScale;
+        float fgHeight = castleTexture.height * fgScale;
+        float fgX = (GetScreenWidth() - fgWidth) / 2.0f;
+        float fgY = (GetScreenHeight() - fgHeight) / 2.0f;
+
+        Color fgTint = WHITE;
+        if (dayProgress > 0.5f) fgTint = LerpColor(WHITE, Color{ 180, 180, 240, 255 }, (dayProgress - 0.5f) * 2);
+
+        DrawTexturePro(castleTexture,
+            Rectangle{ 0, 0, (float)castleTexture.width, (float)castleTexture.height },  // source
+            Rectangle{ fgX, fgY, fgWidth, fgHeight },  // dest
+            Vector2{ 0, 0 },  // origin (top-left pivot)
+            0.0f,           // rotation
+            fgTint);        // tint
+    }
 }
+
 
 
 void Renderer::DrawTextOverlay(const std::vector<std::string>& displayLines, const char* inputBuffer) {
