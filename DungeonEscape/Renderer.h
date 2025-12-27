@@ -12,6 +12,7 @@ private:
     std::chrono::steady_clock::time_point startTime;
     float dayProgress;
 	float scrollOffset = 0.0f; // 0 = window bottom, increases as we scroll up
+    Font customFont;
 
     // Wrap text in window width, draw multiple lines, update currentY position
     void DrawWrappedText(const char* text, int x, int startY, int maxWidth, int fontSize, Color color);

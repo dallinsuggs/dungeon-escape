@@ -79,4 +79,7 @@
   <ItemGroup>
     <None Include="packages.config" />
   </ItemGroup>
+  <ItemGroup>
+    <Font Include="fonts\Jacquard_12\Jacquard12-Regular.ttf" />
+  </ItemGroup>
 </Project>

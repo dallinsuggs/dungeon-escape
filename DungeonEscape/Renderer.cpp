@@ -28,6 +28,9 @@ Renderer::Renderer(int width = 1024, int height = 768) : screenWidth(width), scr
 	castleTexture = LoadTexture("foreground.png");
     SetTargetFPS(60);
     scrollOffset = 0.0f;
+	dayProgress = 0.0f;
+	customFont = LoadFontEx("Jacquard12-Regular.ttf", 96, nullptr, 250);
+	SetTextureFilter(customFont.texture, TEXTURE_FILTER_BILINEAR); // smooth when scaled
 }
 
 // Computes height for one wrapped line
@@ -41,7 +44,7 @@ int Renderer::GetWrappedHeight(const char* text, int maxWidth, int fontSize) {
 
     while (iss >> word) {
         std::string testLine = currentLine.empty() ? word : currentLine + " " + word;
-        if (MeasureText(testLine.c_str(), fontSize) <= maxWidth) {
+        if (MeasureTextEx(customFont, testLine.c_str(), (float)fontSize, 2.0f).x <= maxWidth) {
             currentLine = testLine;
         }
         else {
@@ -75,14 +78,14 @@ void Renderer::DrawWrappedText(const char* text, int x, int startY, int maxWidth
         }
         else {
             if (!currentLine.empty()) {
-                DrawText(currentLine.c_str(), x, lineY, fontSize, color);
+                DrawTextEx(customFont, currentLine.c_str(), Vector2{ (float)x, (float)lineY }, (float)fontSize, 2.0f, color);  // 2.0f spacing = open feel
                 lineY += fontSize + spacing;  // Advance for next line
             }
             currentLine = word;
         }
     }
     if (!currentLine.empty()) {
-        DrawText(currentLine.c_str(), x, lineY, fontSize, color);
+        DrawTextEx(customFont, currentLine.c_str(), Vector2{ (float)x, (float)lineY }, (float)fontSize, 2.0f, color);  // 2.0f spacing = open feel
     }
 }
 
@@ -271,15 +274,18 @@ void Renderer::DrawTextOverlay(const std::vector<std::string>& displayLines, con
 	Color inputBg = Fade(BLACK, 0.7f); // solid for input area
 	if (dayProgress > 0.5f) inputBg = Fade(Color{ 20, 15, 40, 255 }, 0.75f); // indigo at night
     DrawRectangle(30, inputY - 2, GetScreenWidth() - 60, inputHeight, inputBg); // Covers prompt + buffer space
-    DrawText("> ", 40, inputY, 20, WHITE);
-    DrawText(inputBuffer ? inputBuffer : "", 80, inputY, 20, WHITE); // Always draw input
+
+	// DRAW INPUT PROMPT
+    float promptSize = 36.0f;  // Big and charming ♡
+    DrawTextEx(customFont, "> ", Vector2{ 40.0f, (float)inputY }, promptSize, 2.0f, WHITE);
+    DrawTextEx(customFont, inputBuffer ? inputBuffer : "", Vector2{ 80.0f, (float)inputY }, promptSize, 2.0f, WHITE);
 
     // Text area setup
     int textAreaTop = 50;
     int textAreaBottom = GetScreenHeight() - 120; // Buffer for input
     int availableHeight = textAreaBottom - textAreaTop;
     int textAreaWidth = GetScreenWidth() - 80;
-    int fontSize = 16;
+    int fontSize = 32;
     int lineSpacing = fontSize + 4;
 
     // Precompute heights
@@ -322,7 +328,7 @@ void Renderer::DrawTextOverlay(const std::vector<std::string>& displayLines, con
     DrawText(speedText.c_str(), GetScreenWidth() - 150, 20, 16, (timeSpeed > 1.0f ? RED : GRAY));
 
     // Debug
-    //DrawText(TextFormat("Offset: %.0f / Max: %.0f", scrollOffset, maxScroll), GetScreenWidth() - 300, 40, 16, YELLOW);
+    // DrawText(TextFormat("Offset: %.0f / Max: %.0f", scrollOffset, maxScroll), GetScreenWidth() - 300, 40, 16, YELLOW);
 }
 
 // Update scrollOffset based on mouse wheel and arrow keys
@@ -355,5 +361,6 @@ bool Renderer::WindowShouldClose() {
 
 Renderer::~Renderer() {
     UnloadTexture(castleTexture);
+    UnloadFont(customFont);
     CloseWindow();
 }
