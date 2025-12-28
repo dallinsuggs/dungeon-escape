@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 
 #include <string>
 #include <unordered_map>
@@ -111,6 +111,8 @@ public:
 
 	// VERB HANDLERS
 
+	// Help handler
+	void handleHelp(ParsedCommand& cmd);
 	// Use handler
 	void handleUse(ParsedCommand& cmd);
 	// Open handler

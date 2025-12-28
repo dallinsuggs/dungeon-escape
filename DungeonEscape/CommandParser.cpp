@@ -1,4 +1,4 @@
-#include "CommandParser.hpp"
+﻿#include "CommandParser.hpp"
 #include <algorithm>
 #include <cctype>
 #include <string>
@@ -179,6 +179,8 @@ CommandParser::CommandParser(Player* p, bool& runningFlag)
 	: player(p), running(runningFlag) {
 
 	// Initialize verbs umap
+	verbs["help"] = &CommandParser::handleHelp;
+	verbs["h"] = &CommandParser::handleHelp;
 	verbs["use"] = &CommandParser::handleUse;
 	verbs["open"] = &CommandParser::handleOpen;
 	verbs["pick"] = &CommandParser::handlePick;
@@ -212,7 +214,6 @@ CommandParser::CommandParser(Player* p, bool& runningFlag)
 	prepositions.insert("to");
 	prepositions.insert("with");
 	prepositions.insert("at");
-
 }
 
 bool CommandParser::processPendingChoice(const std::string& input, std::vector<std::string>& displayLines)
@@ -518,7 +519,7 @@ void CommandParser::handleGo(ParsedCommand& cmd)
 		return;
 	}
 
-	// Multiple exits: just store pending choice, don�t wait
+	// Multiple exits: just store pending choice, don’t wait
 	pendingExit.options = exitList;
 	pendingExit.direction = dir;
 	pendingExit.active = true;
@@ -550,6 +551,23 @@ void CommandParser::handleGo(ParsedCommand& cmd)
 
 	//writeMessage("Multiple exits to {object1}: {object2}", dir, options);
 }
+
+// Help handler for displaying available commands
+void CommandParser::handleHelp(ParsedCommand& cmd)
+{
+	writeMessage(
+		"You remember a few useful actions:\n\n"
+		"- look [object]: Look around or at an object.\n"
+		"- go [direction]: Move in a direction (north, south, east, west, etc.).\n"
+		"- take / pick up [object]: Pick up an item.\n"
+		"- drop [object]: Drop an item from your inventory.\n"
+		"- use [object1] [preposition] [object2]: Use an item on another item.\n"
+		"- inventory / i: View your current inventory.\n"
+		"- quit / exit / q: Exit the game.\n"
+		"- help: Display this help message.\n"
+		);
+}
+
 
 // Quit handler
 void CommandParser::handleQuit(ParsedCommand& cmd)
