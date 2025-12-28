@@ -1,2 +1,11 @@
-﻿  CommandParser.cpp
+﻿  Game.cpp
+  Renderer.cpp
+C:\Users\kelle\source\repos\dungeon-escape\DungeonEscape\Renderer.cpp(152,22): warning C4244: 'argument': conversion from 'float' to 'int', possible loss of data
+C:\Users\kelle\source\repos\dungeon-escape\DungeonEscape\Renderer.cpp(152,16): warning C4244: 'argument': conversion from 'float' to 'int', possible loss of data
+C:\Users\kelle\source\repos\dungeon-escape\DungeonEscape\Renderer.cpp(176,45): warning C4244: 'argument': conversion from 'int' to 'float', possible loss of data
+C:\Users\kelle\source\repos\dungeon-escape\DungeonEscape\Renderer.cpp(177,45): warning C4244: 'argument': conversion from 'int' to 'float', possible loss of data
+C:\Users\kelle\source\repos\dungeon-escape\DungeonEscape\Renderer.cpp(236,45): warning C4244: 'argument': conversion from 'int' to 'float', possible loss of data
+C:\Users\kelle\source\repos\dungeon-escape\DungeonEscape\Renderer.cpp(237,45): warning C4244: 'argument': conversion from 'int' to 'float', possible loss of data
+C:\Users\kelle\source\repos\dungeon-escape\DungeonEscape\Renderer.cpp(238,45): warning C4244: 'argument': conversion from 'int' to 'float', possible loss of data
+  Generating Code...
   DungeonEscape.vcxproj -> C:\Users\kelle\Source\Repos\dungeon-escape\DungeonEscape\x64\Debug\DungeonEscape.exe

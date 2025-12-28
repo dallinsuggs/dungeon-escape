@@ -231,25 +231,25 @@ void Renderer::DrawBackground() {
             float intensity = nightIntensity * pulseBase * flicker;
 
             Color warmCore = Color{ 255, 180, 80, 255 };
-			Color warmGlow = Color{ 255, 160, 60, 255 };
+            Color warmGlow = Color{ 255, 160, 60, 255 };
 
             DrawCircle((int)x, (int)y, (int)(baseRadius * 2.5f), Fade(warmGlow, 0.1f * intensity));  // Outer
             DrawCircle((int)x, (int)y, (int)(baseRadius * 1.6f), Fade(warmGlow, 0.2f * intensity));  // Mid
             DrawCircle((int)x, (int)y, (int)baseRadius, Fade(warmCore, intensity));                // Core
             };
 
-		// Example lantern positions on castle (as % of screen)
-		// Use a lamda counter for a few lights
-        // MAX: 10-15 lights
-        // (Run, see where they land, adjust percentX/Y—e.g., 0.3 = 30% from left, 0.4 = 40% from top)
-        DrawGlowLightRelative(0.2f, 0.5f, 2.5f); // Far left mid tower outside castle walls
-        DrawGlowLightRelative(0.33f, 0.54f, 2.5f); // Far left castle window
-		DrawGlowLightRelative(0.425f, 0.47f, 2.0f); // Upper left castle window
-        DrawGlowLightRelative(0.465f, 0.675f, 2.0f); // Left castle door tower
-        DrawGlowLightRelative(0.557f, 0.675f, 2.0f); // Right castle door tower
-        DrawGlowLightRelative(0.565f, 0.52f, 2.0f); // Upper right castle window
-        DrawGlowLightRelative(0.64f, 0.23f, 2.3f); // Tall upper right tower inside castle walls
-        DrawGlowLightRelative(0.86f, 0.61f, 2.5f); // Far right wide tower on castle walls
+            // Example lantern positions on castle (as % of screen)
+            // Use a lamda counter for a few lights
+            // MAX: 10-15 lights
+            // (Run, see where they land, adjust percentX/Y—e.g., 0.3 = 30% from left, 0.4 = 40% from top)
+            DrawGlowLightRelative(0.2f, 0.5f, 2.5f); // Far left mid tower outside castle walls
+            DrawGlowLightRelative(0.33f, 0.54f, 2.5f); // Far left castle window
+            DrawGlowLightRelative(0.425f, 0.47f, 2.0f); // Upper left castle window
+            DrawGlowLightRelative(0.465f, 0.675f, 2.0f); // Left castle door tower
+            DrawGlowLightRelative(0.557f, 0.675f, 2.0f); // Right castle door tower
+            DrawGlowLightRelative(0.565f, 0.52f, 2.0f); // Upper right castle window
+            DrawGlowLightRelative(0.64f, 0.23f, 2.3f); // Tall upper right tower inside castle walls
+            DrawGlowLightRelative(0.86f, 0.61f, 2.5f); // Far right wide tower on castle walls
     }
 }
 
@@ -258,28 +258,23 @@ void Renderer::DrawBackground() {
 void Renderer::DrawTextOverlay(const std::vector<std::string>& displayLines, const char* inputBuffer) {
     // Semi-transparent background for text area
     // DrawRectangle(20, 20, GetScreenWidth() - 40, GetScreenHeight() - 100, Fade(BLACK, 0.2f));
-
     //////////////////////////////* TEXT AREA *//////////////////////////////
-	Color panelColor = Fade(BLACK, 0.65f); // Semi-transparent black
+    Color panelColor = Fade(BLACK, 0.65f); // Semi-transparent black
     if (dayProgress > 0.5f) {
-		panelColor = Fade(Color{ 15, 10, 35, 255 }, 0.7f); // Indogo at night
+        panelColor = Fade(Color{ 15, 10, 35, 255 }, 0.7f); // Indigo at night
     }
     DrawRectangle(20, 20, GetScreenWidth() - 40, GetScreenHeight() - 100, panelColor);
     DrawRectangleLinesEx(Rectangle{ 18, 18, (float)GetScreenWidth() - 36, (float)GetScreenHeight() - 96 }, 2.0f, Fade(WHITE, 0.15f));
-
-
     // Input prompt with bg overdraw for clean clears/backspace
     int inputY = GetScreenHeight() - 60;
     int inputHeight = 24; // Font 20 + padding
-	Color inputBg = Fade(BLACK, 0.7f); // solid for input area
-	if (dayProgress > 0.5f) inputBg = Fade(Color{ 20, 15, 40, 255 }, 0.75f); // indigo at night
+    Color inputBg = Fade(BLACK, 0.7f); // solid for input area
+    if (dayProgress > 0.5f) inputBg = Fade(Color{ 20, 15, 40, 255 }, 0.75f); // indigo at night
     DrawRectangle(30, inputY - 2, GetScreenWidth() - 60, inputHeight, inputBg); // Covers prompt + buffer space
-
-	// DRAW INPUT PROMPT
-    float promptSize = 36.0f;  // Big and charming ♡
+    // DRAW INPUT PROMPT
+    float promptSize = 36.0f; // Big and charming ♡
     DrawTextEx(customFont, "> ", Vector2{ 40.0f, (float)inputY }, promptSize, 2.0f, WHITE);
     DrawTextEx(customFont, inputBuffer ? inputBuffer : "", Vector2{ 80.0f, (float)inputY }, promptSize, 2.0f, WHITE);
-
     // Text area setup
     int textAreaTop = 50;
     int textAreaBottom = GetScreenHeight() - 120; // Buffer for input
@@ -287,46 +282,60 @@ void Renderer::DrawTextOverlay(const std::vector<std::string>& displayLines, con
     int textAreaWidth = GetScreenWidth() - 80;
     int fontSize = 32;
     int lineSpacing = fontSize + 4;
-
-    // Precompute heights
+    // Precompute heights for permanent history lines
     std::vector<int> lineHeights;
     int totalHeight = 0;
     for (const auto& line : displayLines) {
         int h = GetWrappedHeight(line.c_str(), textAreaWidth, fontSize);
         lineHeights.push_back(h);
-        totalHeight += h + 2;
+        totalHeight += h + 10;  // We now use +10 consistently (your better spacing!)
     }
-    if (!displayLines.empty()) totalHeight -= 2;  // Avoid double-gap
+    if (!displayLines.empty()) totalHeight -= 10; // Avoid extra gap at end
 
-    // Scrolling setup (replaces old auto-scroll)
+    // Scrolling setup
     float maxScroll = std::max(0.0f, (float)totalHeight - (float)availableHeight);
-
-    // Manual clamp scrollOffset
     if (scrollOffset < 0.0f) scrollOffset = 0.0f;
     if (scrollOffset > maxScroll) scrollOffset = maxScroll;
 
     // Viewport offset: 0 = newest at bottom
     int viewportTopContent = (int)((float)totalHeight - (float)availableHeight - scrollOffset);
-    viewportTopContent = std::max(0, viewportTopContent);  // Prevent over-scroll top
+    viewportTopContent = std::max(0, viewportTopContent);
 
-    // Then draw visible lines
     int currentContentY = 0;
+
+    // FIRST: Draw permanent history (all finished text)
     for (size_t i = 0; i < displayLines.size(); ++i) {
         int h = lineHeights[i];
-        // Draw if this line overlaps the viewport
         if (currentContentY + h > viewportTopContent && currentContentY < viewportTopContent + availableHeight) {
-            // This line is at least partially visible
             int drawStartY = textAreaTop + (currentContentY - viewportTopContent);
             DrawWrappedText(displayLines[i].c_str(), 40, drawStartY, textAreaWidth, fontSize, WHITE);
         }
-        currentContentY += h + 2; // GAP BETWEEN MESSAGES
+        currentContentY += h + 10;  // Consistent spacing
+    }
+
+    // SECOND: If typing is active, draw the typing animation ON TOP of the history
+    if (typingActive) {
+        for (size_t i = 0; i < animLines.size(); ++i) {
+            int visibleChars = (int)(animLines[i].length() * animProgress[i]);
+            std::string partial = animLines[i].substr(0, visibleChars);
+
+            // Blinking cursor (faster and cuter ♡)
+            if (animProgress[i] < 1.0f && fmod(typingTimer * 8.0f, 1.0f) > 0.5f) {
+                partial += "_";
+            }
+
+            int h = GetWrappedHeight(partial.c_str(), textAreaWidth, fontSize);
+            if (currentContentY + h > viewportTopContent && currentContentY < viewportTopContent + availableHeight) {
+                int drawStartY = textAreaTop + (currentContentY - viewportTopContent);
+                DrawWrappedText(partial.c_str(), 40, drawStartY, textAreaWidth, fontSize, WHITE);
+            }
+            currentContentY += h + 10;
+        }
     }
 
     // TESTING PURPOSES ONLY COMMENT OUT WHEN DONE
-    // Speed indicator (top-right, subtle)
-    std::string speedText = "Time: " + std::to_string((int)timeSpeed) + "x";  // Use 'timeSpeed' directly (member var)
+    std::string speedText = "Time: " + std::to_string((int)timeSpeed) + "x";
     DrawText(speedText.c_str(), GetScreenWidth() - 150, 20, 16, (timeSpeed > 1.0f ? RED : GRAY));
-
     // Debug
     // DrawText(TextFormat("Offset: %.0f / Max: %.0f", scrollOffset, maxScroll), GetScreenWidth() - 300, 40, 16, YELLOW);
 }
@@ -349,11 +358,33 @@ void Renderer::UpdateScrollInput() {
  //   }
 }
 
+
+// Typing animation update per frame
+void Renderer::StartTypingAnimation(const std::vector<std::string>& lines) {
+    animLines = lines;
+    animProgress.clear();
+    for (auto& line : animLines) animProgress.push_back(0.0f);
+    typingTimer = 0.0f;
+    typingActive = !lines.empty();
+}
+
+// Update typing animation progress
+void Renderer::UpdateTypingAnimation(float deltaTime) {
+    if (!typingActive) return;
+	typingTimer += deltaTime * typingSpeed; // characters progressed
+    bool done = true;
+    for (size_t i = 0; i < animProgress.size(); ++i) {
+        animProgress[i] = std::min(1.0f, typingTimer / (float)animLines[i].length());
+        if (animProgress[i] < 1.0f) done = false;
+    }
+    if (done) typingActive = false;
+}
+
+
 // Snap scroll to bottom (newest output)
 void Renderer::SnapToBottom() {
     scrollOffset = 0.0f;
 }
-
 
 bool Renderer::WindowShouldClose() {
     return ::WindowShouldClose();

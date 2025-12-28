@@ -61,7 +61,25 @@ int main() {
     std::string userInput = "";
     std::vector<std::string> displayLines;
     CommandParser parser(&player, running);
-    displayLines = captureOutput([&]() { parser.writeMessage(allRooms.at("cell_1").describeSelf()); });
+
+    // Show the starting room description instantly (no typing animation for the very first message)
+    std::vector<std::string> startingLines = captureOutput([&]() {
+        parser.writeMessage(allRooms.at("cell_1").describeSelf());
+        });
+
+    // Remove empty lines just in case
+    startingLines.erase(std::remove_if(startingLines.begin(), startingLines.end(),
+        [](const std::string& s) { return s.empty(); }), startingLines.end());
+
+    // Add directly to permanent history
+    for (const auto& line : startingLines) {
+        if (!line.empty()) {
+            displayLines.push_back(line);
+        }
+    }
+
+    // Optional: make sure player sees it right away
+    renderer.SnapToBottom();
 
     // Input handler
     InputHandler inputHandler;
@@ -74,6 +92,25 @@ int main() {
         // Update day progress (30-min cycle)
         renderer.UpdateDayProgress();
         renderer.UpdateScrollInput(); // handle scroll input
+		renderer.UpdateTypingAnimation(GetFrameTime());
+
+        // Check if typing just finished this frame
+        static bool wasTyping = false;
+        bool currentlyTyping = !renderer.IsTypingDone();
+
+        if (wasTyping && !currentlyTyping) {
+            // Typing just finished → add the lines to permanent history
+            const auto& completedLines = renderer.GetLastTypedLines();
+            for (const auto& line : completedLines) {
+                if (!line.empty()) {
+                    displayLines.push_back(line);
+                }
+            }
+            renderer.SnapToBottom();  // Auto-scroll to new text
+        }
+        wasTyping = currentlyTyping;
+
+        
 
         // TESTING PURPOSES ONLY COMMENT OUT WHEN DONE
         if (IsKeyPressed(KEY_LEFT_CONTROL)) {
@@ -94,6 +131,10 @@ int main() {
             // Echo the input as history
             std::string inputEcho = "> " + userInput;
             displayLines.push_back(inputEcho);
+            renderer.SnapToBottom();
+
+            // Check for pending exit choice (multiple doors)
+            std::vector<std::string> newOutputLines;
 
             // Check pending exit first
             if (parser.pendingExit.active) {
@@ -103,27 +144,31 @@ int main() {
 
                 if (choice >= 0 && choice < parser.pendingExit.options.size()) {
                     player.setCurrentRoom(parser.pendingExit.options[choice].room);
-                    displayLines.push_back(player.getCurrentRoom()->describeSelf());
+                    newOutputLines = captureOutput([&]() {
+                        parser.writeMessage(player.getCurrentRoom()->describeSelf());
+                        });
                     parser.pendingExit.active = false;
                 }
                 else {
-                    displayLines.push_back("Invalid choice, enter a number corresponding to your exit.");
+                    newOutputLines.push_back("Invalid choice, enter a number corresponding to your exit.");
                 }
             }
             else {
                 // Normal command parsing
-                auto newLines = captureOutput([&]() { parser.parse(userInput); });
-                for (const auto& line : newLines) {
-                    if (!line.empty()) displayLines.push_back(line);
-                }
+                newOutputLines = captureOutput([&]() { parser.parse(userInput); });
             }
 
-            // Optional: keep only last N lines
-            // if (displayLines.size() > 20) { 
-            //     displayLines.erase(displayLines.begin(), displayLines.begin() + (displayLines.size() - 20));
-            // }
+			// remove empty lines
+            newOutputLines.erase(
+                std::remove_if(newOutputLines.begin(), newOutputLines.end(),
+                    [](const std::string& s) { return s.empty(); }),
+                newOutputLines.end()
+            );
 
-            renderer.SnapToBottom(); // Auto-scroll to bottom on new input
+			// New text > start typing animation
+            if (!newOutputLines.empty()) {
+                renderer.StartTypingAnimation(newOutputLines);
+			}
             userInput.clear(); // Reset for next
         }
 

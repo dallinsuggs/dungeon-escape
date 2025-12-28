@@ -17,6 +17,13 @@ private:
     // Wrap text in window width, draw multiple lines, update currentY position
     void DrawWrappedText(const char* text, int x, int startY, int maxWidth, int fontSize, Color color);
 
+    // Typing animation
+	float typingSpeed = 30.0f; // characters per second
+    std::vector<std::string> animLines; // lines being typed
+	std::vector<float> animProgress; // Progress per line (0.0 to 1.0)
+    float typingTimer = 0.0f;
+    bool typingActive = false;
+
     // TESTING PURPOSES ONLY COMMENT OUT WHEN DONE
     float simulatedElapsed = 0.0f;
     float timeSpeed = 1.0f; // Speed multiplier for time progression
@@ -30,6 +37,13 @@ public:
     void UpdateScrollInput(); // Call every frame for wheel/arrows
     void SnapToBottom(); // Force window down to newest on output
     ~Renderer();
+
+	// Typing animation controls
+    void StartTypingAnimation(const std::vector<std::string>& lines);
+    void UpdateTypingAnimation(float deltaTime);
+    bool IsTypingActive() const { return typingActive; }
+    bool IsTypingDone() const { return !typingActive; }
+    const std::vector<std::string>& GetLastTypedLines() const { return animLines; }
 
     // TESTING PURPOSES ONLY COMMENT OUT WHEN DONE
     float GetTimeSpeed() const { return timeSpeed; } // for display
