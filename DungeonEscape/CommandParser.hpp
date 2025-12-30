@@ -7,6 +7,7 @@
 #include <fstream>
 #include <sstream>
 #include <algorithm>
+#include <functional>
 
 #include "Item.hpp"
 #include "Player.hpp"
@@ -14,13 +15,26 @@
 
 class CommandParser {
 public:
+	// msgs struct
+	struct MultiMsg {
+		std::string msg1;
+		std::string msg1Param1 = "";
+		std::string msg1Param2 = "";
+		std::string msg2;
+		std::string msg2Param1 = "";
+		std::string msg2Param2 = "";
+	};
+	// Choice struct
+	struct Choice {
+		std::string label;
+		std::function<void()> action;
+	};
 	// Pending choice state
-	struct PendingExitChoice {
-		std::vector<Room::ExitOption> options;
-		std::string direction;
+	struct PendingChoice {
+		std::vector<Choice> choices;
 		bool active = false;
 	};
-	PendingExitChoice pendingExit;
+	PendingChoice pendingChoice;
 private:
 	// struct
 	struct ParsedCommand {
@@ -57,12 +71,16 @@ private:
 	const std::string MSG_DONT_HAVE = "You don't have a {object1}.";
 	const std::string MSG_CANT_TAKE = "You can't pick up the {object1}, it's either too heavy or securely attached.";
 	const std::string MSG_NO_EXIT = "You don't see any path or exit to the {object1}.";
+	const std::string MSG_MULTI_EXITS = "There are multiple exits to the {object1}: \n{object2}";
+	const std::string MSG_SELECT_CHOICE = "Type the number of your choice and press enter.";
+	const std::string MSG_MULTI_ITEMS = "There are multiple {object1} items: \n{object2}";
 
 	// booleans
 	bool doorLocked = true;
 	bool doorOpen = false;
 
 	// Internal helpers
+	void promptChoice(const std::vector<Choice>& choices, MultiMsg msgs);
 	std::vector<std::string> getItemIdsByName(const std::unordered_map<std::string, Item*>& itemList, const std::string& objectName);
 	std::vector<std::string> getAllItemIdsByName(const std::unordered_map<std::string, Item*>& inventory, const std::unordered_map<std::string, Item*>& roomItems, const std::string& objectName);
 	std::string resolveSingleItemId(const std::unordered_map<std::string, Item*>& itemList, const std::string& objectName);
@@ -97,9 +115,6 @@ public:
 
 	// Constructor
 	CommandParser(Player* p, bool& runningFlag);
-
-	// Process pending choice
-	bool processPendingChoice(const std::string& input, std::vector<std::string>& displayLines);
 
 	// Parse function (primary function to interpret player input and delegate work to handler functions)
 	void parse(std::string& input);

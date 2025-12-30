@@ -14,6 +14,17 @@ std::string normalize(const std::string& s) {
 // INTERNAL HELPERS
 
 
+void CommandParser::promptChoice(const std::vector<Choice>& choices, MultiMsg msgs)
+{
+	pendingChoice.choices = choices;
+	pendingChoice.active = true;
+	
+	writeMessage(msgs.msg1, msgs.msg1Param1, msgs.msg1Param2);
+	if (!msgs.msg2.empty()) {
+		writeMessage(msgs.msg2, msgs.msg2Param1, msgs.msg2Param2);
+	}
+}
+
 // This function checks a single unordered map of Items and returns the IDs of all Items with names matching a given string
 std::vector<std::string> CommandParser::getItemIdsByName(const std::unordered_map<std::string, Item*>& itemList, const std::string& objectName)
 {
@@ -67,6 +78,8 @@ std::string CommandParser::resolveSingleItemId(const std::unordered_map<std::str
 		options.pop_back(); options.pop_back(); // remove trailing ", "
 		writeMessage("Multiple {object1}s found: {object2}", objectName, options);
 	}
+
+
 	return "";
 }
 
@@ -214,36 +227,6 @@ CommandParser::CommandParser(Player* p, bool& runningFlag)
 	prepositions.insert("to");
 	prepositions.insert("with");
 	prepositions.insert("at");
-}
-
-bool CommandParser::processPendingChoice(const std::string& input, std::vector<std::string>& displayLines)
-{
-	if (!pendingExit.active) return false;
-
-	int choice = -1;
-	try {
-		choice = std::stoi(input) - 1;
-	}
-	catch (...) {
-		displayLines.push_back("Please enter a number corresponding to your choice.");
-		return true; // consumed input
-	}
-
-	if (choice >= 0 && choice < pendingExit.options.size()) {
-		player->setCurrentRoom(pendingExit.options[choice].room);
-
-		// Display new room desc
-		std::string desc = player->getCurrentRoom()->describeSelf();
-		displayLines.push_back(desc);
-	}
-	else {
-		displayLines.push_back("Invalid choice, try again.");
-		return true; // input was consumed
-	}
-
-	pendingExit.active = false;
-
-	return true; // input handled
 }
 
 // Parse function (primary function to interpret player input and delegate work to handler functions)
@@ -407,17 +390,53 @@ void CommandParser::handleDrop(ParsedCommand& cmd)
 {
 	auto& inventory = player->getInventory();
 	auto& roomItems = player->getCurrentRoom()->getRoomItems();
-	
-	std::string targetId = resolveSingleItemId(inventory, cmd.object1);
-	if (targetId.empty()) {
+
+	// Get all item IDs in inventory matching the input
+	auto matches = getItemIdsByName(inventory, cmd.object1);
+
+	if (matches.empty()) {
 		writeMessage(MSG_DONT_HAVE, cmd.object1);
-		return; // either not found or multiple matches
+		return;
 	}
 
-	// Drop the item
-	roomItems[targetId] = inventory.at(targetId);
-	inventory.erase(targetId);
-	writeMessage(MSG_DROP, cmd.object1);
+	// If only one match, drop immediately
+	if (matches.size() == 1) {
+		const std::string& targetId = matches[0];
+		roomItems[targetId] = inventory[targetId];
+		inventory.erase(targetId);
+		writeMessage(MSG_DROP, inventory[targetId]->getName());
+		return;
+	}
+
+	// Multiple matches: build choice list
+	std::vector<Choice> choices;
+	for (const auto& id : matches) {
+		Item* itemPtr = inventory[id]; // capture pointer
+		choices.push_back(Choice{
+			itemPtr->getName() + " (" + id + ")", // label shown to player
+			[this, &inventory, &roomItems, id, itemPtr]() { // action when chosen
+				roomItems[id] = inventory[id];
+				inventory.erase(id);
+				writeMessage(MSG_DROP, itemPtr->getName());
+			}
+			});
+	}
+
+	// Build options string for display
+	std::string options;
+	for (size_t i = 0; i < choices.size(); ++i) {
+		options += std::to_string(i + 1) + " - " + choices[i].label + "\n";
+	}
+
+	// Use promptChoice to show the options to the player
+	MultiMsg msgs{
+		MSG_MULTI_ITEMS,
+		cmd.object1,
+		options,
+		MSG_SELECT_CHOICE
+	};
+
+	promptChoice(choices, msgs);
 }
 
 void CommandParser::handlePut(ParsedCommand& cmd)
@@ -433,28 +452,71 @@ void CommandParser::handleTake(ParsedCommand& cmd)
 	auto& inventory = player->getInventory();
 	auto& roomItems = player->getCurrentRoom()->getRoomItems();
 
-	std::string targetId = resolveSingleItemId(roomItems, cmd.object1);
-	if (targetId.empty()) {
+	// get all item IDs matching the input
+	auto matches = getItemIdsByName(roomItems, cmd.object1);
+
+	if (matches.empty()) {
 		writeMessage(MSG_DONT_SEE, cmd.object1);
-		return; // either not found or multiple matches
-	}
-	// Now proceed with taking the item from the room
-
-	//// If moveable and presently accessible to player, take item
-	auto roomIt = roomItems.find(targetId);
-	if (!roomIt->second->isMoveable()) {
-		writeMessage(MSG_CANT_TAKE, cmd.object1);
 		return;
 	}
 
-	if (inventory.count(targetId)) {
-		writeMessage(MSG_ALREADY_HAVE, cmd.object1);
+	// If only one match, take immediately
+
+	if (matches.size() == 1) {
+		const std::string& targetId = matches[0];
+
+		if (!roomItems[targetId]->isMoveable()) { // if unmoveable, can't take
+			writeMessage(MSG_CANT_TAKE, cmd.object1);
+			return;
+		}
+
+		if (inventory.count(targetId)) {
+			writeMessage(MSG_ALREADY_HAVE, cmd.object1);
+			return;
+		}
+
+		inventory[targetId] = roomItems[targetId];
+		roomItems.erase(targetId);
+		writeMessage(MSG_TAKE, cmd.object1);
 		return;
 	}
 
-	inventory[targetId] = roomIt->second;
-	roomItems.erase(roomIt);
-	writeMessage(MSG_TAKE, cmd.object1);
+	// If multiple, build choice list
+	std::vector<Choice> choices;
+	for (const auto& id : matches) {
+		Item* itemPtr = roomItems[id]; // capture the pointer
+		choices.push_back(Choice{
+			roomItems[id]->getName() + " (" + id + ")", // label shown to player
+			[this, &inventory, &roomItems, id, itemPtr]() { // action when chosen
+				if (!roomItems[id]->isMoveable()) {
+					writeMessage(MSG_CANT_TAKE, roomItems[id]->getName());
+					return;
+				}
+				if (inventory.count(id)) {
+					writeMessage(MSG_ALREADY_HAVE, roomItems[id]->getName());
+					return;
+				}
+				inventory[id] = roomItems[id];
+				roomItems.erase(id);
+				writeMessage(MSG_TAKE, itemPtr->getName());
+			}
+		});
+	}
+
+	std::string options;
+	for (size_t i = 0; i < choices.size(); ++i) {
+		options += std::to_string(i + 1) + " - " + choices[i].label + "\n";
+	}
+
+	// use promptChoice to show the options to the player
+	MultiMsg msgs{
+		MSG_MULTI_ITEMS,
+		cmd.object1,
+		options,
+		MSG_SELECT_CHOICE
+	};
+
+	promptChoice(choices, msgs);
 }
 
 // Pick handler
@@ -487,13 +549,50 @@ void CommandParser::handleExamine(ParsedCommand& cmd) {
 	auto& inventory = player->getInventory();
 	auto& roomItems = player->getCurrentRoom()->getRoomItems();
 
-	std::string targetId = resolveAllSingleItemId(inventory, roomItems, target);
-	if (targetId.empty()) return; // either not found or multiple matches
+	// Get all item IDs matching the input in both room and inventory
+	auto matches = getAllItemIdsByName(inventory, roomItems, target);
 
-	// Now we know exactly which item to describe
-	Item* itemPtr = roomItems.count(targetId) ? roomItems.at(targetId) : inventory.at(targetId);
-	writeMessage(itemPtr->getDescription());
+	if (matches.empty()) {
+		writeMessage(MSG_DONT_SEE, target);
+		return;
+	}
+
+	// If only one match, examine immediately
+	if (matches.size() == 1) {
+		Item* itemPtr = roomItems.count(matches[0]) ? roomItems.at(matches[0]) : inventory.at(matches[0]);
+		writeMessage(itemPtr->getDescription());
+		return;
+	}
+
+	// Multiple matches: build choice list
+	std::vector<Choice> choices;
+	for (const auto& id : matches) {
+		Item* itemPtr = roomItems.count(id) ? roomItems.at(id) : inventory.at(id);
+		choices.push_back(Choice{
+			itemPtr->getName() + " (" + id + ")", // label shown to player
+			[this, itemPtr]() { // action when chosen
+				writeMessage(itemPtr->getDescription());
+			}
+			});
+	}
+
+	// Build options string for display
+	std::string options;
+	for (size_t i = 0; i < choices.size(); ++i) {
+		options += std::to_string(i + 1) + " - " + choices[i].label + "\n";
+	}
+
+	// Use promptChoice to show the options to the player
+	MultiMsg msgs{
+		MSG_MULTI_ITEMS,
+		target,
+		options,
+		MSG_SELECT_CHOICE
+	};
+
+	promptChoice(choices, msgs);
 }
+
 
 // Go handler
 void CommandParser::handleGo(ParsedCommand& cmd)
@@ -519,37 +618,31 @@ void CommandParser::handleGo(ParsedCommand& cmd)
 		return;
 	}
 
-	// Multiple exits: just store pending choice, don’t wait
-	pendingExit.options = exitList;
-	pendingExit.direction = dir;
-	pendingExit.active = true;
+	// Set up choices vector for promptChoice
+	std::vector<Choice> choices;
+	for (auto& exit : exitList) {
+		choices.push_back({ exit.label, [this, &exit]() { player->setCurrentRoom(exit.room); writeMessage(player->getCurrentRoom()->describeSelf()); } });
+	}
 
+	// format choice text output
 	std::string options;
 	for (size_t i = 0; i < exitList.size(); ++i)
 		options += std::to_string(i + 1) + " - " + exitList[i].label + "\n";
 
-	writeMessage("Multiple exits to {object1}: {object2}", dir, options);
-	writeMessage("Type the number of your choice and press enter.");
+	MultiMsg msgs{
+		MSG_MULTI_EXITS,
+		dir,
+		options,
+		MSG_SELECT_CHOICE
+	};
 
+	// call promptChoice
+	promptChoice(choices, msgs);
 
-	//if (exitList.size() == 1) {
-	//	// Single exit: move immediately
-	//	player->setCurrentRoom(exitList[0].room); // fix to correctly referent Room* from exitList
-	//	writeMessage(player->getCurrentRoom()->describeSelf());
-	//	return;
-	//}
+	//// write messages
+	//writeMessage("Multiple exits to {object1}: \n{object2}", dir, options);
+	//writeMessage("Type the number of your choice and press enter.");
 
-	//// Multiple exits - set pending choice
-	//pendingExit.options = exitList;
-	//pendingExit.direction = dir;
-	//pendingExit.active = true;
-
-	//std::string options;
-	//for (size_t i = 0; i < exitList.size(); ++i) {
-	//	options += std::to_string(i + 1) + " - " + exitList[i].label + "\n";
-	//}
-
-	//writeMessage("Multiple exits to {object1}: {object2}", dir, options);
 }
 
 // Help handler for displaying available commands

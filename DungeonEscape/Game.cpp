@@ -48,6 +48,9 @@ int main() {
     // Renderer setup
     Renderer renderer(1024, 768);
 
+    // Maximum lines to be displayed on screen
+    const size_t MAX_LINES = 100;
+
     // Items setup
     std::unordered_map<std::string, Item> allItems = fm.loadItems("items.json");
 
@@ -106,6 +109,11 @@ int main() {
                     displayLines.push_back(line);
                 }
             }
+
+            // Trim old lines if needed
+            if (displayLines.size() > MAX_LINES) {
+                displayLines.erase(displayLines.begin(), displayLines.begin() + (displayLines.size() - MAX_LINES));
+            }
             renderer.SnapToBottom();  // Auto-scroll to new text
         }
         wasTyping = currentlyTyping;
@@ -136,18 +144,19 @@ int main() {
             // Check for pending exit choice (multiple doors)
             std::vector<std::string> newOutputLines;
 
-            // Check pending exit first
-            if (parser.pendingExit.active) {
+            // Check pending Choice first
+            if (parser.pendingChoice.active) {
                 int choice = -1;
                 try { choice = std::stoi(userInput) - 1; }
                 catch (...) {}
 
-                if (choice >= 0 && choice < parser.pendingExit.options.size()) {
-                    player.setCurrentRoom(parser.pendingExit.options[choice].room);
-                    newOutputLines = captureOutput([&]() {
-                        parser.writeMessage(player.getCurrentRoom()->describeSelf());
-                        });
-                    parser.pendingExit.active = false;
+                if (choice >= 0 && choice < parser.pendingChoice.choices.size()) {
+                    auto lines = captureOutput([&]() {
+                        parser.pendingChoice.choices[choice].action();
+                    });
+                    
+                    displayLines.insert(displayLines.end(), lines.begin(), lines.end());
+                    parser.pendingChoice.active = false;
                 }
                 else {
                     newOutputLines.push_back("Invalid choice, enter a number corresponding to your exit.");
