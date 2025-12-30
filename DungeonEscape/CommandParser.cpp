@@ -210,6 +210,7 @@ CommandParser::CommandParser(Player* p, bool& runningFlag)
 	verbs["look"] = &CommandParser::handleLook;
 	verbs["examine"] = &CommandParser::handleExamine;
 	verbs["go"] = &CommandParser::handleGo;
+	verbs["unlock"] = &CommandParser::handleUnlock;
 	// sit
 	// lay
 	// tear (sheet?)
@@ -643,6 +644,79 @@ void CommandParser::handleGo(ParsedCommand& cmd)
 	//writeMessage("Multiple exits to {object1}: \n{object2}", dir, options);
 	//writeMessage("Type the number of your choice and press enter.");
 
+}
+
+// Unlock handler
+void CommandParser::handleUnlock(ParsedCommand& cmd)
+{
+	std::string target = cmd.object1;
+
+	if (target.empty()) {
+		writeMessage(MSG_VERB_WHAT, cmd.verb);
+		return;
+	}
+
+	auto& inventory = player->getInventory();
+	auto& roomItems = player->getCurrentRoom()->getRoomItems();
+
+	// Get all item IDs matching the input in both room and inventory
+	auto matches = getAllItemIdsByName(inventory, roomItems, target);
+
+	if (matches.empty()) {
+		writeMessage(MSG_DONT_SEE, target);
+		return;
+	}
+
+	// If only one match, examine immediately
+	if (matches.size() == 1) {
+		Item* itemPtr = roomItems.count(matches[0]) ? roomItems.at(matches[0]) : inventory.at(matches[0]);
+		if (itemPtr->getName() == "door") {
+			itemPtr->toggleLock();
+			std::string msg = itemPtr->isLocked() ? "The {object1} is locked." : "The {object1} is unlocked.";
+			writeMessage(msg, itemPtr->getName());
+			return;
+		}
+		else {
+			writeMessage(MSG_DONT_KNOW_HOW);
+		}
+	}
+
+	// Multiple matches: build choice list
+	std::vector<Choice> choices;
+	for (const auto& id : matches) {
+		Item* itemPtr = roomItems.count(id) ? roomItems.at(id) : inventory.at(id);
+		choices.push_back(Choice{
+			itemPtr->getName() + " (" + id + ")", // label shown to player
+			[this, itemPtr]() { // action when chosen
+				if (itemPtr->getName() == "door") {
+					itemPtr->toggleLock();
+					std::string msg = itemPtr->isLocked() ? "The {object1} is locked." : "The {object1} is unlocked.";
+					writeMessage(msg, itemPtr->getName());
+					return;
+				}
+				else {
+					writeMessage(MSG_DONT_KNOW_HOW);
+				}
+			}
+			});
+	}
+
+	// Build options string for display
+	std::string options;
+	for (size_t i = 0; i < choices.size(); ++i) {
+		options += std::to_string(i + 1) + " - " + choices[i].label + "\n";
+	}
+
+	// Use promptChoice to show the options to the player
+	MultiMsg msgs{
+		MSG_MULTI_ITEMS,
+		target,
+		options,
+		MSG_SELECT_CHOICE
+	};
+
+	promptChoice(choices, msgs);
+	
 }
 
 // Help handler for displaying available commands

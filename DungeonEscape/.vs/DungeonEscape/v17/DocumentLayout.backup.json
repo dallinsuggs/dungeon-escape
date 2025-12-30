@@ -3,12 +3,36 @@
   "WorkspaceRootPath": "C:\\CppProjects\\ConsolePrograms\\DungeonEscape\\DungeonEscape\\",
   "Documents": [
     {
-      "AbsoluteMoniker": "D:0:0:{4A969EED-384E-4B79-AADF-A91356519391}|DungeonEscape.vcxproj|C:\\CppProjects\\ConsolePrograms\\DungeonEscape\\DungeonEscape\\Game.cpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}",
-      "RelativeMoniker": "D:0:0:{4A969EED-384E-4B79-AADF-A91356519391}|DungeonEscape.vcxproj|solutionrelative:Game.cpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}"
-    },
-    {
       "AbsoluteMoniker": "D:0:0:{4A969EED-384E-4B79-AADF-A91356519391}|DungeonEscape.vcxproj|C:\\CppProjects\\ConsolePrograms\\DungeonEscape\\DungeonEscape\\CommandParser.cpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}",
       "RelativeMoniker": "D:0:0:{4A969EED-384E-4B79-AADF-A91356519391}|DungeonEscape.vcxproj|solutionrelative:CommandParser.cpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{4A969EED-384E-4B79-AADF-A91356519391}|DungeonEscape.vcxproj|C:\\CppProjects\\ConsolePrograms\\DungeonEscape\\DungeonEscape\\CommandParser.hpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}",
+      "RelativeMoniker": "D:0:0:{4A969EED-384E-4B79-AADF-A91356519391}|DungeonEscape.vcxproj|solutionrelative:CommandParser.hpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{4A969EED-384E-4B79-AADF-A91356519391}|DungeonEscape.vcxproj|C:\\CppProjects\\ConsolePrograms\\DungeonEscape\\DungeonEscape\\Item.hpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}",
+      "RelativeMoniker": "D:0:0:{4A969EED-384E-4B79-AADF-A91356519391}|DungeonEscape.vcxproj|solutionrelative:Item.hpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{4A969EED-384E-4B79-AADF-A91356519391}|DungeonEscape.vcxproj|C:\\CppProjects\\ConsolePrograms\\DungeonEscape\\DungeonEscape\\Item.cpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}",
+      "RelativeMoniker": "D:0:0:{4A969EED-384E-4B79-AADF-A91356519391}|DungeonEscape.vcxproj|solutionrelative:Item.cpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{4A969EED-384E-4B79-AADF-A91356519391}|DungeonEscape.vcxproj|C:\\CppProjects\\ConsolePrograms\\DungeonEscape\\DungeonEscape\\items.json||{8B382828-6202-11D1-8870-0000F87579D2}",
+      "RelativeMoniker": "D:0:0:{4A969EED-384E-4B79-AADF-A91356519391}|DungeonEscape.vcxproj|solutionrelative:items.json||{8B382828-6202-11D1-8870-0000F87579D2}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{4A969EED-384E-4B79-AADF-A91356519391}|DungeonEscape.vcxproj|C:\\CppProjects\\ConsolePrograms\\DungeonEscape\\DungeonEscape\\FileManager.cpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}",
+      "RelativeMoniker": "D:0:0:{4A969EED-384E-4B79-AADF-A91356519391}|DungeonEscape.vcxproj|solutionrelative:FileManager.cpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{4A969EED-384E-4B79-AADF-A91356519391}|DungeonEscape.vcxproj|C:\\CppProjects\\ConsolePrograms\\DungeonEscape\\DungeonEscape\\rooms.json||{8B382828-6202-11D1-8870-0000F87579D2}",
+      "RelativeMoniker": "D:0:0:{4A969EED-384E-4B79-AADF-A91356519391}|DungeonEscape.vcxproj|solutionrelative:rooms.json||{8B382828-6202-11D1-8870-0000F87579D2}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{4A969EED-384E-4B79-AADF-A91356519391}|DungeonEscape.vcxproj|C:\\CppProjects\\ConsolePrograms\\DungeonEscape\\DungeonEscape\\Game.cpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}",
+      "RelativeMoniker": "D:0:0:{4A969EED-384E-4B79-AADF-A91356519391}|DungeonEscape.vcxproj|solutionrelative:Game.cpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}"
     },
     {
       "AbsoluteMoniker": "D:0:0:{4A969EED-384E-4B79-AADF-A91356519391}|DungeonEscape.vcxproj|C:\\CppProjects\\ConsolePrograms\\DungeonEscape\\DungeonEscape\\Renderer.cpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}",
@@ -27,32 +51,8 @@
       "RelativeMoniker": "D:0:0:{4A969EED-384E-4B79-AADF-A91356519391}|DungeonEscape.vcxproj|solutionrelative:Room.cpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{4A969EED-384E-4B79-AADF-A91356519391}|DungeonEscape.vcxproj|C:\\CppProjects\\ConsolePrograms\\DungeonEscape\\DungeonEscape\\CommandParser.hpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}",
-      "RelativeMoniker": "D:0:0:{4A969EED-384E-4B79-AADF-A91356519391}|DungeonEscape.vcxproj|solutionrelative:CommandParser.hpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}"
-    },
-    {
       "AbsoluteMoniker": "D:0:0:{4A969EED-384E-4B79-AADF-A91356519391}|DungeonEscape.vcxproj|C:\\CppProjects\\ConsolePrograms\\DungeonEscape\\DungeonEscape\\Player.hpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}",
       "RelativeMoniker": "D:0:0:{4A969EED-384E-4B79-AADF-A91356519391}|DungeonEscape.vcxproj|solutionrelative:Player.hpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{4A969EED-384E-4B79-AADF-A91356519391}|DungeonEscape.vcxproj|C:\\CppProjects\\ConsolePrograms\\DungeonEscape\\DungeonEscape\\rooms.json||{8B382828-6202-11D1-8870-0000F87579D2}",
-      "RelativeMoniker": "D:0:0:{4A969EED-384E-4B79-AADF-A91356519391}|DungeonEscape.vcxproj|solutionrelative:rooms.json||{8B382828-6202-11D1-8870-0000F87579D2}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{4A969EED-384E-4B79-AADF-A91356519391}|DungeonEscape.vcxproj|C:\\CppProjects\\ConsolePrograms\\DungeonEscape\\DungeonEscape\\FileManager.cpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}",
-      "RelativeMoniker": "D:0:0:{4A969EED-384E-4B79-AADF-A91356519391}|DungeonEscape.vcxproj|solutionrelative:FileManager.cpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{4A969EED-384E-4B79-AADF-A91356519391}|DungeonEscape.vcxproj|C:\\CppProjects\\ConsolePrograms\\DungeonEscape\\DungeonEscape\\items.json||{8B382828-6202-11D1-8870-0000F87579D2}",
-      "RelativeMoniker": "D:0:0:{4A969EED-384E-4B79-AADF-A91356519391}|DungeonEscape.vcxproj|solutionrelative:items.json||{8B382828-6202-11D1-8870-0000F87579D2}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{4A969EED-384E-4B79-AADF-A91356519391}|DungeonEscape.vcxproj|C:\\CppProjects\\ConsolePrograms\\DungeonEscape\\DungeonEscape\\Item.hpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}",
-      "RelativeMoniker": "D:0:0:{4A969EED-384E-4B79-AADF-A91356519391}|DungeonEscape.vcxproj|solutionrelative:Item.hpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{4A969EED-384E-4B79-AADF-A91356519391}|DungeonEscape.vcxproj|C:\\CppProjects\\ConsolePrograms\\DungeonEscape\\DungeonEscape\\Item.cpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}",
-      "RelativeMoniker": "D:0:0:{4A969EED-384E-4B79-AADF-A91356519391}|DungeonEscape.vcxproj|solutionrelative:Item.cpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}"
     },
     {
       "AbsoluteMoniker": "D:0:0:{4A969EED-384E-4B79-AADF-A91356519391}|DungeonEscape.vcxproj|C:\\CppProjects\\ConsolePrograms\\DungeonEscape\\DungeonEscape\\Room.hpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}",
@@ -74,34 +74,8 @@
       "DocumentGroups": [
         {
           "DockedWidth": 200,
-          "SelectedChildIndex": 17,
+          "SelectedChildIndex": 7,
           "Children": [
-            {
-              "$type": "Document",
-              "DocumentIndex": 3,
-              "Title": "Renderer.h",
-              "DocumentMoniker": "C:\\CppProjects\\ConsolePrograms\\DungeonEscape\\DungeonEscape\\Renderer.h",
-              "RelativeDocumentMoniker": "Renderer.h",
-              "ToolTip": "C:\\CppProjects\\ConsolePrograms\\DungeonEscape\\DungeonEscape\\Renderer.h",
-              "RelativeToolTip": "Renderer.h",
-              "ViewState": "AgIAABUAAAAAAAAAAAAAACIAAAARAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000680|",
-              "WhenOpened": "2025-12-30T00:31:26.073Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 2,
-              "Title": "Renderer.cpp",
-              "DocumentMoniker": "C:\\CppProjects\\ConsolePrograms\\DungeonEscape\\DungeonEscape\\Renderer.cpp",
-              "RelativeDocumentMoniker": "Renderer.cpp",
-              "ToolTip": "C:\\CppProjects\\ConsolePrograms\\DungeonEscape\\DungeonEscape\\Renderer.cpp",
-              "RelativeToolTip": "Renderer.cpp",
-              "ViewState": "AgIAADoBAAAAAAAAAAAIwEwBAABTAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000677|",
-              "WhenOpened": "2025-12-30T00:29:11.7Z",
-              "EditorCaption": ""
-            },
             {
               "$type": "Bookmark",
               "Name": "ST:128:0:{1fc202d4-d401-403c-9834-5b218574bb67}"
@@ -112,7 +86,31 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 4,
+              "DocumentIndex": 9,
+              "Title": "Renderer.h",
+              "DocumentMoniker": "C:\\CppProjects\\ConsolePrograms\\DungeonEscape\\DungeonEscape\\Renderer.h",
+              "RelativeDocumentMoniker": "Renderer.h",
+              "ToolTip": "C:\\CppProjects\\ConsolePrograms\\DungeonEscape\\DungeonEscape\\Renderer.h",
+              "RelativeToolTip": "Renderer.h",
+              "ViewState": "AgIAABUAAAAAAAAAAAAAACIAAAARAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000680|",
+              "WhenOpened": "2025-12-30T00:31:26.073Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 8,
+              "Title": "Renderer.cpp",
+              "DocumentMoniker": "C:\\CppProjects\\ConsolePrograms\\DungeonEscape\\DungeonEscape\\Renderer.cpp",
+              "RelativeDocumentMoniker": "Renderer.cpp",
+              "ToolTip": "C:\\CppProjects\\ConsolePrograms\\DungeonEscape\\DungeonEscape\\Renderer.cpp",
+              "RelativeToolTip": "Renderer.cpp",
+              "ViewState": "AgIAADoBAAAAAAAAAAAIwEwBAABTAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000677|",
+              "WhenOpened": "2025-12-30T00:29:11.7Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 10,
               "Title": "document.h",
               "DocumentMoniker": "C:\\CppProjects\\ConsolePrograms\\DungeonEscape\\DungeonEscape\\libs\\rapidjson\\document.h",
               "RelativeDocumentMoniker": "libs\\rapidjson\\document.h",
@@ -120,8 +118,7 @@
               "RelativeToolTip": "libs\\rapidjson\\document.h",
               "ViewState": "AgIAAOYEAAAAAAAAAAAAwPkEAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000680|",
-              "WhenOpened": "2025-12-03T02:27:17.223Z",
-              "EditorCaption": ""
+              "WhenOpened": "2025-12-03T02:27:17.223Z"
             },
             {
               "$type": "Document",
@@ -137,7 +134,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 7,
+              "DocumentIndex": 12,
               "Title": "Player.hpp",
               "DocumentMoniker": "C:\\CppProjects\\ConsolePrograms\\DungeonEscape\\DungeonEscape\\Player.hpp",
               "RelativeDocumentMoniker": "Player.hpp",
@@ -145,38 +142,37 @@
               "RelativeToolTip": "Player.hpp",
               "ViewState": "AgIAAAAAAAAAAAAAAAAAACgAAAACAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000680|",
-              "WhenOpened": "2025-12-03T01:41:02.099Z",
-              "EditorCaption": ""
+              "WhenOpened": "2025-12-03T01:41:02.099Z"
             },
             {
               "$type": "Document",
-              "DocumentIndex": 1,
+              "DocumentIndex": 0,
               "Title": "CommandParser.cpp",
               "DocumentMoniker": "C:\\CppProjects\\ConsolePrograms\\DungeonEscape\\DungeonEscape\\CommandParser.cpp",
               "RelativeDocumentMoniker": "CommandParser.cpp",
               "ToolTip": "C:\\CppProjects\\ConsolePrograms\\DungeonEscape\\DungeonEscape\\CommandParser.cpp",
               "RelativeToolTip": "CommandParser.cpp",
-              "ViewState": "AgIAAMABAAAAAAAAAAAIwCACAAAqAAAAAAAAAA==",
+              "ViewState": "AgIAAK0CAAAAAAAAAAAYwMICAAAdAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000677|",
               "WhenOpened": "2025-11-04T00:19:41.678Z",
               "EditorCaption": ""
             },
             {
               "$type": "Document",
-              "DocumentIndex": 6,
+              "DocumentIndex": 1,
               "Title": "CommandParser.hpp",
               "DocumentMoniker": "C:\\CppProjects\\ConsolePrograms\\DungeonEscape\\DungeonEscape\\CommandParser.hpp",
               "RelativeDocumentMoniker": "CommandParser.hpp",
-              "ToolTip": "C:\\CppProjects\\ConsolePrograms\\DungeonEscape\\DungeonEscape\\CommandParser.hpp",
-              "RelativeToolTip": "CommandParser.hpp",
-              "ViewState": "AgIAACoAAAAAAAAAAAAAAEsAAAAvAAAAAAAAAA==",
+              "ToolTip": "C:\\CppProjects\\ConsolePrograms\\DungeonEscape\\DungeonEscape\\CommandParser.hpp*",
+              "RelativeToolTip": "CommandParser.hpp*",
+              "ViewState": "AgIAADwAAAAAAAAAAAAAAEwAAAA1AAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000680|",
               "WhenOpened": "2025-12-02T07:12:54.442Z",
               "EditorCaption": ""
             },
             {
               "$type": "Document",
-              "DocumentIndex": 5,
+              "DocumentIndex": 11,
               "Title": "Room.cpp",
               "DocumentMoniker": "C:\\CppProjects\\ConsolePrograms\\DungeonEscape\\DungeonEscape\\Room.cpp",
               "RelativeDocumentMoniker": "Room.cpp",
@@ -184,8 +180,7 @@
               "RelativeToolTip": "Room.cpp",
               "ViewState": "AgIAAGcAAAAAAAAAAAAAAGcAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000677|",
-              "WhenOpened": "2025-11-03T23:04:00.724Z",
-              "EditorCaption": ""
+              "WhenOpened": "2025-11-03T23:04:00.724Z"
             },
             {
               "$type": "Document",
@@ -201,39 +196,42 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 10,
+              "DocumentIndex": 4,
               "Title": "items.json",
               "DocumentMoniker": "C:\\CppProjects\\ConsolePrograms\\DungeonEscape\\DungeonEscape\\items.json",
               "RelativeDocumentMoniker": "items.json",
               "ToolTip": "C:\\CppProjects\\ConsolePrograms\\DungeonEscape\\DungeonEscape\\items.json",
               "RelativeToolTip": "items.json",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAgAAAA3AAAAAAAAAA==",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAABoAAAARAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001642|",
-              "WhenOpened": "2025-11-03T23:52:15.336Z"
+              "WhenOpened": "2025-11-03T23:52:15.336Z",
+              "EditorCaption": ""
             },
             {
               "$type": "Document",
-              "DocumentIndex": 8,
+              "DocumentIndex": 6,
               "Title": "rooms.json",
               "DocumentMoniker": "C:\\CppProjects\\ConsolePrograms\\DungeonEscape\\DungeonEscape\\rooms.json",
               "RelativeDocumentMoniker": "rooms.json",
               "ToolTip": "C:\\CppProjects\\ConsolePrograms\\DungeonEscape\\DungeonEscape\\rooms.json",
               "RelativeToolTip": "rooms.json",
-              "ViewState": "AgIAAAwAAAAAAAAAAAAAACgAAAAeAAAAAAAAAA==",
+              "ViewState": "AgIAAB4AAAAAAAAAAAAAADgAAAAEAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001642|",
-              "WhenOpened": "2025-11-03T23:06:54.82Z"
+              "WhenOpened": "2025-11-03T23:06:54.82Z",
+              "EditorCaption": ""
             },
             {
               "$type": "Document",
-              "DocumentIndex": 9,
+              "DocumentIndex": 5,
               "Title": "FileManager.cpp",
               "DocumentMoniker": "C:\\CppProjects\\ConsolePrograms\\DungeonEscape\\DungeonEscape\\FileManager.cpp",
               "RelativeDocumentMoniker": "FileManager.cpp",
               "ToolTip": "C:\\CppProjects\\ConsolePrograms\\DungeonEscape\\DungeonEscape\\FileManager.cpp",
               "RelativeToolTip": "FileManager.cpp",
-              "ViewState": "AgIAAA8AAAAAAAAAAAAAACoAAAAgAAAAAAAAAA==",
+              "ViewState": "AgIAACEAAAAAAAAAAAAAACkAAAAQAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000677|",
-              "WhenOpened": "2025-11-03T22:22:38.668Z"
+              "WhenOpened": "2025-11-03T22:22:38.668Z",
+              "EditorCaption": ""
             },
             {
               "$type": "Document",
@@ -249,37 +247,39 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 12,
+              "DocumentIndex": 3,
               "Title": "Item.cpp",
               "DocumentMoniker": "C:\\CppProjects\\ConsolePrograms\\DungeonEscape\\DungeonEscape\\Item.cpp",
               "RelativeDocumentMoniker": "Item.cpp",
               "ToolTip": "C:\\CppProjects\\ConsolePrograms\\DungeonEscape\\DungeonEscape\\Item.cpp",
               "RelativeToolTip": "Item.cpp",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAABEAAAABAAAAAAAAAA==",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAYAAABDAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000677|",
-              "WhenOpened": "2025-11-03T22:29:10.588Z"
+              "WhenOpened": "2025-11-03T22:29:10.588Z",
+              "EditorCaption": ""
             },
             {
               "$type": "Document",
-              "DocumentIndex": 11,
+              "DocumentIndex": 2,
               "Title": "Item.hpp",
               "DocumentMoniker": "C:\\CppProjects\\ConsolePrograms\\DungeonEscape\\DungeonEscape\\Item.hpp",
               "RelativeDocumentMoniker": "Item.hpp",
               "ToolTip": "C:\\CppProjects\\ConsolePrograms\\DungeonEscape\\DungeonEscape\\Item.hpp",
               "RelativeToolTip": "Item.hpp",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAB4AAAAAAAAAAAAAAA==",
+              "ViewState": "AgIAAAYAAAAAAAAAAAAAABYAAAABAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000680|",
-              "WhenOpened": "2025-12-02T23:18:16.837Z"
+              "WhenOpened": "2025-12-02T23:18:16.837Z",
+              "EditorCaption": ""
             },
             {
               "$type": "Document",
-              "DocumentIndex": 0,
+              "DocumentIndex": 7,
               "Title": "Game.cpp",
               "DocumentMoniker": "C:\\CppProjects\\ConsolePrograms\\DungeonEscape\\DungeonEscape\\Game.cpp",
               "RelativeDocumentMoniker": "Game.cpp",
               "ToolTip": "C:\\CppProjects\\ConsolePrograms\\DungeonEscape\\DungeonEscape\\Game.cpp",
               "RelativeToolTip": "Game.cpp",
-              "ViewState": "AgIAAJcAAAAAAAAAAAAYwLYAAAAAAAAAAAAAAA==",
+              "ViewState": "AgIAAJQAAAAAAAAAAAAYwKQAAAA+AAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000677|",
               "WhenOpened": "2025-11-03T22:22:20.003Z",
               "EditorCaption": ""

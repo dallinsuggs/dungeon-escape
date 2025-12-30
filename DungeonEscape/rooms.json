@@ -49,7 +49,16 @@
 	"gallery": {
 		"name": "gallery",
 		"description": "You are in a medium-length gallery with two doors on the south wall, one on the left, one on the right. There is an open doorway leading north, and an open doorway leading east.",
-		"items": [],
+		"items": [
+			{
+				"template": "door",
+				"id": "gallery_door_to_cell_1"
+			},
+			{
+				"template": "door",
+				"id":  "gallery_door_to_cell_2"
+			}
+		],
 		"exits": {
 			"south": [ { "id": "cell_1", "label": "left door" }, { "id": "cell_2", "label": "right door" } ]
 		}

@@ -17,7 +17,8 @@
 	"door": {
 		"name": "door",
 		"description": "It is a grimy wooden door with horizontal and vertical iron strips reinforcing it",
-		"moveable": false
+		"moveable": false,
+		"locked": true
 	},
 	"animal bone": {
 		"name": "animal bone",

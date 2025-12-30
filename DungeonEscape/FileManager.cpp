@@ -41,7 +41,7 @@ std::unordered_map<std::string, Item> FileManager::loadItems(const std::string& 
 
 		// Read fields
 		std::string name, description;
-		bool moveable;
+		bool moveable = true, locked = false;
 
 		if (itemObj.HasMember("name") && itemObj["name"].IsString()) {
 			name = itemObj["name"].GetString();
@@ -52,9 +52,12 @@ std::unordered_map<std::string, Item> FileManager::loadItems(const std::string& 
 		if (itemObj.HasMember("moveable") && itemObj["moveable"].IsBool()) {
 			moveable = itemObj["moveable"].GetBool();
 		}
+		if (itemObj.HasMember("locked") && itemObj["locked"].IsBool()) {
+			locked = itemObj["locked"].GetBool();
+		}
 		
 		// Create Item using item template from json file
-		Item item(name, description, moveable);
+		Item item(name, description, moveable, locked);
 
 		// Insert into map
 		items[templateId] = item;

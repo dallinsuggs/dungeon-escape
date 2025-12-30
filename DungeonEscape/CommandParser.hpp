@@ -74,6 +74,7 @@ private:
 	const std::string MSG_MULTI_EXITS = "There are multiple exits to the {object1}: \n{object2}";
 	const std::string MSG_SELECT_CHOICE = "Type the number of your choice and press enter.";
 	const std::string MSG_MULTI_ITEMS = "There are multiple {object1} items: \n{object2}";
+	const std::string MSG_VERB_WHAT = "{object1} what?";
 
 	// booleans
 	bool doorLocked = true;
@@ -148,6 +149,8 @@ public:
 	void handleExamine(ParsedCommand& cmd);
 	// Go handler
 	void handleGo(ParsedCommand& cmd);
+	// Unlock handler
+	void handleUnlock(ParsedCommand& cmd);
 
 	// Quit handler
 	void handleQuit(ParsedCommand& cmd);

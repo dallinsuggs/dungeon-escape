@@ -153,6 +153,8 @@ if (inputHandler.UpdateInput(userInput)) {
 
     std::vector<std::string> newOutputLines;
 
+
+    // Check if choice prompt bool is active
     if (parser.pendingChoice.active) {
         int choice = -1;
         try { choice = std::stoi(userInput) - 1; }
@@ -166,7 +168,7 @@ if (inputHandler.UpdateInput(userInput)) {
         } else {
             newOutputLines.push_back("Invalid choice, enter a number corresponding to your exit.");
         }
-    } else {
+    } else {                                                                                           // else, regular input parsing
         newOutputLines = captureOutput([&]() { parser.parse(userInput); });
     }
 
