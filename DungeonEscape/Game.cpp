@@ -102,7 +102,7 @@ int main() {
         bool currentlyTyping = !renderer.IsTypingDone();
 
         if (wasTyping && !currentlyTyping) {
-            // Typing just finished → add the lines to permanent history
+            // Typing just finished → append lines to permanent history
             const auto& completedLines = renderer.GetLastTypedLines();
             for (const auto& line : completedLines) {
                 if (!line.empty()) {
@@ -114,7 +114,8 @@ int main() {
             if (displayLines.size() > MAX_LINES) {
                 displayLines.erase(displayLines.begin(), displayLines.begin() + (displayLines.size() - MAX_LINES));
             }
-            renderer.SnapToBottom();  // Auto-scroll to new text
+
+            renderer.SnapToBottom();  // Auto-scroll
         }
         wasTyping = currentlyTyping;
 
@@ -135,51 +136,50 @@ int main() {
         }
 
         // Handle input
-        if (inputHandler.UpdateInput(userInput)) {
-            // Echo the input as history
-            std::string inputEcho = "> " + userInput;
-            displayLines.push_back(inputEcho);
-            renderer.SnapToBottom();
+if (inputHandler.UpdateInput(userInput)) {
+    // Compose input line
+    std::string inputLine = "> " + userInput;
 
-            // Check for pending exit choice (multiple doors)
-            std::vector<std::string> newOutputLines;
+    // Echo input immediately
+    displayLines.push_back(inputLine);
 
-            // Check pending Choice first
-            if (parser.pendingChoice.active) {
-                int choice = -1;
-                try { choice = std::stoi(userInput) - 1; }
-                catch (...) {}
+    // Compute wrapped height for proper spacing (matches DrawTextOverlay)
+    int fontSize = 32; // same as in DrawTextOverlay
+    int textAreaWidth = GetScreenWidth() - 80; // same as in DrawTextOverlay
+    int inputHeight = renderer.GetWrappedHeight(inputLine.c_str(), textAreaWidth, fontSize);
 
-                if (choice >= 0 && choice < parser.pendingChoice.choices.size()) {
-                    auto lines = captureOutput([&]() {
-                        parser.pendingChoice.choices[choice].action();
-                    });
-                    
-                    displayLines.insert(displayLines.end(), lines.begin(), lines.end());
-                    parser.pendingChoice.active = false;
-                }
-                else {
-                    newOutputLines.push_back("Invalid choice, enter a number corresponding to your exit.");
-                }
-            }
-            else {
-                // Normal command parsing
-                newOutputLines = captureOutput([&]() { parser.parse(userInput); });
-            }
+    // Optionally auto-scroll to bottom after input
+    renderer.SnapToBottom(0); // 0 = no extra padding; adjust if you want
 
-			// remove empty lines
-            newOutputLines.erase(
-                std::remove_if(newOutputLines.begin(), newOutputLines.end(),
-                    [](const std::string& s) { return s.empty(); }),
-                newOutputLines.end()
-            );
+    std::vector<std::string> newOutputLines;
 
-			// New text > start typing animation
-            if (!newOutputLines.empty()) {
-                renderer.StartTypingAnimation(newOutputLines);
-			}
-            userInput.clear(); // Reset for next
+    if (parser.pendingChoice.active) {
+        int choice = -1;
+        try { choice = std::stoi(userInput) - 1; }
+        catch (...) {}
+
+        if (choice >= 0 && choice < parser.pendingChoice.choices.size()) {
+            newOutputLines = captureOutput([&]() {
+                parser.pendingChoice.choices[choice].action();
+            });
+            parser.pendingChoice.active = false;
+        } else {
+            newOutputLines.push_back("Invalid choice, enter a number corresponding to your exit.");
         }
+    } else {
+        newOutputLines = captureOutput([&]() { parser.parse(userInput); });
+    }
+
+    // Only start animation if there are new lines
+    if (!newOutputLines.empty()) {
+        renderer.StartTypingAnimation(newOutputLines);
+        // Do NOT append to displayLines here – it happens after animation completes
+    }
+
+    userInput.clear();
+}
+
+
 
         // Draw everything
         BeginDrawing();

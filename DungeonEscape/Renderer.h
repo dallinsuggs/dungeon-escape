@@ -33,9 +33,9 @@ public:
     void UpdateDayProgress();
     void DrawBackground();
     void DrawTextOverlay(const std::vector<std::string>& displayLines, const char* inputBuffer);
+    void SnapToBottom(int paddingLines = 4);
     bool WindowShouldClose();
     void UpdateScrollInput(); // Call every frame for wheel/arrows
-    void SnapToBottom(); // Force window down to newest on output
     ~Renderer();
 
 	// Typing animation controls

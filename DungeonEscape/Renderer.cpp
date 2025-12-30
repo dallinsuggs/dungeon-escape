@@ -294,7 +294,6 @@ void Renderer::DrawTextOverlay(const std::vector<std::string>& displayLines, con
 
     // Scrolling setup
     float maxScroll = std::max(0.0f, (float)totalHeight - (float)availableHeight);
-    if (scrollOffset < 0.0f) scrollOffset = 0.0f;
     if (scrollOffset > maxScroll) scrollOffset = maxScroll;
 
     // Viewport offset: 0 = newest at bottom
@@ -329,7 +328,9 @@ void Renderer::DrawTextOverlay(const std::vector<std::string>& displayLines, con
                 int drawStartY = textAreaTop + (currentContentY - viewportTopContent);
                 DrawWrappedText(partial.c_str(), 40, drawStartY, textAreaWidth, fontSize, WHITE);
             }
-            currentContentY += h + 10;
+            // Use GetWrappedHeight to compute actual height in pixels
+            int wrappedHeight = GetWrappedHeight(partial.c_str(), textAreaWidth, fontSize);
+            currentContentY += wrappedHeight + 10;  // 10 = spacing between entries
         }
     }
 
@@ -370,21 +371,56 @@ void Renderer::StartTypingAnimation(const std::vector<std::string>& lines) {
 
 // Update typing animation progress
 void Renderer::UpdateTypingAnimation(float deltaTime) {
+ //   if (!typingActive) return;
+	//typingTimer += deltaTime * typingSpeed; // characters progressed
+ //   bool done = true;
+ //   for (size_t i = 0; i < animProgress.size(); ++i) {
+ //       animProgress[i] = std::min(1.0f, typingTimer / (float)animLines[i].length());
+ //       if (animProgress[i] < 1.0f) done = false;
+ //   }
+ //   if (done) typingActive = false;
+
     if (!typingActive) return;
-	typingTimer += deltaTime * typingSpeed; // characters progressed
+
+    float effectiveSpeed = typingSpeed * 10.0f; // adjust fast typing
+    typingTimer += deltaTime * effectiveSpeed;
+
     bool done = true;
-    for (size_t i = 0; i < animProgress.size(); ++i) {
-        animProgress[i] = std::min(1.0f, typingTimer / (float)animLines[i].length());
-        if (animProgress[i] < 1.0f) done = false;
+    float accumulatedTime = typingTimer; // time used for this frame
+
+    for (size_t i = 0; i < animLines.size(); ++i) {
+        if (animProgress[i] >= 1.0f) {
+            accumulatedTime -= (float)animLines[i].length(); // subtract time spent on previous line
+            continue; // this line already finished
+        }
+
+        // Calculate progress for current line only
+        animProgress[i] = std::min(1.0f, accumulatedTime / (float)animLines[i].length());
+
+        if (animProgress[i] < 1.0f) {
+            done = false; // we’re still typing this line
+            break;       // stop processing further lines until this one finishes
+        }
+        else {
+            accumulatedTime -= (float)animLines[i].length(); // leftover time carries to next line
+        }
     }
+
     if (done) typingActive = false;
 }
 
 
 // Snap scroll to bottom (newest output)
-void Renderer::SnapToBottom() {
-    scrollOffset = 0.0f;
+void Renderer::SnapToBottom(int paddingLines) {
+    // Compute total height of the padding in pixels
+    int fontSize = 32;           // match text font size
+    int lineSpacing = fontSize + 4; // spacing between lines
+    int paddingPixels = paddingLines * lineSpacing;
+
+    // Leave paddingPixels above the bottom
+    scrollOffset = -paddingPixels;
 }
+
 
 bool Renderer::WindowShouldClose() {
     return ::WindowShouldClose();
