@@ -6,7 +6,7 @@
 		"items": [
 			{
 				"template": "door",
-				"id": "cell_1_door"
+				"id": "cell1_gallery_door"
 			},
 			{
 				"template": "brick",
@@ -26,7 +26,7 @@
 			}
 		],
 		"exits": {
-			"north": [ { "id": "gallery", "label":  "cell exit" } ]
+			"north": [ { "id": "gallery", "label":  "cell exit", "doorId":  "cell1_gallery_door" } ]
 		}
 	},
 	"cell_2": {
@@ -35,7 +35,7 @@
 		"items": [
 			{
 				"template": "door",
-				"id": "cell_2_door"
+				"id": "cell2_gallery_door"
 			},
 			{
 				"template": "animal bone",
@@ -43,7 +43,7 @@
 			}
 		],
 		"exits": {
-			"north": [ { "id": "gallery", "label":  "cell exit"  } ]
+			"north": [ { "id": "gallery", "label":  "cell exit", "doorId": "cell2_gallery_door"  } ]
 		}
 	},
 	"gallery": {
@@ -52,15 +52,15 @@
 		"items": [
 			{
 				"template": "door",
-				"id": "gallery_door_to_cell_1"
+				"id": "cell1_gallery_door"
 			},
 			{
 				"template": "door",
-				"id":  "gallery_door_to_cell_2"
+				"id": "cell2_gallery_door"
 			}
 		],
 		"exits": {
-			"south": [ { "id": "cell_1", "label": "left door" }, { "id": "cell_2", "label": "right door" } ]
+			"south": [ { "id": "cell_1", "label": "left door", "doorId":  "cell1_gallery_door" }, { "id": "cell_2", "label": "right door", "doorId": "cell2_gallery_door" } ]
 		}
 	},
 	"guardroom": {

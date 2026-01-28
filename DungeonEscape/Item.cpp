@@ -17,6 +17,16 @@ void Item::toggleLock() {
 	locked = !locked;
 }
 
+void Item::setLocked(bool value)
+{
+	locked = value;
+}
+
+void Item::setMoveable(bool value)
+{
+	moveable = value;
+}
+
 // << overload print function
 std::ostream& operator<<(std::ostream& os, const Item& item) {
 	os << "Item: " << item.name << "\nDescription: " << item.description << "\nMoveable: " << item.moveable;

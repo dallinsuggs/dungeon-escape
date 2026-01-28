@@ -75,6 +75,7 @@ private:
 	const std::string MSG_SELECT_CHOICE = "Type the number of your choice and press enter.";
 	const std::string MSG_MULTI_ITEMS = "There are multiple {object1} items: \n{object2}";
 	const std::string MSG_VERB_WHAT = "{object1} what?";
+	const std::string MSG_LOCKED = "It seems the door to that is locked.";
 
 	// booleans
 	bool doorLocked = true;

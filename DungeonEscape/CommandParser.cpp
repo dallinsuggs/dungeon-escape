@@ -613,9 +613,70 @@ void CommandParser::handleGo(ParsedCommand& cmd)
 	}
 
 	auto& exitList = it->second;
+	
+	//// can pass helper
+	//auto canPassExit = [&](const Room::ExitOption& exit) -> bool {
+	//	if (exit.doorId.empty()) {
+
+	//		return true;
+	//	}
+
+	//	auto& roomItems = player->getCurrentRoom()->getRoomItems();
+	//	auto doorIt = roomItems.find(exit.doorId);
+	//	if (doorIt == roomItems.end()) {
+	//		return true;
+	//	}
+
+	//	Item* door = doorIt->second;
+	//	if (door->isLocked()) {
+	//		writeMessage(MSG_LOCKED);
+	//		return false;
+	//	}
+	//	return true;
+	//};
+
+	auto canPassExit = [&](const Room::ExitOption& exit) -> bool {
+
+		writeMessage(std::string("DEBUG: exit.doorId = '") + exit.doorId + "'");
+
+		if (exit.doorId.empty()) {
+			writeMessage("DEBUG: doorId is empty -> treating as open passage");
+			return true;
+		}
+
+		auto& roomItems = player->getCurrentRoom()->getRoomItems();
+
+		writeMessage(std::string("DEBUG: roomItems.count(doorId) = ")
+			+ (roomItems.count(exit.doorId) ? "1" : "0"));
+
+		auto doorIt = roomItems.find(exit.doorId);
+		if (doorIt == roomItems.end()) {
+			writeMessage("DEBUG: doorId not found in roomItems -> letting you pass (your current behavior)");
+			return true; // you can change to false later
+		}
+
+		Item* door = doorIt->second;
+
+		writeMessage(std::string("DEBUG: door->isLocked() = ")
+			+ (door->isLocked() ? "true" : "false"));
+
+		if (door->isLocked()) {
+			writeMessage(MSG_LOCKED);
+			return false;
+		}
+
+		return true;
+		};
+       ///// end deubg canpassexit
 
 
 	if (exitList.size() == 1) {
+		const Room::ExitOption& exit = exitList[0];
+
+		if (!canPassExit(exit)) {           // check for locked doors before going
+			return;
+		}
+
 		player->setCurrentRoom(exitList[0].room);
 		writeMessage(player->getCurrentRoom()->describeSelf());
 		return;
@@ -623,8 +684,30 @@ void CommandParser::handleGo(ParsedCommand& cmd)
 
 	// Set up choices vector for promptChoice
 	std::vector<Choice> choices;
+	choices.reserve(exitList.size());
+
 	for (auto& exit : exitList) {
-		choices.push_back({ exit.label, [this, &exit]() { player->setCurrentRoom(exit.room); writeMessage(player->getCurrentRoom()->describeSelf()); } });
+		Room* targetRoom = exit.room;
+		std::string doorId = exit.doorId;
+		std::string label = exit.label;
+
+		choices.push_back(Choice{
+			label,
+			[this, targetRoom, doorId]() {
+				if (!doorId.empty()) {
+					auto& roomItems = player->getCurrentRoom()->getRoomItems();
+					auto doorIt = roomItems.find(doorId);
+					if (doorIt != roomItems.end() && doorIt->second->isLocked()) {
+						writeMessage(MSG_LOCKED);
+						return;
+					}
+				}
+
+				player->setCurrentRoom(targetRoom);
+				writeMessage(player->getCurrentRoom()->describeSelf());
+			}
+
+		});
 	}
 
 	// format choice text output
@@ -641,10 +724,6 @@ void CommandParser::handleGo(ParsedCommand& cmd)
 
 	// call promptChoice
 	promptChoice(choices, msgs);
-
-	//// write messages
-	//writeMessage("Multiple exits to {object1}: \n{object2}", dir, options);
-	//writeMessage("Type the number of your choice and press enter.");
 
 }
 
@@ -673,13 +752,14 @@ void CommandParser::handleUnlock(ParsedCommand& cmd)
 	if (matches.size() == 1) {
 		Item* itemPtr = roomItems.count(matches[0]) ? roomItems.at(matches[0]) : inventory.at(matches[0]);
 		if (itemPtr->getName() == "door") {
-			itemPtr->toggleLock();
+			itemPtr->setLocked(false);
 			std::string msg = itemPtr->isLocked() ? "The {object1} is locked." : "The {object1} is unlocked.";
 			writeMessage(msg, itemPtr->getName());
 			return;
 		}
 		else {
 			writeMessage(MSG_DONT_KNOW_HOW);
+			return;
 		}
 	}
 
@@ -691,7 +771,7 @@ void CommandParser::handleUnlock(ParsedCommand& cmd)
 			itemPtr->getName() + " (" + id + ")", // label shown to player
 			[this, itemPtr]() { // action when chosen
 				if (itemPtr->getName() == "door") {
-					itemPtr->toggleLock();
+					itemPtr->setLocked(false);
 					std::string msg = itemPtr->isLocked() ? "The {object1} is locked." : "The {object1} is unlocked.";
 					writeMessage(msg, itemPtr->getName());
 					return;

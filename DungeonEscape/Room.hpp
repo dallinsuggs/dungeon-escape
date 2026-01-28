@@ -10,7 +10,7 @@
 // It has a description, may contain items, and has exits leading to other rooms.
 class Room {
 public:
-	struct ExitOption { Room* room; std::string label; };
+	struct ExitOption { Room* room; std::string label; std::string doorId; };
 	const std::unordered_map<std::string, std::vector<ExitOption>>& getExits() const;
 	std::unordered_map<std::string, std::vector<ExitOption>>& getExits();
 private:
@@ -35,7 +35,7 @@ public:
 	std::string describeSelf() const;
 
 	// Connect this room to another in a given direction
-	void connectRoom(const std::string& direction, Room* otherRoom, const std::string& label);
+	void connectRoom(const std::string& direction, Room* otherRoom, const std::string& label, const std::string& doorId = "");
 
 	// Look up the room in a given direction
 	const std::vector<ExitOption>* getExit(const std::string& direction) const;

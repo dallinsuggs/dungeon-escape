@@ -71,6 +71,8 @@ std::unordered_map<std::string, Item> FileManager::loadItems(const std::string& 
 std::unordered_map<std::string, Room> FileManager::loadRooms(const std::string& filename, std::unordered_map<std::string, Item>& allItems)
 {
 	std::unordered_map<std::string, Room> rooms;
+	itemInstances.clear();
+
 
 	FILE* fp = nullptr;
 	errno_t err = fopen_s(&fp, filename.c_str(), "r");
@@ -129,10 +131,35 @@ std::unordered_map<std::string, Room> FileManager::loadRooms(const std::string& 
 					std::string itemId = itemVal["id"].GetString();
 
 					// Look up the Item* from pre-loaded allItems map
-					auto it = allItems.find(itemTemplateId);
-					if (it != allItems.end()) {
-						roomItems[itemId] = std::addressof(it->second);
+					// 1) If instance already exists for this itemId, reuse it
+					auto instIt = itemInstances.find(itemId);
+					if (instIt != itemInstances.end()) {
+						roomItems[itemId] = instIt->second.get();
+						continue;
 					}
+
+					// 2) Otherwise create a new instance from the template
+					auto templIt = allItems.find(itemTemplateId);
+					if (templIt == allItems.end()) {
+						std::cout << "Unknown item template: " << itemTemplateId << "\n";
+						continue;
+					}
+
+					// Copy the template into a new instance.
+					// This requires Item to be copyable (default is usually fine unless you added raw owning pointers).
+					itemInstances[itemId] = std::make_unique<Item>(templIt->second);
+
+					// Optional: allow per-instance overrides from rooms.json (locked/moveable/etc)
+					if (itemVal.HasMember("locked") && itemVal["locked"].IsBool()) {
+						itemInstances[itemId]->setLocked(itemVal["locked"].GetBool()); // if you have setter
+					}
+					if (itemVal.HasMember("moveable") && itemVal["moveable"].IsBool()) {
+						itemInstances[itemId]->setMoveable(itemVal["moveable"].GetBool());
+					}
+
+					// 3) Store pointer in this room
+					roomItems[itemId] = itemInstances[itemId].get();
+
 				}
 			}
 		}
@@ -167,14 +194,24 @@ std::unordered_map<std::string, Room> FileManager::loadRooms(const std::string& 
 
 				if (exitArray.IsArray()) {
 					for (auto& exitVal : exitArray.GetArray()) {
+
+						if (!exitVal.HasMember("id") || !exitVal["id"].IsString()) continue;
 						std::string targetId = exitVal["id"].GetString();
-						std::string label = exitVal.HasMember("label") ? exitVal["label"].GetString() : "";
+
+						std::string label = (exitVal.HasMember("label") && exitVal["label"].IsString())
+							? exitVal["label"].GetString()
+							: "";
+
+						std::string doorId = (exitVal.HasMember("doorId") && exitVal["doorId"].IsString())
+							? exitVal["doorId"].GetString()
+							: "";
 
 						Room* targetRoom = rooms.count(targetId) ? &rooms.at(targetId) : nullptr;
 						if (targetRoom) {
-							room.connectRoom(direction, targetRoom, label);
+							room.connectRoom(direction, targetRoom, label, doorId);
 						}
 					}
+
 				}
 			}
 		}

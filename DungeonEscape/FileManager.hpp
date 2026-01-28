@@ -7,6 +7,7 @@
 class FileManager {
 private:
 	//Private vars and methods
+	std::unordered_map < std::string, std::unique_ptr<Item> > itemInstances;
 
 public:
 	// Constructor

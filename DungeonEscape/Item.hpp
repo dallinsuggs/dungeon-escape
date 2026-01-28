@@ -24,6 +24,8 @@ public:
 
 	// Setters
 	void toggleLock();
+	void setLocked(bool value);
+	void setMoveable(bool value);
 
 	// Overload equality operator for comparisons
 	bool operator==(const Item& other) const {

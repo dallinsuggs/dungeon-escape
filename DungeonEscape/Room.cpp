@@ -65,8 +65,8 @@ std::string Room::describeSelf() const
 }
 
 // Store a pointer to another room in the exits map
-void Room::connectRoom(const std::string& direction, Room* otherRoom, const std::string& label) {
-	exits[direction].push_back({ otherRoom, label });
+void Room::connectRoom(const std::string& direction, Room* otherRoom, const std::string& label, const std::string& doorId) {
+	exits[direction].push_back({ otherRoom, label, doorId });
 }
 
 // Try to find an exit in a direction (returns null pointer if none exists)
