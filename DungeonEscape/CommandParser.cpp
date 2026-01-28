@@ -403,20 +403,22 @@ void CommandParser::handleDrop(ParsedCommand& cmd)
 	// If only one match, drop immediately
 	if (matches.size() == 1) {
 		const std::string& targetId = matches[0];
-		roomItems[targetId] = inventory[targetId];
+		Item* itemPtr = inventory.at(targetId);
+		roomItems[targetId] = itemPtr;
+
 		inventory.erase(targetId);
-		writeMessage(MSG_DROP, inventory[targetId]->getName());
+		writeMessage(MSG_DROP, itemPtr->getName());
 		return;
 	}
 
 	// Multiple matches: build choice list
 	std::vector<Choice> choices;
 	for (const auto& id : matches) {
-		Item* itemPtr = inventory[id]; // capture pointer
+		Item* itemPtr = inventory.at(id); // capture pointer
 		choices.push_back(Choice{
 			itemPtr->getName() + " (" + id + ")", // label shown to player
 			[this, &inventory, &roomItems, id, itemPtr]() { // action when chosen
-				roomItems[id] = inventory[id];
+				roomItems[id] = itemPtr;
 				inventory.erase(id);
 				writeMessage(MSG_DROP, itemPtr->getName());
 			}
