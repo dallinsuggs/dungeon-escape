@@ -19,6 +19,7 @@
 #include <fstream> // for file reading
 // For Input Handling
 #include "InputHandler.h"
+#include "raylib.h"
 
 // so it doesn't open a console window on Windows
 #ifdef _WIN32
@@ -42,6 +43,15 @@ std::vector<std::string> captureOutput(std::function<void()> func) {
 
 //////////////////////* MAIN */////////////////////
 int main() {
+	// For logging purposes
+    SetTraceLogLevel(LOG_ALL);
+    SetTraceLogCallback([](int logType, const char* text, va_list args) {
+        // This sends every Raylib log to the normal console
+        char buffer[1024];
+        vsnprintf(buffer, sizeof(buffer), text, args);
+        printf("%s\n", buffer);
+            });
+
     // Set up file manager
     FileManager fm;
 

@@ -24,7 +24,19 @@ Color LerpColor(Color a, Color b, float t) {
 Renderer::Renderer(int width = 1024, int height = 768) : screenWidth(width), screenHeight(height) {    
     startTime = std::chrono::steady_clock::now();
 	SetConfigFlags(FLAG_WINDOW_RESIZABLE);
+    // Initialize the window + Window Title
     InitWindow(screenWidth, screenHeight, "Dungeon Escape");
+
+	// These lines will remove window decorations and maximize the window
+    //SetWindowState(FLAG_WINDOW_UNDECORATED);
+    //SetWindowState(FLAG_WINDOW_MAXIMIZED);
+    //SetWindowState(FLAG_WINDOW_TOPMOST);
+
+    // Load Window Icon
+    windowIcon = LoadImage("window-icon.png");
+    SetWindowIcon(windowIcon);
+
+
 	castleTexture = LoadTexture("foreground.png");
     SetTargetFPS(60);
     scrollOffset = 0.0f;
@@ -429,5 +441,6 @@ bool Renderer::WindowShouldClose() {
 Renderer::~Renderer() {
     UnloadTexture(castleTexture);
     UnloadFont(customFont);
+    UnloadImage(windowIcon);
     CloseWindow();
 }
