@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 #include <string>
 #include <vector>
 #include <unordered_map>
@@ -14,6 +14,7 @@ public:
 	const std::unordered_map<std::string, std::vector<ExitOption>>& getExits() const;
 	std::unordered_map<std::string, std::vector<ExitOption>>& getExits();
 private:
+	std::string id; // unique identifier for the room, used for saving/loading and referencing in other rooms' exits
 	std::string name;
 	std::string description; // Text describing the room
 	std::unordered_map<std::string, Item*> roomItems; // Items lying around in the room
@@ -27,6 +28,10 @@ public:
 
 	// getters
 	std::unordered_map<std::string, Item*>& getRoomItems();
+
+	// for saving/loading and referencing in other rooms' exits
+	void setId(const std::string& roomId) { id = roomId; }
+	const std::string& getId() const { return id; }
 
 	std::string getDescription() const;
 	std::string getName() const;
