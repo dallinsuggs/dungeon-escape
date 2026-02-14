@@ -1,4 +1,4 @@
-{
+﻿{
 	"chamber pot": {
 		"name": "chamber pot",
 		"description": "It is a smelly, stained, ceramic chamber pot with blue and white flower designs on the outside.",
@@ -24,5 +24,16 @@
 		"name": "animal bone",
 		"description": "It is a short yet sturdy animal bone, possibly from some kind of rodent that died in here.",
 		"moveable": true
+	},
+	"rope": {
+		"name": "rope",
+		"description": "A coiled length of sturdy rope. You'll probably need more than one for a safe descent.",
+		"moveable": true
+	},
+	"toilet": {
+		"name": "toilet",
+		"description": "A cold, wooden seat over a vertical chute, allowing waste to fall directly into the castle moat.",
+		"moveable": false,
+		"locked": true
 	}
 }

@@ -1,0 +1,61 @@
+# Gameplay outline
+
+- Each day lasts set amount of time \(30 mins\)
+- Player starts in cell\.
+    - Sleeping on mat passes time until next morning
+    - Chamber pot which guard empties every morning and every evening
+    - Food port in door for passing chamber pot and food&#x2F;drink \(bread&#x2F;beer\)
+- Neighboring cell
+    - Neighboring inmate, old and decrepit, uninterested in escape
+    - Inmate has information on guard shifts, provides hints to player when prompted
+- Gallery north of cells, south of armory or torture chamber, west of guardroom
+- Guardroom east of gallery, west of stairwell
+- Stairwell east of guardroom, locked door at the top
+
+### Possible Exits:
+
+1. Social stealth: disguise in guard clothes and escape at right time
+    1. guard password found on note to get out front door
+    2. If tie guard before removing clothes, must re\-knock\-out, untie, disrobe, retie
+    3. Guard can be knocked out with brick or chamber pot, both break when used
+2. Escape through sewer grate or down trash&#x2F;waste chute \(1 \- WE DECIDED TO DO THIS FIRST CAUSE IT&#39;S THE EASIEST\)
+    1. If tie guard with some improvised rope, no rope to go down chute, must go sewer or social stealth
+    2. Gallery? Underneath toilets? Bathroom?
+3. Secret exit \(information found on note, overheard conversation, visit from stranger that didn&#39;t come through the guard door, etc\.\)
+
+alternate ideas:
+
+Hidden compartment accessible via a subtle lever \(maybe the compartment contains an important key or something\)
+
+Lever could be just a notch in the wall that requires the player to find and insert another object in order to access the hidden area
+
+### Possible flow:
+
+- You wake up in your cell\. You have time to familiarize and look around\. Once the first day is over \(can be ended early by sleeping\) you are alerted to having a neighbor
+- Can converse through the wall\. Inmate points out loose brick
+- Can remove brick
+- Can lure guard into cell \(how?\) and knock him out with brick
+- Guard stays unconscious set amount of time \(5 mins or less\)
+- If guard wakes up, he will find you, knock you out, and you will be executed for assault
+- If you escape in time, this doesn&#39;t matter
+- In order to buy more time, must find a way to gag and bind the guard
+- At the end of the day, new guard comes to relieve old guard and will find you, and you will be executed
+- In other words, once you assault the guard to get out of your cell, you&#39;re on a timer \(depends how late into the 30 min &quot;day&quot; you do this\)\.
+- Once out of the cell
+
+## Exit 1: 
+
+Escape through the toilet
+
+Tools Required: 
+
+- 3 lengths of rope \- located in armory
+    - 3 lengths because the toilet is over a cliff\. 1 or 2 lengths are too short, the player will fall and die\.
+- key to leave your cell
+- small spoon to dig underneath stone to hide the rope
+- 4 animal bones to pick your lock \(3 to pick your lock while gathering rope, 1 to pick it when you decide to escape\)\.
+
+Method: 
+
+- can only be accomplished at night with the cover of darkness, otherwise you will get caught
+- the rope cannot be gathered in one go\. Guards will discover the rope is missing and get suspicious of you, but will just go get more rope\.

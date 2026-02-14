@@ -1,4 +1,4 @@
-
+﻿
 {
 	"cell_1": {
 		"name": "cell",
@@ -23,6 +23,10 @@
 			{
 				"template": "chamber pot",
 				"id": "cell_1_chamber_pot"
+			},
+			{
+				"template": "animal bone",
+				"id": "cell_1_animal_bone"
 			}
 		],
 		"exits": {
@@ -57,20 +61,71 @@
 			{
 				"template": "door",
 				"id": "cell2_gallery_door"
+			},
+			{
+				"template": "door",
+				"id": "gallery_guardroom_door"
+			},
+			{
+				"template": "door",
+        "id": "gallery_armory_door"
 			}
 		],
 		"exits": {
-			"south": [ { "id": "cell_1", "label": "left door", "doorId":  "cell1_gallery_door" }, { "id": "cell_2", "label": "right door", "doorId": "cell2_gallery_door" } ]
+			"south": [
+				{
+					"id": "cell_1",
+					"label": "left door",
+					"doorId": "cell1_gallery_door"
+				},
+				{
+					"id": "cell_2",
+					"label": "right door",
+					"doorId": "cell2_gallery_door"
+				}
+			],
+			"north": [
+				{
+					"id": "armory",
+					"label": "armory door",
+					"doorId": "gallery_armory_door"
+				}
+			],
+			"east": [
+				{
+					"id": "guardroom",
+					"label": "guardroom door",
+					"doorId": "gallery_guardroom_door"
+				}
+			]
 		}
 	},
 	"guardroom": {
 		"name": "guardroom",
 		"description": "You are in a large foyer-style room with a big desk in the center, a shelf against the west wall, and sprawling landscape painting hanging from the north wall.",
-		"items": []
+		"items": [
+				{
+					"template": "toilet",
+					"id": "guardroom_toilet"
+				}
+		]
 	},
 	"armory": {
 		"name": "armory",
 		"description": "You are in a dimly lit storage room with several sets of armor hanging on mannequins against the north wall. There is a weapon rack next to it, and in the northwest corner there is what appears to be a torture table.",
-		"items": []
+		"items": [
+			{
+				"template": "rope",
+				"id": "armory_rope_1"
+			},
+			{
+				"template": "rope",
+				"id": "armory_rope_2"
+			},
+			{
+				"template": "rope",
+				"id": "armory_rope_3"
+			}
+		]
 	}
 }

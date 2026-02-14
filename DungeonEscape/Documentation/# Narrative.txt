@@ -1,0 +1,114 @@
+# Narrative
+
+The player is imprisoned along with another prisoner\. The prisoners overhear that they will be put to death soon for their crimes\. The player&#39;s focus is to escape before the guards come in and take them to the guillotine\.
+
+### Overall Mechanics
+
+- **Time System**: 30 days to escape; each &quot;day&quot; a 30\-minute play session\. Commands like &quot;use spoon on mortar&quot; advance puzzles over days\. Track days via Eadric&#39;s moans and guard taunts\.
+- **Inventory**: Start empty; gather&#x2F;use items for puzzles\. Combine them creatively \(e\.g\., sharpen spoon on brick\)\. 
+- **Win Condition**: Reach outside via Guardroom or alternate paths\. At least three ways: 1\) Stealth through Guardroom, 2\) Secret tunnel from nextCell, 3\) Armory bypass to hidden exit\.
+- **Lose Condition**: Day 0 hits \(guillotine\), or guards catch you mid\-escape \(noisy actions or failed puzzles trigger immediate execution\)\.
+
+### Room\-by\-Room Puzzles &amp; Script Outline
+
+**Cell \(Starting Room\)**
+
+- **Description Script**: &quot;Chained in a grim cell with Eadric groaning\. Food tray near door\. A guard patrols the beginning and middle of every day \(every 15 minutes\)\. 30 days till the blade\.&quot;
+- **Puzzles&#x2F;Actions**:
+    - Examine chains: Find weak link; use later\.
+    - Pick up loose brick: Base for sharpening\.
+    - Grab rusty spoon from tray: Dig mortar \(multi\-day\) for wall hole\.
+    - Puzzle Options: 
+        1. Animal bones can be sharpened on a loose brick\. Combine with weak chain link to unlock shackles quietly\.
+        2. Talk to Eadric: Hints like &quot;There are hidden keys in the gallery\.&quot;; trade food for animal bone\.
+- **Escape Path**: Unlock and dig to next cell \(quiet multi\-day puzzle\)\. Noisy dig: Guards catch you, execution\.
+
+**Next Cell**
+
+- **Description Script**: &quot;A small, empty cell with no windows\. Small animal bones litter the ground, a wooden spoon in the corner of the room\.&quot;
+- **Puzzles&#x2F;Actions**:
+    - Collect animal bones: Can be sharpened on the loose brick in main cell, can be used as a weapon or lockpick\.
+    - Spoon in corner: Can be used to find a small, unfinished hidden tunnel in the ground in the corner\. Completing the tunnel in the direction it leads can lead to the Guard room\. The player can dig in a different direction for a secret exit\.
+- **Escape Path**: 
+    1. Cell door is not locked, player can access Gallery this way\.
+    2. Player can dig through the tunnel to the Guard room\.
+    3. Bypass all rooms via underground, extended dig \(10\+ days\) for secret tunnel outside 
+
+**Gallery**
+
+- **Description Script**: &quot;Paintings and statues line the hall\. At the end of the hall is the door to the Guardroom\. Two large doors take the other side of the hall, leading to the Armory\. There, the guards do despicable things\.&quot;
+- **Puzzles&#x2F;Actions**:
+    - Examine paintings: The painting next to the Armory hides a compartment with a black key\. The black key can be used in the Armory\.
+    - Use animal bone lockpick on middle doors: To Armory\.
+    - Examine statues: The statue at the end of the gallery opposite of the guard room is kept up straight by a small wooden wedge\.
+- **Escape Path**: 
+    1. Black key opens a hidden chest in the Armory containing items the guards use for torture\. Can be used as weapons or removed and hidden to avoid torture\.
+    2. Wedge jams the armory door for stealth slip\. The armory door is VERY noisy and can easily be heard by the guards\. 
+
+**Torture Chamber or Armory \(Upper Room\)**
+
+- **Description Script**: &quot;Armor and weapons line the walls, gleaming cruelly in the lights from the lanterns hanging near the door\. Chains and shackles line the farthest right wall, meant for transporting prisoners\. A large bench sits in the middle of the room\.&quot;
+- **Puzzles&#x2F;Actions**:
+    - Inspect&#x2F;look at the bench: underneath is a small black chest that can be opened with the black key, containing items the guards use for torture\. Can be used as weapons or removed and hidden to avoid torture\.
+    - Inspect weapons: ANY weapons taken cannot be hidden anywhere when the guards do their twice\-daily patrols EXCEPT one place: the underground tunnel\. However, there are not enough weapons that the guards wouldn&#39;t notice if one was gone, so if they&#39;re gone for more than one day, the player will be executed immediately\.
+    - Inspect chains and shackles: a rope can be found\.
+    - Inspect lantern: oil can be extracted from the lantern\. 
+    - Oil from lamp: can be used light fire with rope\. If the player lights the whole rope, it&#39;ll be a one use\. If the player is smart and cuts the rope up, it&#39;ll be a many use\. This can be used to dig a tunnel outside in 5 days instead of 10\. 
+- **Escape Path**: No escape path directly from Armory\.
+
+**Guardroom \(Final Room\)**
+
+- **Description Script**: &quot;A guard resides here, switching out daily\. The door outside leads to freedom\.&quot;
+- **Puzzles&#x2F;Actions**:
+    - The guard can be killed here if they&#39;re alone and if they&#39;re not patrolling\. If the player comes when the guard is not alone \(i\.e\. when the guard switches at the end of the day\), they will lose\. 
+    - The outside door is locked and the guard has the key\. Killing the guard gets the player the key\.
+- **Escape Path**: 
+    1. Kill guard, grab key, unlock door to escape\. However, if they player escapes at the wrong time, they will be caught and executed by guards outside\. 
+    2. ONLY TIME THE PLAYER CAN ESCAPE THROUGH THIS DOOR: between the second patrol and four hours before the end of the day \(game time: between 16 minutes and 26 minutes\)\.
+
+## Constraints
+
+\(the elements that prevent or challenge players from achieving a win—such as barriers, enemies, puzzles, or restrictions\)
+
+**Length of Day in Game**: 30 minutes
+
+**Total Days to Escape**: 30 \(more or less, not sure about this\)
+
+- At the end of each day, the player is reminded in some way of the number of days left\.
+- Eadric&#39;s moans about their fate, the player&#39;s thoughts, Guard&#39;s taunts at 10 days, etc\.
+
+**Shackles and Chains**
+
+- The player and their neighbor are both shackled at their feet to the wall, chains only long enough to reach close to the door where food is provided\. 
+- Chains rattle and make noise when the player moves, possibly alerting the guards\.
+- It is expected that if the guard sees the player in the cell, they will be shackled\. 
+
+**Torture**
+
+- Starting at 10 days left, the guards will start to mock the player and torture them\. This is purely to jolt the player, not a status update\. 
+- Guard Taunts
+    - &quot;10 days till the execution\. They say it&#39;s swift\.\.\.for the innocent\.&quot;
+    - &quot;Confess your sins, wretch, or the devil&#39;s own thumbscrews will wring &#39;em out\. Heaven&#39;s gate swings shut at dawn—&lt;number&gt; days, and yours slams too\.&quot;
+
+## Affordances
+
+\(the elements that support or enable players in achieving a win—such as interactive objects, hints, power\-ups, or environmental cues that suggest possible actions\)
+
+Eadric
+
+- Will provide hints to the player under the right circumstances \(bribery, flattery, threats, being befriended, etc\.\) 
+
+Items found in the Dungeon
+
+- Brick
+- Rusty Spoon
+    - Its handle can be sharpened against stone for digging small tunnels or loosening mortar around bars\.
+    - It could quietly erode chain anchors over days, but risks alerting guards with scraping echoes\.
+- Animal Bones
+    - Femur of a rat or other vermin can be whittled into a makeshift lockpick or file for shackles\.
+    - Silent, but brittle under too much pressure\.
+- Loose Brick
+    - Weapon to hit the guard
+    - Wedge for door
+    - Dropping it is loud
+- 

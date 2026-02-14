@@ -1,0 +1,72 @@
+# Dungeon Escape Design Document
+
+### Summary
+
+Player has been locked in a dungeon and must escape\.
+
+**Core Scope**
+
+The time\-frame is 2\-4 weeks, so the game will be relatively simple:
+
+- **Game world:** 5\-8 “rooms” or locations
+- **Player state:** inventory to hold items, possibly health, etc
+- **Interactions:** picking up \(and maybe dropping\) items, moving between rooms, puzzles, maybe an “enemy” encounter
+- **Ending:** 1\-2 possible endings depending on choices
+
+**Classes and Structure**
+
+See Table &gt;&gt;&gt;&gt;&gt;
+
+ 
+
+**GitHub Workflow**
+
+- Use branches for features \(room, inventory, parser\) to avoid overwriting each other’s work, merge after review
+
+**Initial Objectives**
+
+1. Hardcode a few rooms and items
+2. Implement movement between rooms \(north, south, etc\)
+3. Add item pickup&#x2F;drop and inventory
+4. Add simple puzzles or branching endings
+5. Optional: add save&#x2F;load functionality
+
+**Testing &amp; Validation**
+
+- Test moving between rooms correctly
+- Test picking up and dropping items
+- Test player state \(inventory count, flags\)
+- Possibly write tests\.cpp to simulate a short “playthrough” automatically
+
+**Game World Layout**
+
+With 5\-8 rooms we’ll be able to keep things manageable but interesting\. For example:
+
+1. Entrance area – starting point, maybe a locked door puzzle
+2. Guard room – could have a key or item
+3. Armory – contains an item or hint
+4. Library or Office – maybe a puzzle to read a code or riddles
+5. Prison Cell – optional mini challenge
+
+**Items &amp; Puzzles**
+
+Simple but engaging:
+
+- **Items:** key, torch, scroll, lever, rock
+- **Puzzles:**
+- Combine items \(e\.g\., use key on door\)
+- Solve riddles in text
+- Move items to trigger hidden passage
+- Make each puzzle unlock the next step to keep a sense of progression
+
+**Player &amp; Game State**
+
+- **Player attributes:**
+- Current room
+- Inventory \(vector of items\)
+- Optional: flags like “torch lit” or “found secret lever”
+- **Game state management:**
+- Keep track of solved puzzles, used items, and unlocked rooms
+- End the game when the player reaches the exit room
+
+ 
