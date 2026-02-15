@@ -67,9 +67,20 @@ int main() {
     // Load rooms
     std::unordered_map<std::string, Room> allRooms = fm.loadRooms("rooms.json", allItems);
 
+    if (allRooms.empty()) {
+        std::cout << "ERROR: No rooms loaded from rooms.json – check file and JSON validity.\n";
+        return 1;
+    }
+
+    auto startIt = allRooms.find("cell_1");
+    if (startIt == allRooms.end()) {
+        std::cout << "ERROR: Starting room 'cell_1' not found.\n";
+        return 1;
+    }
+
     // Initial setup
     Player player("Ferengate");
-    player.setCurrentRoom(&allRooms.at("cell_1"));
+    player.setCurrentRoom(&startIt->second);
     bool running = true;
     std::string userInput = "";
     std::vector<std::string> displayLines;
