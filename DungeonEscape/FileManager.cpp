@@ -71,6 +71,16 @@ std::unordered_map<std::string, Item> FileManager::loadItems(const std::string& 
 	return items;
 }
 
+// Helper function to get an Item* by ID from the itemInstances map (returns nullptr if not found)
+Item* FileManager::getItem(const std::string& id) {
+	auto it = itemInstances.find(id);
+	if (it != itemInstances.end()) {
+		return it->second.get();
+	}
+	return nullptr; // not found
+}
+
+
 std::unordered_map<std::string, Room> FileManager::loadRooms(const std::string& filename, std::unordered_map<std::string, Item>& allItems)
 {
 	std::cout << "Trying to load rooms.json...\n";

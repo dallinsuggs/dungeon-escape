@@ -20,6 +20,7 @@
 // For Input Handling
 #include "InputHandler.h"
 #include "raylib.h"
+#include "FileManager.hpp"
 
 // so it doesn't open a console window on Windows
 #ifdef _WIN32
@@ -84,7 +85,7 @@ int main() {
     bool running = true;
     std::string userInput = "";
     std::vector<std::string> displayLines;
-    CommandParser parser(&player, running);
+    CommandParser parser(&player, running, &fm);
 
     // Show the starting room description instantly (no typing animation for the very first message)
     std::vector<std::string> startingLines = captureOutput([&]() {

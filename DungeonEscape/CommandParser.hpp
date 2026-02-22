@@ -12,6 +12,7 @@
 #include "Item.hpp"
 #include "Player.hpp"
 #include "Room.hpp"
+#include "FileManager.hpp"
 
 class CommandParser {
 public:
@@ -59,6 +60,7 @@ private:
 	// Pointers for inventory, roomItems
 	Player* player;
 	bool& running;
+	FileManager* fileManager = nullptr;
 
 	// const string messages no object
 	const std::string MSG_DONT_KNOW_HOW = "I don't know how to do that.";
@@ -116,7 +118,7 @@ private:
 public:
 
 	// Constructor
-	CommandParser(Player* p, bool& runningFlag);
+	CommandParser(Player* p, bool& runningFlag, FileManager* fm);
 
 	// Parse function (primary function to interpret player input and delegate work to handler functions)
 	void parse(std::string& input);

@@ -188,8 +188,8 @@ CommandParser::ObjectMatch CommandParser::findLongestMatchingObject(int startInd
 // CLASS METHOD DEFINITIONS
 
 // Constructor
-CommandParser::CommandParser(Player* p, bool& runningFlag)
-	: player(p), running(runningFlag) {
+CommandParser::CommandParser(Player* p, bool& runningFlag, FileManager* fm)
+	: player(p), running(runningFlag), fileManager(fm) {
 
 	// Initialize verbs umap
 	verbs["help"] = &CommandParser::handleHelp;
@@ -337,9 +337,75 @@ void CommandParser::writeMessage(const std::string& msgTemplate, const std::stri
 
 // Use handler
 void CommandParser::handleUse(ParsedCommand& cmd) {
+	if (cmd.object1.empty() || cmd.object2.empty()) {
+		writeMessage("Use what on what?");
+		return;
+	}
 
+	std::string item1 = normalize(cmd.object1);
+	std::string item2 = normalize(cmd.object2);
+
+	// Robust full-input check (ignores the parser bug with "on")
+	std::string fullInput = normalize(cmd.object1 + " " + cmd.object2);
+
+	// ── ESCAPE INTERACTIONS (checked FIRST) ─────────────────────────────
+
+	// 1. Animal bone on door
+	if (fullInput.find("bone") != std::string::npos && fullInput.find("door") != std::string::npos) {
+		auto doorIds = getItemIdsByName(player->getCurrentRoom()->getRoomItems(), "door");
+		if (doorIds.empty()) {
+			writeMessage("You don't see a door here.");
+			return;
+		}
+		Item* door = fileManager->getItem(doorIds[0]);
+		if (door) {
+			door->setLocked(false);
+			writeMessage("You carefully work the animal bone in the lock... *click!* The door swings open.");
+		}
+		return;
+	}
+
+	// 2. Brick on toilet
+	if (fullInput.find("brick") != std::string::npos && fullInput.find("toilet") != std::string::npos) {
+		Item* toilet = fileManager->getItem("guardroom_toilet");
+		if (!toilet) {
+			writeMessage("There is no toilet here.");
+			return;
+		}
+		if (!toilet->isLocked()) {
+			writeMessage("The toilet seat is already pried open.");
+			return;
+		}
+		toilet->setLocked(false);
+		writeMessage("You wedge the brick under the wooden seat and pry with all your strength. The seat cracks open, revealing a dark, foul-smelling chute that drops straight down to the moat.");
+		return;
+	}
+
+	// 3. Rope on toilet → WIN CONDITION
+	if (fullInput.find("rope") != std::string::npos && fullInput.find("toilet") != std::string::npos) {
+		Item* toilet = fileManager->getItem("guardroom_toilet");
+		if (!toilet || toilet->isLocked()) {
+			writeMessage("The toilet seat is still fixed in place. You need to pry it open first.");
+			return;
+		}
+
+		auto ropeIds = getItemIdsByName(player->getInventory(), "rope");
+		if (ropeIds.size() >= 3) {
+			writeMessage("You quickly knot the three ropes together into one long line, tie it securely around the toilet frame, and lower yourself into the stinking chute.\n\n"
+				"After a long, slippery descent you splash into the cold moat water below... and swim to freedom under the cover of night.\n\n"
+				"You have escaped the dungeon!\n\n"
+				"Thank you for playing Dungeon Escape.");
+			running = false;
+		}
+		else {
+			writeMessage("You only have " + std::to_string(ropeIds.size()) + " rope(s). You need three lengths knotted together to reach the bottom safely.");
+		}
+		return;
+	}
+
+	// ── YOUR ORIGINAL DOOR / KEY LOGIC (completely untouched) ─────────────────────
 	if (cmd.object2.empty()) {
-		// Handle single-object case
+		// single-object case (e.g. "use door")
 		if (cmd.object1 == "door") {
 			if (doorLocked) {
 				writeMessage("The door is locked, you will need to use the key on it first.");
@@ -351,14 +417,14 @@ void CommandParser::handleUse(ParsedCommand& cmd) {
 			else {
 				writeMessage("You close the door.");
 				doorOpen = false;
-			}	
+			}
 		}
 		else {
 			writeMessage(MSG_DONT_KNOW_HOW);
 		}
 	}
 	else {
-		// Handle two object case
+		// two-object case (e.g. "use key on door")
 		if ((cmd.object1 == "key" && cmd.object2 == "door") ||
 			(cmd.object2 == "key" && cmd.object1 == "door")) {
 			if (doorLocked) {
