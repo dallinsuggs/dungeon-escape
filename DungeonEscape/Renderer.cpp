@@ -383,42 +383,37 @@ void Renderer::StartTypingAnimation(const std::vector<std::string>& lines) {
 
 // Update typing animation progress
 void Renderer::UpdateTypingAnimation(float deltaTime) {
- //   if (!typingActive) return;
-	//typingTimer += deltaTime * typingSpeed; // characters progressed
- //   bool done = true;
- //   for (size_t i = 0; i < animProgress.size(); ++i) {
- //       animProgress[i] = std::min(1.0f, typingTimer / (float)animLines[i].length());
- //       if (animProgress[i] < 1.0f) done = false;
- //   }
- //   if (done) typingActive = false;
+    if (!typingActive || animLines.empty()) {
+        typingActive = false;
+        return;
+    }
 
-    if (!typingActive) return;
+    float charsPerSecond = typingSpeed;
+    float charsThisFrame = charsPerSecond * deltaTime;
 
-    float effectiveSpeed = typingSpeed * 10.0f; // adjust fast typing
-    typingTimer += deltaTime * effectiveSpeed;
-
-    bool done = true;
-    float accumulatedTime = typingTimer; // time used for this frame
+    bool stillTyping = false;
 
     for (size_t i = 0; i < animLines.size(); ++i) {
-        if (animProgress[i] >= 1.0f) {
-            accumulatedTime -= (float)animLines[i].length(); // subtract time spent on previous line
-            continue; // this line already finished
+        if (animLines[i].empty()) {
+            animProgress[i] = 1.0f;
+            continue;
         }
+        if (animProgress[i] >= 1.0f) continue;
 
-        // Calculate progress for current line only
-        animProgress[i] = std::min(1.0f, accumulatedTime / (float)animLines[i].length());
+        animProgress[i] += charsThisFrame / (float)animLines[i].length();
 
         if (animProgress[i] < 1.0f) {
-            done = false; // we’re still typing this line
-            break;       // stop processing further lines until this one finishes
+            stillTyping = true;
+            break;                    // type one line at a time
         }
         else {
-            accumulatedTime -= (float)animLines[i].length(); // leftover time carries to next line
+            animProgress[i] = 1.0f;   // finish this line
         }
     }
 
-    if (done) typingActive = false;
+    if (!stillTyping) {
+        typingActive = false;
+    }
 }
 
 
@@ -429,6 +424,15 @@ void Renderer::SnapToBottom(int paddingLines) {
     int lineSpacing = fontSize + 4; // spacing between lines
     int paddingPixels = paddingLines * lineSpacing;
 
+    // dynamic padding for currently typing lines
+    if (typingActive && !animLines.empty())
+    {
+        int typingHeight = 0;
+        for (const auto& line : animLines) {
+            typingHeight += GetWrappedHeight(line.c_str(), GetScreenWidth() - 80, fontSize);
+        }
+        paddingPixels += typingHeight = 30; // 30px buffer for cursor to stay visible
+    }
     // Leave paddingPixels above the bottom
     scrollOffset = -paddingPixels;
 }

@@ -120,26 +120,19 @@ int main() {
 
         // Check if typing just finished this frame
         static bool wasTyping = false;
-        bool currentlyTyping = !renderer.IsTypingDone();
+        bool currentlyTyping = renderer.IsTypingActive();
 
         if (wasTyping && !currentlyTyping) {
-            // Typing just finished → append lines to permanent history
+            // Typing just finished — move it to permanent history
             const auto& completedLines = renderer.GetLastTypedLines();
             for (const auto& line : completedLines) {
                 if (!line.empty()) {
                     displayLines.push_back(line);
                 }
             }
-
-            // Trim old lines if needed
-            if (displayLines.size() > MAX_LINES) {
-                displayLines.erase(displayLines.begin(), displayLines.begin() + (displayLines.size() - MAX_LINES));
-            }
-
-            renderer.SnapToBottom();  // Auto-scroll
         }
-        wasTyping = currentlyTyping;
 
+        wasTyping = currentlyTyping;
         
 
         // TESTING PURPOSES ONLY COMMENT OUT WHEN DONE
@@ -170,7 +163,7 @@ if (inputHandler.UpdateInput(userInput)) {
     int inputHeight = renderer.GetWrappedHeight(inputLine.c_str(), textAreaWidth, fontSize);
 
     // Optionally auto-scroll to bottom after input
-    renderer.SnapToBottom(0); // 0 = no extra padding; adjust if you want
+    // renderer.SnapToBottom(0); // 0 = no extra padding; adjust if you want
 
     std::vector<std::string> newOutputLines;
 
