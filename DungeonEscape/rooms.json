@@ -102,18 +102,23 @@
 	},
 	"guardroom": {
 		"name": "guardroom",
-		"description": "You are in a large foyer-style room with a big desk in the center, a shelf against the west wall, and sprawling landscape painting hanging from the north wall.",
+		"description": "You are in a large foyer-style room with a big desk in the center, a shelf against the west wall, and sprawling landscape painting hanging from the north wall. Set in an alcove along the east wall you see a dirty toilet.",
 		"items": [
-				{
-					"template": "toilet",
-					"id": "guardroom_toilet"
-				}
+			{
+				"template": "toilet",
+				"id": "guardroom_toilet"
+			},
+			{
+				"template": "door",
+				"id": "gallery_guardroom_door"
+			}
 		],
-		"exit": {
+		"exits": {
 			"west": [
 				{
 					"id": "gallery",
-					"label": "open door back to the gallery"
+					"label": "open door back to the gallery",
+					"doorId": "gallery_guardroom_door"
 				}
 			]
 		}
@@ -133,13 +138,18 @@
 			{
 				"template": "rope",
 				"id": "armory_rope_3"
+			},
+			{
+				"template": "door",
+				"id": "gallery_armory_door"
 			}
 		],
 		"exits": {
 			"south": [
 				{
 					"id": "gallery",
-					"label": "open door back to the gallery"
+					"label": "open door back to the gallery",
+					"doorId": "gallery_armory_door"
 				}
 			]
 		}

@@ -52,6 +52,12 @@ private:
 		};
 	};
 
+	enum class ItemScope {
+		RoomOnly,
+		InventoryOnly,
+		RoomAndInventory
+	};
+
 	
 
 	std::unordered_map<std::string, void (CommandParser::*)(ParsedCommand&)> verbs;
@@ -78,6 +84,10 @@ private:
 	const std::string MSG_MULTI_ITEMS = "There are multiple {object1} items: \n{object2}";
 	const std::string MSG_VERB_WHAT = "{object1} what?";
 	const std::string MSG_LOCKED = "It seems the door to that is locked.";
+	const std::string MSG_TOILET_DEATH = "You approach the toilet and peer down a dark hole. After a moment's hesitation you leap inside, falling for several seconds before a voilent impact. You feel your legs shatter beneath you and everything cuts to black. Game Over.";
+	const std::string MSG_NO_MATCH = "I don't see a {object1} here.";
+	const std::string MSG_VERB_WHAT_ON_WHAT = "{object1} what on {object2}?";
+	const std::string MSG_PICK_LOCK = "Using the {object1} you are able to pick the lock, but the animal bone breaks. The {object2} is now unlocked.";
 
 	// booleans
 	bool doorLocked = true;
@@ -89,8 +99,8 @@ private:
 	std::vector<std::string> getAllItemIdsByName(const std::unordered_map<std::string, Item*>& inventory, const std::unordered_map<std::string, Item*>& roomItems, const std::string& objectName);
 	std::string resolveSingleItemId(const std::unordered_map<std::string, Item*>& itemList, const std::string& objectName);
 	std::string resolveAllSingleItemId(const std::unordered_map<std::string, Item*>& inventory, const std::unordered_map<std::string, Item*>& roomItems, const std::string& objectName);
-
 	std::vector<std::string> splitString(std::string& input, char delimiter = ' ');
+	bool resolveOrPromptItem(const std::string& objectName, ItemScope scope, const std::string& MSG_NO_MATCH, const std::function<void(const std::string& id, Item* item)>& onChosen);
 
 	bool isValidWord(
 		const std::unordered_map<std::string, Item*>& inventory, 

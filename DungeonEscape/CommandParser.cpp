@@ -2,6 +2,8 @@
 #include <algorithm>
 #include <cctype>
 #include <string>
+#include <thread>
+#include <chrono>
 
 std::string normalize(const std::string& s) {
 	std::string out = s;
@@ -182,6 +184,76 @@ CommandParser::ObjectMatch CommandParser::findLongestMatchingObject(int startInd
 	return { longestMatch, tokensUsed, foundValid };
 }
 
+// Returns true if resolved immediately (0 or 1 match handled now).
+// Returns false if it prompted (will call onChosen later).
+bool CommandParser::resolveOrPromptItem(
+	const std::string& objectName,
+	ItemScope scope,
+	const std::string& MSG_NO_MATCH,
+	const std::function<void(const std::string& id, Item* item)>& onChosen)
+{
+	auto& inventory = player->getInventory();
+	auto& roomItems = player->getCurrentRoom()->getRoomItems();
+
+	struct Match { std::string id; Item* ptr; bool inRoom; };
+	std::vector<Match> matches;
+
+	auto addMatches = [&](const std::unordered_map<std::string, Item*>& src, bool inRoomFlag) {
+		auto ids = getItemIdsByName(src, objectName);
+		for (auto& id : ids) {
+			matches.push_back({ id, src.at(id), inRoomFlag });
+		}
+		};
+
+	if (scope == ItemScope::RoomOnly || scope == ItemScope::RoomAndInventory) {
+		addMatches(roomItems, true);
+	}
+	if (scope == ItemScope::InventoryOnly || scope == ItemScope::RoomAndInventory) {
+		addMatches(inventory, false);
+	}
+
+	if (matches.empty()) {
+		writeMessage(MSG_NO_MATCH, objectName);
+		return true; // handled now (nothing pending)
+	}
+
+	if (matches.size() == 1) {
+		onChosen(matches[0].id, matches[0].ptr);
+		return true; // handled now
+	}
+
+	// multi -> build choices
+	std::vector<Choice> choices;
+	choices.reserve(matches.size());
+
+	for (auto& m : matches) {
+		Item* itemPtr = m.ptr;
+		std::string id = m.id;
+
+		choices.push_back(Choice{
+			itemPtr->getName() + " (" + id + ")",
+			[this, onChosen, id, itemPtr]() {
+				onChosen(id, itemPtr);
+			}
+			});
+	}
+
+	std::string options;
+	for (size_t i = 0; i < choices.size(); ++i) {
+		options += std::to_string(i + 1) + " - " + choices[i].label + "\n";
+	}
+
+	MultiMsg msgs{
+		MSG_MULTI_ITEMS,
+		objectName,
+		options,
+		MSG_SELECT_CHOICE
+	};
+
+	promptChoice(choices, msgs);
+	return false; // will resolve later via onChosen
+}
+
 //                END HELPER FUNCTIONS
 
 
@@ -337,108 +409,122 @@ void CommandParser::writeMessage(const std::string& msgTemplate, const std::stri
 
 // Use handler
 void CommandParser::handleUse(ParsedCommand& cmd) {
-	if (cmd.object1.empty() || cmd.object2.empty()) {
-		writeMessage("Use what on what?");
-		return;
-	}
+	// Basic validation
+	if (cmd.object1.empty()) { writeMessage(MSG_VERB_WHAT, cmd.verb); return; }
+	if (cmd.object2.empty()) { writeMessage(MSG_VERB_WHAT_ON_WHAT, cmd.object1, cmd.object2); return; }
+	if (cmd.preposition != "on") { writeMessage(MSG_DONT_KNOW_HOW); return; }
 
-	std::string item1 = normalize(cmd.object1);
-	std::string item2 = normalize(cmd.object2);
+	// Copy what we need (IMPORTANT: don’t capture cmd by reference)
+	std::string obj1Name = cmd.object1;
+	std::string obj2Name = cmd.object2;
+	std::string prep = cmd.preposition;
 
-	// Robust full-input check (ignores the parser bug with "on")
-	std::string fullInput = normalize(cmd.object1 + " " + cmd.object2);
+	// Step 1: resolve the item being used (inventory only)
+	bool finishedNow1 = resolveOrPromptItem(
+		obj1Name,
+		ItemScope::InventoryOnly,
+		MSG_DONT_HAVE,
+		[this, obj1Name, obj2Name, prep](const std::string& id1, Item* item1)
+		{
+			// Step 2: resolve the target being used on
+			bool finishedNow2 = resolveOrPromptItem(
+				obj2Name,
+				ItemScope::RoomAndInventory,
+				MSG_DONT_SEE,
+				[this, id1, item1, obj1Name, obj2Name, prep](const std::string& id2, Item* item2)
+				{
+					// Step 3: now we have both, do the actual use logic
+					if (!item1 || !item2) { writeMessage(MSG_DONT_KNOW_HOW); return; }
 
-	// ── ESCAPE INTERACTIONS (checked FIRST) ─────────────────────────────
+					// Example: "use animal bone on door"
+					if (prep == "on" && item1->getName() == "animal bone" && item2->getName() == "door") {
+						
+						item2->setLocked(false);
+						writeMessage(MSG_PICK_LOCK, item2->getName());
+						return;
+					}
 
-	// 1. Animal bone on door
-	if (fullInput.find("bone") != std::string::npos && fullInput.find("door") != std::string::npos) {
-		auto doorIds = getItemIdsByName(player->getCurrentRoom()->getRoomItems(), "door");
-		if (doorIds.empty()) {
-			writeMessage("You don't see a door here.");
-			return;
-		}
-		Item* door = fileManager->getItem(doorIds[0]);
-		if (door) {
-			door->setLocked(false);
-			writeMessage("You carefully work the animal bone in the lock... *click!* The door swings open.");
-		}
-		return;
-	}
+					writeMessage(MSG_DONT_KNOW_HOW);
+				}
+			);
 
-	// 2. Brick on toilet
-	if (fullInput.find("brick") != std::string::npos && fullInput.find("toilet") != std::string::npos) {
-		Item* toilet = fileManager->getItem("guardroom_toilet");
-		if (!toilet) {
-			writeMessage("There is no toilet here.");
-			return;
+			// If it prompted for object2, we must stop here and wait for the numeric input.
+			if (!finishedNow2) return;
 		}
-		if (!toilet->isLocked()) {
-			writeMessage("The toilet seat is already pried open.");
-			return;
-		}
-		toilet->setLocked(false);
-		writeMessage("You wedge the brick under the wooden seat and pry with all your strength. The seat cracks open, revealing a dark, foul-smelling chute that drops straight down to the moat.");
-		return;
-	}
+	);
 
-	// 3. Rope on toilet → WIN CONDITION
-	if (fullInput.find("rope") != std::string::npos && fullInput.find("toilet") != std::string::npos) {
-		Item* toilet = fileManager->getItem("guardroom_toilet");
-		if (!toilet || toilet->isLocked()) {
-			writeMessage("The toilet seat is still fixed in place. You need to pry it open first.");
-			return;
-		}
+	// If it prompted for object1, stop now and wait for numeric input.
+	if (!finishedNow1) return;
 
-		auto ropeIds = getItemIdsByName(player->getInventory(), "rope");
-		if (ropeIds.size() >= 3) {
-			writeMessage("You quickly knot the three ropes together into one long line, tie it securely around the toilet frame, and lower yourself into the stinking chute.\n\n"
-				"After a long, slippery descent you splash into the cold moat water below... and swim to freedom under the cover of night.\n\n"
-				"You have escaped the dungeon!\n\n"
-				"Thank you for playing Dungeon Escape.");
-			running = false;
-		}
-		else {
-			writeMessage("You only have " + std::to_string(ropeIds.size()) + " rope(s). You need three lengths knotted together to reach the bottom safely.");
-		}
-		return;
-	}
+	// If finishedNow1 == true, its callback already ran and either:
+	// - completed the chain immediately, or
+	// - prompted for object2 and returned.
 
-	// ── YOUR ORIGINAL DOOR / KEY LOGIC (completely untouched) ─────────────────────
-	if (cmd.object2.empty()) {
-		// single-object case (e.g. "use door")
-		if (cmd.object1 == "door") {
-			if (doorLocked) {
-				writeMessage("The door is locked, you will need to use the key on it first.");
-			}
-			else if (!doorLocked && !doorOpen) {
-				writeMessage("You open the door.");
-				doorOpen = true;
-			}
-			else {
-				writeMessage("You close the door.");
-				doorOpen = false;
-			}
-		}
-		else {
-			writeMessage(MSG_DONT_KNOW_HOW);
-		}
-	}
-	else {
-		// two-object case (e.g. "use key on door")
-		if ((cmd.object1 == "key" && cmd.object2 == "door") ||
-			(cmd.object2 == "key" && cmd.object1 == "door")) {
-			if (doorLocked) {
-				writeMessage("You unlock the door.");
-				doorLocked = false;
-			}
-			else {
-				writeMessage("The door is already unlocked.");
-			}
-		}
-		else {
-			writeMessage(MSG_DONT_KNOW_HOW);
-		}
-	}
+	//if (cmd.object1.empty() || cmd.object2.empty()) {
+	//	writeMessage("Use what on what?");
+	//	return;
+	//}
+
+	//std::string item1 = normalize(cmd.object1);
+	//std::string item2 = normalize(cmd.object2);
+
+	//// Robust full-input check (ignores the parser bug with "on")
+	//std::string fullInput = normalize(cmd.object1 + " " + cmd.object2);
+
+	//// ── ESCAPE INTERACTIONS (checked FIRST) ─────────────────────────────
+
+	//// 1. Animal bone on door
+	//if (fullInput.find("bone") != std::string::npos && fullInput.find("door") != std::string::npos) {
+	//	auto doorIds = getItemIdsByName(player->getCurrentRoom()->getRoomItems(), "door");
+	//	if (doorIds.empty()) {
+	//		writeMessage("You don't see a door here.");
+	//		return;
+	//	}
+	//	Item* door = fileManager->getItem(doorIds[0]);
+	//	if (door) {
+	//		door->setLocked(false);
+	//		writeMessage("You carefully work the animal bone in the lock... *click!* The door swings open.");
+	//	}
+	//	return;
+	//}
+
+	//// 2. Brick on toilet
+	//if (fullInput.find("brick") != std::string::npos && fullInput.find("toilet") != std::string::npos) {
+	//	Item* toilet = fileManager->getItem("guardroom_toilet");
+	//	if (!toilet) {
+	//		writeMessage("There is no toilet here.");
+	//		return;
+	//	}
+	//	if (!toilet->isLocked()) {
+	//		writeMessage("The toilet seat is already pried open.");
+	//		return;
+	//	}
+	//	toilet->setLocked(false);
+	//	writeMessage("You wedge the brick under the wooden seat and pry with all your strength. The seat cracks open, revealing a dark, foul-smelling chute that drops straight down to the moat.");
+	//	return;
+	//}
+
+	//// 3. Rope on toilet → WIN CONDITION
+	//if (fullInput.find("rope") != std::string::npos && fullInput.find("toilet") != std::string::npos) {
+	//	Item* toilet = fileManager->getItem("guardroom_toilet");
+	//	if (!toilet || toilet->isLocked()) {
+	//		writeMessage("The toilet seat is still fixed in place. You need to pry it open first.");
+	//		return;
+	//	}
+
+	//	auto ropeIds = getItemIdsByName(player->getInventory(), "rope");
+	//	if (ropeIds.size() >= 3) {
+	//		writeMessage("You quickly knot the three ropes together into one long line, tie it securely around the toilet frame, and lower yourself into the stinking chute.\n\n"
+	//			"After a long, slippery descent you splash into the cold moat water below... and swim to freedom under the cover of night.\n\n"
+	//			"You have escaped the dungeon!\n\n"
+	//			"Thank you for playing Dungeon Escape.");
+	//		running = false;
+	//	}
+	//	else {
+	//		writeMessage("You only have " + std::to_string(ropeIds.size()) + " rope(s). You need three lengths knotted together to reach the bottom safely.");
+	//	}
+	//	return;
+	//}
 }
 
 // Open handler
@@ -458,56 +544,25 @@ void CommandParser::handleDrop(ParsedCommand& cmd)
 	auto& inventory = player->getInventory();
 	auto& roomItems = player->getCurrentRoom()->getRoomItems();
 
-	// Get all item IDs in inventory matching the input
-	auto matches = getItemIdsByName(inventory, cmd.object1);
-
-	if (matches.empty()) {
-		writeMessage(MSG_DONT_HAVE, cmd.object1);
-		return;
-	}
-
-	// If only one match, drop immediately
-	if (matches.size() == 1) {
-		const std::string& targetId = matches[0];
-		Item* itemPtr = inventory.at(targetId);
-		roomItems[targetId] = itemPtr;
-
-		inventory.erase(targetId);
-		writeMessage(MSG_DROP, itemPtr->getName());
-		return;
-	}
-
-	// Multiple matches: build choice list
-	std::vector<Choice> choices;
-	for (const auto& id : matches) {
-		Item* itemPtr = inventory.at(id); // capture pointer
-		choices.push_back(Choice{
-			itemPtr->getName() + " (" + id + ")", // label shown to player
-			[this, &inventory, &roomItems, id, itemPtr]() { // action when chosen
-				roomItems[id] = itemPtr;
-				inventory.erase(id);
-				writeMessage(MSG_DROP, itemPtr->getName());
-			}
-			});
-	}
-
-	// Build options string for display
-	std::string options;
-	for (size_t i = 0; i < choices.size(); ++i) {
-		options += std::to_string(i + 1) + " - " + choices[i].label + "\n";
-	}
-
-	// Use promptChoice to show the options to the player
-	MultiMsg msgs{
-		MSG_MULTI_ITEMS,
+	bool finishedNow = resolveOrPromptItem(
 		cmd.object1,
-		options,
-		MSG_SELECT_CHOICE
-	};
+		ItemScope::InventoryOnly,
+		MSG_DONT_HAVE,
+		[this, &inventory, &roomItems](const std::string& chosenId, Item* itemPtr)
+		{
+			// chosenId is guaranteed to exist in inventory for InventoryOnly scope
+			roomItems[chosenId] = itemPtr;
+			inventory.erase(chosenId);
+			writeMessage(MSG_DROP, itemPtr->getName());
+		}
+	);
 
-	promptChoice(choices, msgs);
+	// If it prompted, stop here and wait for numeric input.
+	if (!finishedNow) return;
 }
 
+
+// Put handler
 void CommandParser::handlePut(ParsedCommand& cmd)
 {
 	if (cmd.preposition == "down") {
@@ -521,78 +576,49 @@ void CommandParser::handleTake(ParsedCommand& cmd)
 	auto& inventory = player->getInventory();
 	auto& roomItems = player->getCurrentRoom()->getRoomItems();
 
-	// get all item IDs matching the input
-	auto matches = getItemIdsByName(roomItems, cmd.object1);
-
-	if (matches.empty()) {
-		writeMessage(MSG_DONT_SEE, cmd.object1);
-		return;
-	}
-
-	// If only one match, take immediately
-
-	if (matches.size() == 1) {
-		const std::string& targetId = matches[0];
-
-		if (!roomItems[targetId]->isMoveable()) { // if unmoveable, can't take
-			writeMessage(MSG_CANT_TAKE, cmd.object1);
-			return;
-		}
-
-		if (inventory.count(targetId)) {
-			writeMessage(MSG_ALREADY_HAVE, cmd.object1);
-			return;
-		}
-
-		inventory[targetId] = roomItems[targetId];
-		roomItems.erase(targetId);
-		writeMessage(MSG_TAKE, cmd.object1);
-		return;
-	}
-
-	// If multiple, build choice list
-	std::vector<Choice> choices;
-	for (const auto& id : matches) {
-		Item* itemPtr = roomItems[id]; // capture the pointer
-		choices.push_back(Choice{
-			roomItems[id]->getName() + " (" + id + ")", // label shown to player
-			[this, &inventory, &roomItems, id, itemPtr]() { // action when chosen
-				if (!roomItems[id]->isMoveable()) {
-					writeMessage(MSG_CANT_TAKE, roomItems[id]->getName());
-					return;
-				}
-				if (inventory.count(id)) {
-					writeMessage(MSG_ALREADY_HAVE, roomItems[id]->getName());
-					return;
-				}
-				inventory[id] = roomItems[id];
-				roomItems.erase(id);
-				writeMessage(MSG_TAKE, itemPtr->getName());
-			}
-		});
-	}
-
-	std::string options;
-	for (size_t i = 0; i < choices.size(); ++i) {
-		options += std::to_string(i + 1) + " - " + choices[i].label + "\n";
-	}
-
-	// use promptChoice to show the options to the player
-	MultiMsg msgs{
-		MSG_MULTI_ITEMS,
+	bool finishedNow = resolveOrPromptItem(
 		cmd.object1,
-		options,
-		MSG_SELECT_CHOICE
-	};
+		ItemScope::RoomOnly,
+		MSG_DONT_SEE,
+		[this, &inventory, &roomItems](const std::string& chosenId, Item* itemPtr)
+		{
+			// itemPtr == roomItems.at(chosenId) for RoomOnly scope
+			if (!itemPtr->isMoveable()) {
+				writeMessage(MSG_CANT_TAKE, itemPtr->getName());
+				return;
+			}
 
-	promptChoice(choices, msgs);
+			// This check is kind of redundant for "take" (it’s not in inventory yet),
+			// but keep it if you want to be safe.
+			if (inventory.count(chosenId)) {
+				writeMessage(MSG_ALREADY_HAVE, itemPtr->getName());
+				return;
+			}
+
+			inventory[chosenId] = itemPtr;
+			roomItems.erase(chosenId);
+			writeMessage(MSG_TAKE, itemPtr->getName());
+		}
+	);
+
+	// If it prompted, we wait for numeric selection.
+	if (!finishedNow) return;
+
+	// If finishedNow == true, either:
+	// - it already took the item via callback (single match), OR
+	// - it printed MSG_DONT_SEE (no match)
+	// so nothing else to do here.
 }
+
 
 // Pick handler
 void CommandParser::handlePick(ParsedCommand& cmd)
 {
 	if (cmd.preposition == "up") {
 		handleTake(cmd);
+	}
+	else {
+		writeMessage(MSG_DONT_KNOW_HOW);
 	}
 }
 
@@ -666,6 +692,36 @@ void CommandParser::handleExamine(ParsedCommand& cmd) {
 // Go handler
 void CommandParser::handleGo(ParsedCommand& cmd)
 {
+	if (cmd.preposition == "down") {                 // go down <object>
+
+		// Player typed just "go down" (no object)
+		if (cmd.object1.empty()) {
+			writeMessage(MSG_VERB_WHAT, "go down");
+			return;
+		}
+
+		bool finishedNow = resolveOrPromptItem(
+			cmd.object1,
+			ItemScope::RoomOnly,
+			MSG_DONT_SEE,
+			[this](const std::string& chosenId, Item* itemPtr) {
+				// (chosenId unused here, but fine to keep in the signature)
+				if (itemPtr && itemPtr->getName() == "toilet") {
+					writeMessage(MSG_TOILET_DEATH);
+				}
+				else {
+					writeMessage(MSG_VERB_WHAT, "go down");
+				}
+			}
+		);
+
+		if (!finishedNow) return;
+
+		return;
+	}
+
+
+
 	std::string dir = cmd.object1;
 	// If player entered cardinal direction, and cardinal direction leads to another location, and no locked door, change location to new location
 

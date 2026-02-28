@@ -19,7 +19,8 @@ private:
     void DrawWrappedText(const char* text, int x, int startY, int maxWidth, int fontSize, Color color);
 
     // Typing animation
-	float typingSpeed = 35.0f; // characters per second
+	//float typingSpeed = 35.0f; // characters per second SLOW (UGH)
+    float typingSpeed = 90.0f; // characters per second FAST (YAY!)
     std::vector<std::string> animLines; // lines being typed
 	std::vector<float> animProgress; // Progress per line (0.0 to 1.0)
     float typingTimer = 0.0f;

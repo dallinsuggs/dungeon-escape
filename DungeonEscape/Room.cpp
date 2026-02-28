@@ -25,7 +25,7 @@ std::unordered_map<std::string, Item*>& Room::getRoomItems() {
 std::string Room::getDescription() const { return description; }
 std::string Room::getName() const { return name; }
 
-std::string Room::describeSelf() const
+std::string Room::describeSelf() const  // Combines static desc with dynamic list of moveable items in the room to create a full description of the current state of the room
 {
 	std::string fullDesc = description;
 	static const std::unordered_set<char> vowels = { 'a', 'e', 'i', 'o', 'u'};
