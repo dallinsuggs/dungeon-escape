@@ -27,6 +27,10 @@
 			{
 				"template": "animal bone",
 				"id": "cell_1_animal_bone"
+			},
+			{
+				"template": "mattress",
+				"id": "cell_1_mattress"
 			}
 		],
 		"exits": {
@@ -111,6 +115,10 @@
 			{
 				"template": "door",
 				"id": "gallery_guardroom_door"
+			},
+			{
+				"template": "painting",
+				"id": "guardroom_painting"
 			}
 		],
 		"exits": {
@@ -142,6 +150,10 @@
 			{
 				"template": "door",
 				"id": "gallery_armory_door"
+			},
+			{
+				"template": "armor",
+				"id": "armory_armor"
 			}
 		],
 		"exits": {

@@ -35,5 +35,20 @@
 		"description": "A cold, wooden seat over a vertical chute, allowing waste to fall directly into the castle moat.",
 		"moveable": false,
 		"locked": true
+	},
+	"painting": {
+		"name": "painting",
+		"description": "A beautiful oil painting depicting a serene landscape with rolling hills, a calm river, and a vibrant sunset. The colors are rich and the brushstrokes are delicate, giving the scene a sense of tranquility and depth.",
+		"moveable": false
+	},
+	"armor": {
+		"name": "armor",
+		"description": "Several suits of medieval armor, complete with helmets, breastplates, gauntlets, and greaves. The metal is tarnished and dented, but it still looks sturdy enough to provide some protection.",
+		"moveable": false
+	},
+	"mattress": {
+		"name": "mattress",
+		"description": "A thin, lumpy mattress made of straw and covered in a threadbare cloth. It looks uncomfortable and unsanitary.",
+		"moveable": false
 	}
 }
