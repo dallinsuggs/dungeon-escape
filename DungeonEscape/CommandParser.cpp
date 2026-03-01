@@ -122,9 +122,9 @@ std::vector<std::string> CommandParser::splitString(std::string& input, char del
 	// TODO: Have this check one word ahead to check for phrasal verbs like "pick up"
 
 	while (std::getline(iss, token, delimiter)) {
-		if (token == "on" || token == "with" || token == "to") {
-			continue; // skip specified prepositions
-		}
+		//if (token == "on" || token == "with" || token == "to") {
+		//	continue; // skip specified prepositions
+		//}
 		tokens.push_back(token);
 	}
 
@@ -350,7 +350,7 @@ void CommandParser::parse(std::string& input) {
 	}
 	
 	// object1
-	for (int i = 0; i < tokens.size(); i++) {
+	for (int i = cmd.indexMap["verb"] + 1; i < (int)tokens.size(); i++) {
 		ObjectMatch objectMatch = findLongestMatchingObject(i, static_cast<int>(tokens.size()), tokens, player->getInventory(), player->getCurrentRoom()->getRoomItems(), cmd.indexMap["verb"], cmd.indexMap["preposition"]);
 		if (!objectMatch.name.empty()) {
 			cmd.object1 = objectMatch.name;
@@ -438,9 +438,15 @@ void CommandParser::handleUse(ParsedCommand& cmd) {
 
 					// Example: "use animal bone on door"
 					if (prep == "on" && item1->getName() == "animal bone" && item2->getName() == "door") {
-						
 						item2->setLocked(false);
-						writeMessage(MSG_PICK_LOCK, item2->getName());
+						itemUseCount[id1]++; 
+						if (itemUseCount[id1] >= 2) {
+							player->getInventory().erase(id1);
+							writeMessage(MSG_PICK_LOCK_BREAK, item1->getName(), item2->getName()); // it breaks message
+						}
+						else {
+							writeMessage(MSG_PICK_LOCK, item1->getName(), item2->getName()); // first use message
+						}
 						return;
 					}
 

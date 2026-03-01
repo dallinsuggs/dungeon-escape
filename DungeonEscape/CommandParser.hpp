@@ -62,6 +62,7 @@ private:
 
 	std::unordered_map<std::string, void (CommandParser::*)(ParsedCommand&)> verbs;
 	std::unordered_set<std::string> prepositions;
+	std::unordered_map<std::string, int> itemUseCount; // For items that are consumable, i.e. animal bones
 
 	// Pointers for inventory, roomItems
 	Player* player;
@@ -87,7 +88,8 @@ private:
 	const std::string MSG_TOILET_DEATH = "You approach the toilet and peer down a dark hole. After a moment's hesitation you leap inside, falling for several seconds before a voilent impact. You feel your legs shatter beneath you and everything cuts to black. Game Over.";
 	const std::string MSG_NO_MATCH = "I don't see a {object1} here.";
 	const std::string MSG_VERB_WHAT_ON_WHAT = "{object1} what on {object2}?";
-	const std::string MSG_PICK_LOCK = "Using the {object1} you are able to pick the lock, but the animal bone breaks. The {object2} is now unlocked.";
+	const std::string MSG_PICK_LOCK = "Using the {object1} you are able to pick the lock, but it feels like it may break soon. The {object2} is now unlocked.";
+	const std::string MSG_PICK_LOCK_BREAK = "Using the {object1} you are able to pick the lock, but it breaks. The {object2} is now unlocked.";
 
 	// booleans
 	bool doorLocked = true;
