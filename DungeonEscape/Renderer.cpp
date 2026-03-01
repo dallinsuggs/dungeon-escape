@@ -85,7 +85,7 @@ void Renderer::DrawWrappedText(const char* text, int x, int startY, int maxWidth
 
     while (iss >> word) {
         std::string testLine = currentLine.empty() ? word : currentLine + " " + word;
-        if (MeasureText(testLine.c_str(), fontSize) <= maxWidth) {
+        if (MeasureTextEx(customFont, testLine.c_str(), (float)fontSize, 2.0f).x <= maxWidth) {
             currentLine = testLine;
         }
         else {
