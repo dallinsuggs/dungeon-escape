@@ -13,6 +13,7 @@
 #include "Player.hpp"
 #include "Room.hpp"
 #include "FileManager.hpp"
+#include "Renderer.h"
 
 class CommandParser {
 public:
@@ -36,6 +37,7 @@ public:
 		bool active = false;
 	};
 	PendingChoice pendingChoice;
+	bool gameOver = false;
 private:
 	// struct
 	struct ParsedCommand {
@@ -64,15 +66,18 @@ private:
 	std::unordered_set<std::string> prepositions;
 	std::unordered_map<std::string, int> itemUseCount; // For items that are consumable, i.e. animal bones
 
-	// Pointers for inventory, roomItems
+	// Pointers for inventory, roomItems, and more
 	Player* player;
 	bool& running;
 	FileManager* fileManager = nullptr;
+	Renderer* renderer = nullptr;
+	std::unordered_map<std::string, Room>* allRooms = nullptr;
 
 	// const string messages no object
 	const std::string MSG_DONT_KNOW_HOW = "I don't know how to do that.";
 
 	// const string messages with object
+	const std::string MSG = "You don't know how to do that.";
 	const std::string MSG_TAKE = "You now possess a {object1}.";
 	const std::string MSG_ALREADY_HAVE = "You already have a {object1} in your inventory.";
 	const std::string MSG_DONT_SEE = "You don't see a {object1} here.";
@@ -130,7 +135,7 @@ private:
 public:
 
 	// Constructor
-	CommandParser(Player* p, bool& runningFlag, FileManager* fm);
+	CommandParser(Player* p, bool& runningFlag, FileManager* fm, Renderer* renderer, std::unordered_map<std::string, Room>* rooms);
 
 	// Parse function (primary function to interpret player input and delegate work to handler functions)
 	void parse(std::string& input);

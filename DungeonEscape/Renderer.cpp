@@ -105,7 +105,7 @@ void Renderer::DrawWrappedText(const char* text, int x, int startY, int maxWidth
 void Renderer::UpdateDayProgress() {
     float delta = GetFrameTime();  // Raylib's per-frame time
     simulatedElapsed += delta * timeSpeed;
-    dayProgress = fmod(simulatedElapsed / 1800.0f, 1.0f);  // 1800s = 30min cycle
+    dayProgress = fmod(simulatedElapsed / 900.0f, 1.0f);  // 1800s = 30min cycle, 900 = 15min cycle
 }
 
 // Draw background with Raylib

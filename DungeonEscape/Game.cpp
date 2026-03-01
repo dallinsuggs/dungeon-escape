@@ -85,7 +85,7 @@ int main() {
     bool running = true;
     std::string userInput = "";
     std::vector<std::string> displayLines;
-    CommandParser parser(&player, running, &fm);
+    CommandParser parser(&player, running, &fm, &renderer, &allRooms);
 
     // Show the starting room description instantly (no typing animation for the very first message)
     std::vector<std::string> startingLines = captureOutput([&]() {
@@ -119,89 +119,98 @@ int main() {
         renderer.UpdateScrollInput(); // handle scroll input
 		renderer.UpdateTypingAnimation(GetFrameTime());
 
-        // Check if typing just finished this frame
-        static bool wasTyping = false;
-        bool currentlyTyping = renderer.IsTypingActive();
+        if (parser.gameOver) {
+            // Show text, wait for keypress, then exit
+            if (IsKeyPressed(KEY_ENTER) || IsKeyPressed(KEY_ESCAPE) || IsKeyPressed(KEY_SPACE)) {
+                break;
+            }
+        }
+        else if (running) {
+            // Check if typing just finished this frame
+            static bool wasTyping = false;
+            bool currentlyTyping = renderer.IsTypingActive();
 
-        if (wasTyping && !currentlyTyping) {
-            // Typing just finished — move it to permanent history
-            const auto& completedLines = renderer.GetLastTypedLines();
-            for (const auto& line : completedLines) {
-                if (!line.empty()) {
-                    displayLines.push_back(line);
+            if (wasTyping && !currentlyTyping) {
+                // Typing just finished — move it to permanent history
+                const auto& completedLines = renderer.GetLastTypedLines();
+                for (const auto& line : completedLines) {
+                    if (!line.empty()) {
+                        displayLines.push_back(line);
+                    }
                 }
             }
-        }
 
-        wasTyping = currentlyTyping;
-        
+            wasTyping = currentlyTyping;
 
-        // TESTING PURPOSES ONLY COMMENT OUT WHEN DONE
-        if (IsKeyPressed(KEY_LEFT_CONTROL)) {
-            if (renderer.GetTimeSpeed() > 1.0f) {
-                renderer.SetTimeSpeed(1.0f); // Back to normal speed 
+
+            // TESTING PURPOSES ONLY COMMENT OUT WHEN DONE
+            if (IsKeyPressed(KEY_LEFT_CONTROL)) {
+                if (renderer.GetTimeSpeed() > 1.0f) {
+                    renderer.SetTimeSpeed(1.0f); // Back to normal speed 
+                }
+                else {
+                    renderer.SetTimeSpeed(60.0f); // Speed up time for testing
+                }
             }
-            else {
-                renderer.SetTimeSpeed(60.0f); // Speed up time for testing
+
+            if (IsKeyPressed(KEY_F11)) {
+                ToggleFullscreen();
             }
+
+            // Handle input
+            if (inputHandler.UpdateInput(userInput)) {
+                // Compose input line
+                std::string inputLine = "> " + userInput;
+
+                // Echo input immediately
+                displayLines.push_back(inputLine);
+
+                // Compute wrapped height for proper spacing (matches DrawTextOverlay)
+                int fontSize = 32; // same as in DrawTextOverlay
+                int textAreaWidth = GetScreenWidth() - 80; // same as in DrawTextOverlay
+                int inputHeight = renderer.GetWrappedHeight(inputLine.c_str(), textAreaWidth, fontSize);
+
+                // Optionally auto-scroll to bottom after input
+                // renderer.SnapToBottom(0); // 0 = no extra padding; adjust if you want
+
+                std::vector<std::string> newOutputLines;
+
+
+                // Check if choice prompt bool is active
+                if (parser.pendingChoice.active) {
+                    int choice = -1;
+                    try { choice = std::stoi(userInput) - 1; }
+                    catch (...) {}
+
+                    if (choice >= 0 && choice < parser.pendingChoice.choices.size()) {
+                        newOutputLines = captureOutput([&]() {
+                            parser.pendingChoice.choices[choice].action();
+                            });
+                        parser.pendingChoice.active = false;
+                    }
+                    else {
+                        newOutputLines.push_back("Invalid choice, enter a number corresponding to your exit.");
+                    }
+                }
+                else {                                                                                           // else, regular input parsing
+                    newOutputLines = captureOutput([&]() { parser.parse(userInput); });
+                }
+
+                // Only start animation if there are new lines
+                if (!newOutputLines.empty()) {
+                    renderer.StartTypingAnimation(newOutputLines);
+                    // Do NOT append to displayLines here – it happens after animation completes
+                }
+
+                userInput.clear();
+            }
+
+
         }
-
-        if (IsKeyPressed(KEY_F11)) {
-            ToggleFullscreen();
-        }
-
-        // Handle input
-if (inputHandler.UpdateInput(userInput)) {
-    // Compose input line
-    std::string inputLine = "> " + userInput;
-
-    // Echo input immediately
-    displayLines.push_back(inputLine);
-
-    // Compute wrapped height for proper spacing (matches DrawTextOverlay)
-    int fontSize = 32; // same as in DrawTextOverlay
-    int textAreaWidth = GetScreenWidth() - 80; // same as in DrawTextOverlay
-    int inputHeight = renderer.GetWrappedHeight(inputLine.c_str(), textAreaWidth, fontSize);
-
-    // Optionally auto-scroll to bottom after input
-    // renderer.SnapToBottom(0); // 0 = no extra padding; adjust if you want
-
-    std::vector<std::string> newOutputLines;
-
-
-    // Check if choice prompt bool is active
-    if (parser.pendingChoice.active) {
-        int choice = -1;
-        try { choice = std::stoi(userInput) - 1; }
-        catch (...) {}
-
-        if (choice >= 0 && choice < parser.pendingChoice.choices.size()) {
-            newOutputLines = captureOutput([&]() {
-                parser.pendingChoice.choices[choice].action();
-            });
-            parser.pendingChoice.active = false;
-        } else {
-            newOutputLines.push_back("Invalid choice, enter a number corresponding to your exit.");
-        }
-    } else {                                                                                           // else, regular input parsing
-        newOutputLines = captureOutput([&]() { parser.parse(userInput); });
-    }
-
-    // Only start animation if there are new lines
-    if (!newOutputLines.empty()) {
-        renderer.StartTypingAnimation(newOutputLines);
-        // Do NOT append to displayLines here – it happens after animation completes
-    }
-
-    userInput.clear();
-}
-
-
-
         // Draw everything
         BeginDrawing();
         renderer.DrawBackground();
-        renderer.DrawTextOverlay(displayLines, inputHandler.GetBuffer()); // Pass handler's buffer
+        renderer.DrawTextOverlay(displayLines, parser.gameOver ? "Press ENTER to exit" : inputHandler.GetBuffer()); // Pass handler's buffer
         EndDrawing();
     }
 

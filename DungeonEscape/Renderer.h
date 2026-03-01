@@ -40,6 +40,9 @@ public:
     void UpdateScrollInput(); // Call every frame for wheel/arrows
     ~Renderer();
 
+    // Get the current point/time in the day
+    float GetDayProgress() const { return dayProgress; }
+
 	// Typing animation controls
     void StartTypingAnimation(const std::vector<std::string>& lines);
     void UpdateTypingAnimation(float deltaTime);
