@@ -192,7 +192,8 @@ bool CommandParser::resolveOrPromptItem(
 	const std::string& objectName,
 	ItemScope scope,
 	const std::string& MSG_NO_MATCH,
-	const std::function<void(const std::string& id, Item* item)>& onChosen)
+	const std::function<void(const std::string& id, Item* item)>& onChosen,
+	std::function<std::string(const std::string& id, Item* item)> labelFn)
 {
 	auto& inventory = player->getInventory();
 	auto& roomItems = player->getCurrentRoom()->getRoomItems();
@@ -233,7 +234,7 @@ bool CommandParser::resolveOrPromptItem(
 		std::string id = m.id;
 
 		choices.push_back(Choice{
-			itemPtr->getName() + " (" + id + ")",
+			labelFn ? labelFn(id, itemPtr) : itemPtr->getName() + " — " + getDoorDestinationLabel(id, player->getCurrentRoom()),
 			[this, onChosen, id, itemPtr]() {
 				onChosen(id, itemPtr);
 			}
@@ -284,7 +285,7 @@ CommandParser::CommandParser(Player* p, bool& runningFlag, FileManager* fm, Rend
 	verbs["look"] = &CommandParser::handleLook;
 	verbs["examine"] = &CommandParser::handleExamine;
 	verbs["go"] = &CommandParser::handleGo;
-	verbs["unlock"] = &CommandParser::handleUnlock;
+	//verbs["unlock"] = &CommandParser::handleUnlock;
 	// sit
 	// lay
 	// tear (sheet?)
@@ -455,7 +456,7 @@ void CommandParser::handleUse(ParsedCommand& cmd) {
 							if (!isSafe) {
 								int outcome = std::rand() % 3;
 								if (outcome == 0) {
-									writeMessage("The door swings open — and a guard is standing right behind it. Before you can react, his sword is through your chest. Everything goes dark.\n\nGame Over.");
+									writeMessage("The door swings open and a guard is standing right behind it. Before you can react, his sword is through your chest. Everything goes dark.\n\nGame Over.");
 									gameOver = true;
 								}
 								else if (outcome == 1) {
@@ -463,7 +464,7 @@ void CommandParser::handleUse(ParsedCommand& cmd) {
 									gameOver = true;
 								}
 								else {
-									writeMessage("The lock clicks — and the door flies open from the other side. A guard's fist connects with your jaw. You wake up on the cold cell floor, a whole day later.");
+									writeMessage("The lock clicks and the door flies open from the other side. A guard's fist connects with your jaw. You wake up on the cold cell floor, a whole day later.");
 									if (allRooms && allRooms->count("cell_1")) {
 										player->setCurrentRoom(&allRooms->at("cell_1"));
 									}
@@ -513,14 +514,28 @@ void CommandParser::handleUse(ParsedCommand& cmd) {
 						if ((int)ropeIds.size() >= 3) {
 							writeMessage("You quickly knot the three ropes together into one long line, tie it securely around the toilet frame, and lower yourself into the stinking chute.\n\nAfter a long, slippery descent you splash into the cold moat water below... and swim to freedom under the cover of night.\n\nYou have escaped the dungeon!\n\nThank you for playing Dungeon Escape.");
 							gameWon = true;
+							gameOver = true;
 						}
 						else {
 							writeMessage("You only have " + std::to_string(ropeIds.size()) + " rope(s). Desperate, you tie what you have and drop into the chute anyway.\n\nHalfway down, the rope runs out. The last thing you hear is the distant sound of water rushing up to meet you.\n\nYou Died. Game Over.");
+							gameOver = true;
 						}
 						return;
 					}
 
 					writeMessage(MSG_DONT_KNOW_HOW);
+				},
+				// Label override for doors — shows destination instead of internal ID
+				[this](const std::string& id, Item* item) -> std::string {
+					bool isDoor = (
+						item->getName() == "door" ||
+						item->getName() == "cell door" ||
+						item->getName() == "armory door" ||
+						item->getName() == "guardroom door");
+					if (isDoor) {
+						return item->getName() + " — " + getDoorDestinationLabel(id, player->getCurrentRoom());
+					}
+					return item->getName() + " (" + id + ")";
 				}
 			);
 			// If it prompted for object2, we must stop here and wait for the numeric input.
@@ -683,6 +698,7 @@ void CommandParser::handleExamine(ParsedCommand& cmd) {
 
 	// Use promptChoice to show the options to the player
 	MultiMsg msgs{
+
 		MSG_MULTI_ITEMS,
 		target,
 		options,
@@ -763,28 +779,28 @@ void CommandParser::handleGo(ParsedCommand& cmd)
 
 	auto canPassExit = [&](const Room::ExitOption& exit) -> bool {
 
-		writeMessage(std::string("DEBUG: exit.doorId = '") + exit.doorId + "'");
+		//writeMessage(std::string("DEBUG: exit.doorId = '") + exit.doorId + "'");
 
 		if (exit.doorId.empty()) {
-			writeMessage("DEBUG: doorId is empty -> treating as open passage");
+		//	writeMessage("DEBUG: doorId is empty -> treating as open passage");
 			return true;
 		}
 
 		auto& roomItems = player->getCurrentRoom()->getRoomItems();
 
-		writeMessage(std::string("DEBUG: roomItems.count(doorId) = ")
-			+ (roomItems.count(exit.doorId) ? "1" : "0"));
+		//writeMessage(std::string("DEBUG: roomItems.count(doorId) = ")
+			//+ (roomItems.count(exit.doorId) ? "1" : "0"));
 
 		auto doorIt = roomItems.find(exit.doorId);
 		if (doorIt == roomItems.end()) {
-			writeMessage("DEBUG: doorId not found in roomItems -> letting you pass (your current behavior)");
+			//writeMessage("DEBUG: doorId not found in roomItems -> letting you pass (your current behavior)");
 			return true; // you can change to false later
 		}
 
 		Item* door = doorIt->second;
 
-		writeMessage(std::string("DEBUG: door->isLocked() = ")
-			+ (door->isLocked() ? "true" : "false"));
+		//writeMessage(std::string("DEBUG: door->isLocked() = ")
+			//+ (door->isLocked() ? "true" : "false"));
 
 		if (door->isLocked()) {
 			writeMessage(MSG_LOCKED);
@@ -857,7 +873,6 @@ void CommandParser::handleGo(ParsedCommand& cmd)
 void CommandParser::handleUnlock(ParsedCommand& cmd)
 {
 	std::string target = cmd.object1;
-
 	if (target.empty()) {
 		writeMessage(MSG_VERB_WHAT, cmd.verb);
 		return;
@@ -874,10 +889,18 @@ void CommandParser::handleUnlock(ParsedCommand& cmd)
 		return;
 	}
 
-	// If only one match, examine immediately
+	// Helper to check if an item is a door
+	auto isDoor = [](Item* item) -> bool {
+		return (item->getName() == "door" ||
+			item->getName() == "cell door" ||
+			item->getName() == "armory door" ||
+			item->getName() == "guardroom door");
+		};
+
+	// If only one match, unlock immediately
 	if (matches.size() == 1) {
 		Item* itemPtr = roomItems.count(matches[0]) ? roomItems.at(matches[0]) : inventory.at(matches[0]);
-		if (itemPtr->getName() == "door") {
+		if (isDoor(itemPtr)) {
 			itemPtr->setLocked(false);
 			std::string msg = itemPtr->isLocked() ? "The {object1} is locked." : "The {object1} is unlocked.";
 			writeMessage(msg, itemPtr->getName());
@@ -894,20 +917,22 @@ void CommandParser::handleUnlock(ParsedCommand& cmd)
 	for (const auto& id : matches) {
 		Item* itemPtr = roomItems.count(id) ? roomItems.at(id) : inventory.at(id);
 		choices.push_back(Choice{
-			itemPtr->getName() + " (" + id + ")", // label shown to player
-			[this, itemPtr]() { // action when chosen
-				if (itemPtr->getName() == "door") {
+			itemPtr->getName() + " - " + getDoorDestinationLabel(id, player->getCurrentRoom()),
+			[this, itemPtr]() {
+				bool door = (itemPtr->getName() == "door" ||
+							 itemPtr->getName() == "cell door" ||
+							 itemPtr->getName() == "armory door" ||
+							 itemPtr->getName() == "guardroom door");
+				if (door) {
 					itemPtr->setLocked(false);
 					std::string msg = itemPtr->isLocked() ? "The {object1} is locked." : "The {object1} is unlocked.";
 					writeMessage(msg, itemPtr->getName());
-					return;
-				}
-				else {
+				} else {
 					writeMessage(MSG_DONT_KNOW_HOW);
 				}
 			}
-			});
-	}
+	});
+}
 
 	// Build options string for display
 	std::string options;
@@ -924,7 +949,6 @@ void CommandParser::handleUnlock(ParsedCommand& cmd)
 	};
 
 	promptChoice(choices, msgs);
-	
 }
 
 // Help handler for displaying available commands
@@ -941,6 +965,23 @@ void CommandParser::handleHelp(ParsedCommand& cmd)
 		"- quit / exit / q: Exit the game.\n"
 		"- help: Display this help message.\n"
 		);
+}
+
+// This function looks through all rooms and their exits to find a door with the given ID, and returns its label for display in the "go" choices. 
+// If not found, it returns the doorId itself as a fallback.
+std::string CommandParser::getDoorDestinationLabel(const std::string& doorId, Room* currentRoom) {
+	if (!currentRoom) return doorId;
+	const auto& exits = currentRoom->getExits();
+	for (auto exitDirIt = exits.begin(); exitDirIt != exits.end(); ++exitDirIt) {
+		const std::string& dir = exitDirIt->first;
+		const auto& exitList = exitDirIt->second;
+		for (size_t i = 0; i < exitList.size(); ++i) {
+			if (exitList[i].doorId == doorId) {
+				return dir + " — " + exitList[i].label;
+			}
+		}
+	}
+	return doorId;
 }
 
 

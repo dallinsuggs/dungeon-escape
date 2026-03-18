@@ -347,8 +347,8 @@ void Renderer::DrawTextOverlay(const std::vector<std::string>& displayLines, con
     }
 
     // TESTING PURPOSES ONLY COMMENT OUT WHEN DONE
-    std::string speedText = "Time: " + std::to_string((int)timeSpeed) + "x";
-    DrawText(speedText.c_str(), GetScreenWidth() - 150, 20, 16, (timeSpeed > 1.0f ? RED : GRAY));
+    //std::string speedText = "Time: " + std::to_string((int)timeSpeed) + "x";
+    //DrawText(speedText.c_str(), GetScreenWidth() - 150, 20, 16, (timeSpeed > 1.0f ? RED : GRAY));
     // Debug
     // DrawText(TextFormat("Offset: %.0f / Max: %.0f", scrollOffset, maxScroll), GetScreenWidth() - 300, 40, 16, YELLOW);
 }

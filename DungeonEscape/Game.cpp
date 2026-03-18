@@ -17,7 +17,6 @@
 #include <fstream>
 #include "InputHandler.h"
 #include "raylib.h"
-#include "FileManager.hpp"
 
 #ifdef _WIN32
 #pragma comment(linker, "/SUBSYSTEM:windows /ENTRY:mainCRTStartup")
@@ -202,10 +201,11 @@ int main() {
                 }
                 else if (running) {
                     // Debug keys — remove when done
-                    if (IsKeyPressed(KEY_N)) renderer.SetDayProgress(0.65f);
-                    if (IsKeyPressed(KEY_LEFT_CONTROL)) {
-                        renderer.SetTimeSpeed(renderer.GetTimeSpeed() > 1.0f ? 1.0f : 60.0f);
-                    }
+                    //if (IsKeyPressed(KEY_N)) renderer.SetDayProgress(0.65f);
+                    //if (IsKeyPressed(KEY_LEFT_CONTROL)) {
+                    //    renderer.SetTimeSpeed(renderer.GetTimeSpeed() > 1.0f ? 1.0f : 60.0f);
+                    //}
+					// Full Screen toggle
                     if (IsKeyPressed(KEY_F11)) ToggleFullscreen();
 
                     if (inputHandler.UpdateInput(userInput)) {

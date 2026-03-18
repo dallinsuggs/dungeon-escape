@@ -56,7 +56,7 @@
 	},
 	"gallery": {
 		"name": "gallery",
-		"description": "You are in a medium-length gallery with two doors on the south wall, one on the left, one on the right. There is an open doorway leading north, and an open doorway leading east.",
+		"description": "You are in a medium-length gallery with two cell doors on the south wall, one on the left, one on the right. The Armory doorway is to the north, and the Guardroom is to the east.",
 		"items": [
 			{
 				"template": "door",
@@ -125,7 +125,7 @@
 			"west": [
 				{
 					"id": "gallery",
-					"label": "open door back to the gallery",
+					"label": "gallery door",
 					"doorId": "gallery_guardroom_door"
 				}
 			]
@@ -160,7 +160,7 @@
 			"south": [
 				{
 					"id": "gallery",
-					"label": "open door back to the gallery",
+					"label": "gallery door",
 					"doorId": "gallery_armory_door"
 				}
 			]

@@ -73,6 +73,7 @@ private:
 	FileManager* fileManager = nullptr;
 	Renderer* renderer = nullptr;
 	std::unordered_map<std::string, Room>* allRooms = nullptr;
+	std::string getDoorDestinationLabel(const std::string& doorId, Room* currentRoom);
 
 	// const string messages no object
 	const std::string MSG_DONT_KNOW_HOW = "I don't know how to do that.";
@@ -88,7 +89,7 @@ private:
 	const std::string MSG_NO_EXIT = "You don't see any path or exit to the {object1}.";
 	const std::string MSG_MULTI_EXITS = "There are multiple exits to the {object1}: \n{object2}";
 	const std::string MSG_SELECT_CHOICE = "Type the number of your choice and press enter.";
-	const std::string MSG_MULTI_ITEMS = "There are multiple {object1} items: \n{object2}";
+	const std::string MSG_MULTI_ITEMS = "There are multiple {object1}'s: \n{object2}";
 	const std::string MSG_VERB_WHAT = "{object1} what?";
 	const std::string MSG_LOCKED = "It seems the door to that is locked.";
 	const std::string MSG_TOILET_DEATH = "You approach the toilet and peer down a dark hole. After a moment's hesitation you leap inside, falling for several seconds before a voilent impact. You feel your legs shatter beneath you and everything cuts to black. Game Over.";
@@ -108,7 +109,8 @@ private:
 	std::string resolveSingleItemId(const std::unordered_map<std::string, Item*>& itemList, const std::string& objectName);
 	std::string resolveAllSingleItemId(const std::unordered_map<std::string, Item*>& inventory, const std::unordered_map<std::string, Item*>& roomItems, const std::string& objectName);
 	std::vector<std::string> splitString(std::string& input, char delimiter = ' ');
-	bool resolveOrPromptItem(const std::string& objectName, ItemScope scope, const std::string& MSG_NO_MATCH, const std::function<void(const std::string& id, Item* item)>& onChosen);
+	bool resolveOrPromptItem(const std::string& objectName, ItemScope scope, const std::string& MSG_NO_MATCH, const std::function<void(const std::string& id, Item* item)>& onChosen, std::function<std::string(const std::string& id, Item* item)> labelFn = nullptr);
+
 
 	bool isValidWord(
 		const std::unordered_map<std::string, Item*>& inventory, 
