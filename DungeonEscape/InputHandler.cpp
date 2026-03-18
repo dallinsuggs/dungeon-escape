@@ -9,8 +9,10 @@ bool InputHandler::UpdateInput(std::string& userInput) {
 
 	// Ensure window is focused to receive input
     if (!IsWindowFocused()) {
-        SetWindowFocused(); // Ignore input if window is not focused
-	}
+    #ifndef PLATFORM_WEB
+    SetWindowFocused();
+    #endif
+    }
 
     // Printable chars
     int key = GetCharPressed();

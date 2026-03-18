@@ -1,4 +1,5 @@
-﻿#include "FileManager.hpp"
+﻿#define _CRT_SECURE_NO_WARNINGS
+#include "FileManager.hpp"
 #include "Item.hpp"
 #include <unordered_map>
 
@@ -18,8 +19,8 @@ std::unordered_map<std::string, Item> FileManager::loadItems(const std::string& 
 	std::unordered_map<std::string, Item> items;
 
 	FILE* fp = nullptr;
-	errno_t err = fopen_s(&fp, filename.c_str(), "r");
-	if (err != 0 || !fp) {
+	fp = fopen(filename.c_str(), "r");
+	if ( !fp) {
 		std::cout << "File not found: items.json\n" << filename << "!\n";
 		return items;  // early return on file error
 	}
@@ -89,8 +90,8 @@ std::unordered_map<std::string, Room> FileManager::loadRooms(const std::string& 
 
 
 	FILE* fp = nullptr;
-	errno_t err = fopen_s(&fp, filename.c_str(), "r");
-	if (err != 0 || !fp) {
+	fp = fopen(filename.c_str(), "r");
+	if (!fp) {
 		std::cout << "File not found!";
 		return rooms;
 	}

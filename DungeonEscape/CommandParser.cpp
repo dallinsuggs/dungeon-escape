@@ -964,6 +964,7 @@ void CommandParser::handleHelp(ParsedCommand& cmd)
 		"- inventory / i: View your current inventory.\n"
 		"- quit / exit / q: Exit the game.\n"
 		"- help: Display this help message.\n"
+		"- m: Display available music.\n"
 		);
 }
 

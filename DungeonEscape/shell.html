@@ -1,0 +1,94 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Dungeon Escape</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: #000;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            width: 100vw;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        canvas#canvas {
+            display: block;
+            outline: 0;
+        }
+    </style>
+</head>
+<body>
+    <canvas id="canvas" tabindex="0" class="emscripten" width="1024" height="768" oncontextmenu="event.preventDefault()"></canvas>
+
+    <script>
+        var DungeonMusic = {
+            tracks: [
+                'music/Medieval1.mp3',
+                'music/Medieval2.mp3',
+                'music/Medieval3.mp3',
+                'music/Medieval4.mp3',
+                'music/Medieval5.mp3',
+                'music/Medieval6.mp3',
+                'music/Medieval7.mp3',
+                'music/Medieval8.mp3',
+                'music/Medieval9.mp3',
+                'music/Medieval10.mp3',
+                'music/dungeon_vibes.mp3',
+                'music/savage_dungeon_vibes.mp3',
+                'music/even_more_dungeon_vibes.mp3',
+                'music/more_dungeon_vibes.mp3'
+            ],
+            audio: new Audio(),
+            currentIndex: 0,
+            started: false,
+
+            play: function (index) {
+                if (index < 0 || index >= this.tracks.length) return;
+                this.currentIndex = index;
+                this.audio.src = this.tracks[index];
+                this.audio.volume = 1.0;
+                this.audio.play().catch(function (e) { console.log('Audio play failed:', e); });
+                this.started = true;
+            },
+
+            start: function () {
+                if (!this.started) {
+                    this.play(this.currentIndex);
+                }
+            },
+
+            selectTrack: function (index) {
+                this.play(index);
+            }
+        };
+
+        // Auto-advance to next track when one finishes
+        DungeonMusic.audio.addEventListener('ended', function () {
+            var next = (DungeonMusic.currentIndex + 1) % DungeonMusic.tracks.length;
+            DungeonMusic.play(next);
+        });
+
+        var Module = {
+            canvas: (function () {
+                var canvas = document.getElementById('canvas');
+                canvas.addEventListener('mouseenter', function () { canvas.focus(); });
+                canvas.addEventListener('click', function () { canvas.focus(); });
+                window.addEventListener('load', function () { canvas.focus(); });
+                return canvas;
+            })()
+        };
+    </script>
+
+    {{{ SCRIPT }}}
+
+</body>
+</html>

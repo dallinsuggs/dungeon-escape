@@ -3,6 +3,9 @@
 #include <sstream>
 #include <functional>
 #include <algorithm>
+#ifdef PLATFORM_WEB
+#include <emscripten.h>
+#endif
 
 // CONSTANTS
 const float WHEEL_SPEED = 80.0f; // Pixels per wheel notch
@@ -21,7 +24,7 @@ Color LerpColor(Color a, Color b, float t) {
 }
 
 
-Renderer::Renderer(int width = 1024, int height = 768) : screenWidth(width), screenHeight(height) {    
+Renderer::Renderer(int width, int height) : screenWidth(width), screenHeight(height) {
     startTime = std::chrono::steady_clock::now();
 	SetConfigFlags(FLAG_WINDOW_RESIZABLE);
     // Initialize the window + Window Title
@@ -39,6 +42,46 @@ Renderer::Renderer(int width = 1024, int height = 768) : screenWidth(width), scr
 
 	castleTexture = LoadTexture("foreground.png");
     SetTargetFPS(60);
+    InitAudioDevice();
+    playlist = {
+        "music/Medieval1.mp3",
+        "music/Medieval2.mp3",
+        "music/Medieval3.mp3",
+        "music/Medieval4.mp3",
+        "music/Medieval5.mp3",
+        "music/Medieval6.mp3",
+        "music/Medieval7.mp3",
+        "music/Medieval8.mp3",
+        "music/Medieval9.mp3",
+        "music/Medieval10.mp3",
+        "music/dungeon_vibes.mp3",
+        "music/savage_dungeon_vibes.mp3",
+        "music/even_more_dungeon_vibes.mp3",
+        "music/more_dungeon_vibes.mp3"
+    };
+    trackDisplayNames = {
+        "Medieval I",
+        "Medieval II",
+        "Medieval III",
+        "Medieval IV",
+        "Medieval V",
+        "Medieval VI",
+        "Medieval VII",
+        "Medieval VIII",
+        "Medieval IX",
+        "Medieval X",
+        "Dungeon Vibes",
+        "Savage Dungeon Vibes",
+        "Even More Dungeon Vibes",
+        "More Dungeon Vibes"
+    };
+
+    currentTrackIndex = 0;
+#ifndef PLATFORM_WEB
+    currentTrack = LoadMusicStream(playlist[currentTrackIndex].c_str());
+#endif
+    audioReady = true;
+
     scrollOffset = 0.0f;
 	dayProgress = 0.0f;
 	customFont = LoadFontEx("Jacquard12-Regular.ttf", 96, nullptr, 250);
@@ -234,7 +277,7 @@ void Renderer::DrawBackground() {
             static float phases[20] = { 0 };
             static int lightCount = 0;
             float phase = phases[lightCount % 20];
-            if (phase == 0.0f) phase = phases[lightCount % 20] = (float)rand() / RAND_MAX * PI * 2;
+            if (phase == 0.0f) phase = phases[lightCount % 20] = (float)rand() / (float)RAND_MAX * PI * 2.0f;
             lightCount++;
 
 
@@ -550,14 +593,15 @@ void Renderer::DrawHowToPlayScreen() {
 
     // Commands list
     const char* commands[] = {
-        "look [object]       - Look around or at an object",
+        "look[object]        - Look around or at an object",
         "go [direction]      - Move north, south, east, west",
         "take / pick up      - Pick up an item",
         "drop [object]       - Drop an item",
         "use [item] on [obj] - Use an item on something",
         "inventory / i       - View your inventory",
         "examine [object]    - Examine something closely",
-        "quit / q            - Quit the game",
+        "F2                  - Select music",
+        "quit / q            - Quit the game"
     };
     int numCommands = 8;
     int cmdSize = 24;
@@ -633,6 +677,125 @@ void Renderer::DrawEndScreen(bool won) {
 }
 
 
+//////////////////////////////////////////////////// AUDIO /////////////////////////////////////////////////////////
+void Renderer::StartMusic() {
+#ifdef PLATFORM_WEB
+    emscripten_run_script("DungeonMusic.start();");
+    musicStarted = true;
+#else
+    if (!audioReady) return;
+    if (!musicStarted) {
+        musicStarted = true;
+        PlayMusicStream(currentTrack);
+    }
+    else if (!IsMusicStreamPlaying(currentTrack)) {
+        PlayMusicStream(currentTrack);
+    }
+#endif
+}
+
+void Renderer::UpdateMusic() {
+#ifdef PLATFORM_WEB
+    // JS handles everything - nothing needed here
+#else
+    if (!audioReady || !musicStarted) return;
+    UpdateMusicStream(currentTrack);
+    if (!IsMusicStreamPlaying(currentTrack)) {
+        UnloadMusicStream(currentTrack);
+        currentTrackIndex = (currentTrackIndex + 1) % (int)playlist.size();
+        currentTrack = LoadMusicStream(playlist[currentTrackIndex].c_str());
+        PlayMusicStream(currentTrack);
+    }
+#endif
+}
+
+void Renderer::SelectTrack(int index) {
+    if (index < 0 || index >= (int)playlist.size()) return;
+    currentTrackIndex = index;
+    musicStarted = true;
+#ifdef PLATFORM_WEB
+    char script[64];
+    snprintf(script, sizeof(script), "DungeonMusic.selectTrack(%d);", index);
+    emscripten_run_script(script);
+#else
+    UnloadMusicStream(currentTrack);
+    currentTrack = LoadMusicStream(playlist[currentTrackIndex].c_str());
+    PlayMusicStream(currentTrack);
+#endif
+}
+
+void Renderer::DrawMusicPanel() {
+    if (!musicPanelOpen) return;
+
+    int panelW = 380;
+    int panelH = 520;
+    int panelX = GetScreenWidth() - panelW - 20;
+    int panelY = GetScreenHeight() / 2 - panelH / 2;
+
+    // Background + borders
+    DrawRectangle(panelX, panelY, panelW, panelH, Fade(BLACK, 0.85f));
+    DrawRectangleLinesEx(
+        Rectangle{ (float)panelX, (float)panelY, (float)panelW, (float)panelH },
+        3.0f, Fade(WHITE, 0.6f)
+    );
+    DrawRectangleLinesEx(
+        Rectangle{ (float)panelX + 8, (float)panelY + 8, (float)panelW - 16, (float)panelH - 16 },
+        1.0f, Fade(WHITE, 0.25f)
+    );
+
+    // Title
+    const char* title = "Music";
+    float titleW = MeasureTextEx(customFont, title, 36.0f, 2.0f).x;
+    DrawTextEx(customFont, title,
+        Vector2{ (float)panelX + panelW / 2.0f - titleW / 2.0f, (float)panelY + 16 },
+        36.0f, 2.0f, WHITE);
+
+    DrawLineEx(
+        { (float)panelX + 20, (float)panelY + 62 },
+        { (float)panelX + panelW - 20, (float)panelY + 62 },
+        1.0f, Fade(WHITE, 0.3f)
+    );
+
+    // Track list
+    int trackSize = 24;
+    int trackSpacing = 32;
+    int listStartY = panelY + 75;
+
+    for (int i = 0; i < (int)trackDisplayNames.size(); i++) {
+        float trackY = (float)(listStartY + i * trackSpacing);
+        bool isCurrent = (i == currentTrackIndex);
+        bool isHovered = CheckCollisionPointRec(
+            GetMousePosition(),
+            Rectangle{ (float)panelX + 16, trackY, (float)panelW - 32, (float)trackSpacing }
+        );
+
+        // Highlight current track
+        if (isCurrent) {
+            DrawRectangle(panelX + 16, (int)trackY, panelW - 32, trackSpacing, Fade(WHITE, 0.1f));
+        }
+
+        Color col = isCurrent ? WHITE : (isHovered ? Fade(WHITE, 0.85f) : Fade(WHITE, 0.5f));
+
+        // Playing indicator
+        if (isCurrent) {
+            DrawTextEx(customFont, ">",
+                Vector2{ (float)panelX + 18, trackY + 4 },
+                (float)trackSize, 2.0f, WHITE);
+        }
+
+        DrawTextEx(customFont, trackDisplayNames[i].c_str(),
+            Vector2{ (float)panelX + 36, trackY + 4 },
+            (float)trackSize, 2.0f, col);
+    }
+
+    // Dismiss hint
+    const char* hint = "Press F2 to close";
+    float hintW = MeasureTextEx(customFont, hint, 20.0f, 2.0f).x;
+    DrawTextEx(customFont, hint,
+        Vector2{ (float)panelX + panelW / 2.0f - hintW / 2.0f, (float)(panelY + panelH - 30) },
+        20.0f, 2.0f, Fade(WHITE, 0.35f));
+}
+
 // FOR TESTING REMOVE OR COMMENT OUT WHEN NOT NEEDED
 void Renderer::SetDayProgress(float value) { simulatedElapsed = value * 900.0f; }
 
@@ -644,5 +807,11 @@ Renderer::~Renderer() {
     UnloadTexture(castleTexture);
     UnloadFont(customFont);
     UnloadImage(windowIcon);
+    if (audioReady) {
+#ifndef PLATFORM_WEB
+        UnloadMusicStream(currentTrack);
+#endif
+        CloseAudioDevice();
+    }
     CloseWindow();
 }

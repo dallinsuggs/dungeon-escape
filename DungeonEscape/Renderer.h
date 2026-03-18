@@ -26,7 +26,8 @@ private:
     float typingTimer = 0.0f;
     bool typingActive = false;
 
-    // TESTING PURPOSES ONLY COMMENT OUT WHEN DONE
+
+    // TESTING PURPOSES ONLY 
     float simulatedElapsed = 0.0f;
     float timeSpeed = 1.0f; // Speed multiplier for time progression
 public:
@@ -50,6 +51,25 @@ public:
     bool IsTypingDone() const { return !typingActive; }
     const std::vector<std::string>& GetLastTypedLines() const { return animLines; }
 
+    // Audio
+    bool musicPanelOpen = false;
+    bool musicStarted = false;
+    std::vector<std::string> trackDisplayNames;
+    int currentTrackIndex = 0;
+    bool audioReady = false;
+    std::vector<std::string> playlist;
+
+#ifndef PLATFORM_WEB
+    Music currentTrack;
+#endif
+    void DrawMusicPanel();
+    bool IsMusicPanelOpen() const { return musicPanelOpen; }
+    void ToggleMusicPanel() { musicPanelOpen = !musicPanelOpen; }
+    void SelectTrack(int index);
+    void StartMusic();
+
+    int GetCurrentTrackIndex() const { return currentTrackIndex; }
+
     // TESTING PURPOSES ONLY COMMENT OUT WHEN DONE
     float GetTimeSpeed() const { return timeSpeed; } // for display
     void SetTimeSpeed(float speed) { timeSpeed = speed; } // to adjust speed
@@ -68,4 +88,7 @@ public:
     void DrawMenuScreen(int selectedIndex);
     void DrawHowToPlayScreen();
     void DrawEndScreen(bool won);
+
+    // Audio
+    void UpdateMusic();
 };
