@@ -38,6 +38,7 @@ public:
 	};
 	PendingChoice pendingChoice;
 	bool gameOver = false;
+	bool gameWon = false;
 private:
 	// struct
 	struct ParsedCommand {

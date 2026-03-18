@@ -411,19 +411,16 @@ void CommandParser::writeMessage(const std::string& msgTemplate, const std::stri
 
 
 // VERB HANDLERS
-
 // Use handler
 void CommandParser::handleUse(ParsedCommand& cmd) {
 	// Basic validation
 	if (cmd.object1.empty()) { writeMessage(MSG_VERB_WHAT, cmd.verb); return; }
 	if (cmd.object2.empty()) { writeMessage(MSG_VERB_WHAT_ON_WHAT, cmd.object1, cmd.object2); return; }
 	if (cmd.preposition != "on") { writeMessage(MSG_DONT_KNOW_HOW); return; }
-
-	// Copy what we need (IMPORTANT: don’t capture cmd by reference)
+	// Copy what we need (IMPORTANT: don't capture cmd by reference)
 	std::string obj1Name = cmd.object1;
 	std::string obj2Name = cmd.object2;
 	std::string prep = cmd.preposition;
-
 	// Step 1: resolve the item being used (inventory only)
 	bool finishedNow1 = resolveOrPromptItem(
 		obj1Name,
@@ -441,52 +438,84 @@ void CommandParser::handleUse(ParsedCommand& cmd) {
 					// Step 3: now we have both, do the actual use logic
 					if (!item1 || !item2) { writeMessage(MSG_DONT_KNOW_HOW); return; }
 
-					// Example: "use animal bone on door"
-					if (prep == "on" && item1->getName() == "animal bone" && item2->getName() == "door") {
+					// "use animal bone on [any door]"
+					bool targetIsDoor = (
+						item2->getName() == "door" ||
+						item2->getName() == "cell door" ||
+						item2->getName() == "armory door" ||
+						item2->getName() == "guardroom door");
 
-						auto isDoorSafe = [&](const std::string& doorId) -> bool {
-							if (doorId == "gallery_guardroom_door") {
-								float dp = renderer ? renderer->GetDayProgress() : 0.0f;
-								return (dp > 0.55f && dp < 0.75f); // Safe to enter guardroom only at night
-							}
-							return true; // All other doors safe by default, currently at least
-						};
-							
-						if (!isDoorSafe(id2)) {
-							int outcome = std::rand() % 3;
-							if (outcome == 0) {
-								writeMessage("The door swings open — and a guard is standing right behind it. Before you can react, his sword is through your chest. Everything goes dark.\n\nGame Over.");
-								gameOver = true;
-							}
-							else if (outcome == 1) {
-								writeMessage("The door creaks open and a guard seizes you by the collar. Your execution is moved to dawn. They drag you outside as the sun rises and the rope goes taut.\n\nGame Over.");
-								gameOver = true;
-							}
-							else {
-								writeMessage("The lock clicks — and the door flies open from the other side. A guard's fist connects with your jaw. You wake up on the cold cell floor, a whole day later.");
-								if (allRooms && allRooms->count("cell_1")) {
-									player->setCurrentRoom(&allRooms->at("cell_1"));
+					if (prep == "on" && item1->getName() == "animal bone" && targetIsDoor) {
+
+						// Time gate — only applies to the guardroom door
+						if (id2 == "gallery_guardroom_door") {
+							float dp = renderer ? renderer->GetDayProgress() : 0.0f;
+							bool isSafe = (dp > 0.55f && dp < 0.75f);
+
+							if (!isSafe) {
+								int outcome = std::rand() % 3;
+								if (outcome == 0) {
+									writeMessage("The door swings open — and a guard is standing right behind it. Before you can react, his sword is through your chest. Everything goes dark.\n\nGame Over.");
+									gameOver = true;
 								}
-								auto& inv = player->getInventory();
-								if (inv.count(id1)) inv.erase(id1);
-								itemUseCount.erase(id1);
-								Item* bonePtr = fileManager->getItem(id1);
-								if (bonePtr && allRooms && allRooms->count("cell_1")) {
-									allRooms->at("cell_1").getRoomItems()[id1] = bonePtr;
+								else if (outcome == 1) {
+									writeMessage("The door creaks open and a guard seizes you by the collar. Your execution is moved to dawn. They drag you outside as the sun rises and the rope goes taut.\n\nGame Over.");
+									gameOver = true;
 								}
+								else {
+									writeMessage("The lock clicks — and the door flies open from the other side. A guard's fist connects with your jaw. You wake up on the cold cell floor, a whole day later.");
+									if (allRooms && allRooms->count("cell_1")) {
+										player->setCurrentRoom(&allRooms->at("cell_1"));
+									}
+									auto& inv = player->getInventory();
+									if (inv.count(id1)) inv.erase(id1);
+									itemUseCount.erase(id1);
+									Item* bonePtr = fileManager->getItem(id1);
+									if (bonePtr && allRooms && allRooms->count("cell_1")) {
+										allRooms->at("cell_1").getRoomItems()[id1] = bonePtr;
+									}
+								}
+								return;
 							}
-							return;
 						}
 
-
+						// Safe to pick — applies to all doors that pass the above check
 						item2->setLocked(false);
-						itemUseCount[id1]++; 
+						itemUseCount[id1]++;
 						if (itemUseCount[id1] >= 2) {
 							player->getInventory().erase(id1);
-							writeMessage(MSG_PICK_LOCK_BREAK, item1->getName(), item2->getName()); // it breaks message
+							writeMessage(MSG_PICK_LOCK_BREAK, item1->getName(), item2->getName());
 						}
 						else {
-							writeMessage(MSG_PICK_LOCK, item1->getName(), item2->getName()); // first use message
+							writeMessage(MSG_PICK_LOCK, item1->getName(), item2->getName());
+						}
+						return;
+					}
+
+					// "use brick on toilet"
+					if (prep == "on" && item1->getName() == "brick" && item2->getName() == "toilet") {
+						if (!item2->isLocked()) {
+							writeMessage("The toilet seat is already pried open.");
+							return;
+						}
+						item2->setLocked(false);
+						writeMessage("You wedge the brick under the wooden seat and pry with all your strength. The seat cracks open, revealing a dark, foul-smelling chute that drops straight down to the moat.");
+						return;
+					}
+
+					// "use rope on toilet" — win condition
+					if (prep == "on" && item1->getName() == "rope" && item2->getName() == "toilet") {
+						if (item2->isLocked()) {
+							writeMessage("The toilet seat is still fixed in place. You need to pry it open first.");
+							return;
+						}
+						auto ropeIds = getItemIdsByName(player->getInventory(), "rope");
+						if ((int)ropeIds.size() >= 3) {
+							writeMessage("You quickly knot the three ropes together into one long line, tie it securely around the toilet frame, and lower yourself into the stinking chute.\n\nAfter a long, slippery descent you splash into the cold moat water below... and swim to freedom under the cover of night.\n\nYou have escaped the dungeon!\n\nThank you for playing Dungeon Escape.");
+							gameWon = true;
+						}
+						else {
+							writeMessage("You only have " + std::to_string(ropeIds.size()) + " rope(s). Desperate, you tie what you have and drop into the chute anyway.\n\nHalfway down, the rope runs out. The last thing you hear is the distant sound of water rushing up to meet you.\n\nYou Died. Game Over.");
 						}
 						return;
 					}
@@ -494,12 +523,10 @@ void CommandParser::handleUse(ParsedCommand& cmd) {
 					writeMessage(MSG_DONT_KNOW_HOW);
 				}
 			);
-
 			// If it prompted for object2, we must stop here and wait for the numeric input.
 			if (!finishedNow2) return;
 		}
 	);
-
 	// If it prompted for object1, stop now and wait for numeric input.
 	if (!finishedNow1) return;
 }

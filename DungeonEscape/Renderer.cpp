@@ -437,6 +437,8 @@ void Renderer::SnapToBottom(int paddingLines) {
     scrollOffset = -paddingPixels;
 }
 
+void Renderer::SetDayProgress(float value) { simulatedElapsed = value * 900.0f; }
+
 
 bool Renderer::WindowShouldClose() {
     return ::WindowShouldClose();

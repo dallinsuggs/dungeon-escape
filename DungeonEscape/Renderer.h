@@ -53,4 +53,5 @@ public:
     // TESTING PURPOSES ONLY COMMENT OUT WHEN DONE
     float GetTimeSpeed() const { return timeSpeed; } // for display
     void SetTimeSpeed(float speed) { timeSpeed = speed; } // to adjust speed
+    void SetDayProgress(float value); // set day progress automtically for testing
 };

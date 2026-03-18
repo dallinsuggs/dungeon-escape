@@ -30,13 +30,13 @@
 // Capture cout to lines for Raylib display
 std::vector<std::string> captureOutput(std::function<void()> func) {
     std::ostringstream oss;
-    std::streambuf* old = std::cout.rdbuf(oss.rdbuf()); // Redirect cout to oss
-    func(); // Call the function that produces output
-    std::cout.rdbuf(old); // Restore original cout buffer
-    std::istringstream iss(oss.str()); // Fixed: 'iss' not 'isspace'
+    std::streambuf* old = std::cout.rdbuf(oss.rdbuf());
+    func();
+    std::cout.rdbuf(old);
+    std::istringstream iss(oss.str());
     std::vector<std::string> lines;
     std::string line;
-    while (std::getline(iss, line)) { // Now uses 'iss'
+    while (std::getline(iss, line)) {
         if (!line.empty()) lines.push_back(line);
     }
     return lines;
@@ -44,174 +44,168 @@ std::vector<std::string> captureOutput(std::function<void()> func) {
 
 //////////////////////* MAIN */////////////////////
 int main() {
-	// For logging purposes
+    // For logging purposes
     SetTraceLogLevel(LOG_ALL);
     SetTraceLogCallback([](int logType, const char* text, va_list args) {
-        // This sends every Raylib log to the normal console
         char buffer[1024];
         vsnprintf(buffer, sizeof(buffer), text, args);
         printf("%s\n", buffer);
-            });
-
-    // Set up file manager
-    FileManager fm;
-
-    // Renderer setup
-    Renderer renderer(1024, 768);
-
-    // Maximum lines to be displayed on screen
-    const size_t MAX_LINES = 100;
-
-    // Items setup
-    std::unordered_map<std::string, Item> allItems = fm.loadItems("items.json");
-
-    // Load rooms
-    std::unordered_map<std::string, Room> allRooms = fm.loadRooms("rooms.json", allItems);
-
-    if (allRooms.empty()) {
-        std::cout << "ERROR: No rooms loaded from rooms.json – check file and JSON validity.\n";
-        return 1;
-    }
-
-    auto startIt = allRooms.find("cell_1");
-    if (startIt == allRooms.end()) {
-        std::cout << "ERROR: Starting room 'cell_1' not found.\n";
-        return 1;
-    }
-
-    // Initial setup
-    Player player("Ferengate");
-    player.setCurrentRoom(&startIt->second);
-    bool running = true;
-    std::string userInput = "";
-    std::vector<std::string> displayLines;
-    CommandParser parser(&player, running, &fm, &renderer, &allRooms);
-
-    // Show the starting room description instantly (no typing animation for the very first message)
-    std::vector<std::string> startingLines = captureOutput([&]() {
-        parser.writeMessage(allRooms.at("cell_1").describeSelf());
         });
 
-    // Remove empty lines just in case
-    startingLines.erase(std::remove_if(startingLines.begin(), startingLines.end(),
-        [](const std::string& s) { return s.empty(); }), startingLines.end());
+    // Renderer setup — created ONCE outside the play loop so the window persists
+    Renderer renderer(1024, 768);
 
-    // Add directly to permanent history
-    for (const auto& line : startingLines) {
-        if (!line.empty()) {
-            displayLines.push_back(line);
+    bool playAgain = true;
+
+    while (playAgain && !renderer.WindowShouldClose()) {
+
+        // ── GAME SETUP (fresh each run) ──────────────────────────────────────
+
+        FileManager fm;
+
+        std::unordered_map<std::string, Item> allItems = fm.loadItems("items.json");
+        std::unordered_map<std::string, Room> allRooms = fm.loadRooms("rooms.json", allItems);
+
+        if (allRooms.empty()) {
+            std::cout << "ERROR: No rooms loaded from rooms.json – check file and JSON validity.\n";
+            return 1;
         }
-    }
 
-    // Optional: make sure player sees it right away
-    renderer.SnapToBottom();
-
-    // Input handler
-    InputHandler inputHandler;
-
-    //////////////////////* GAME LOOP HERE */////////////////////
-    // Enter game loop
-    // 
-    // 
-    while (!renderer.WindowShouldClose() && running) {
-        // Update day progress (30-min cycle)
-        renderer.UpdateDayProgress();
-        renderer.UpdateScrollInput(); // handle scroll input
-		renderer.UpdateTypingAnimation(GetFrameTime());
-
-        if (parser.gameOver) {
-            // Show text, wait for keypress, then exit
-            if (IsKeyPressed(KEY_ENTER) || IsKeyPressed(KEY_ESCAPE) || IsKeyPressed(KEY_SPACE)) {
-                break;
-            }
+        auto startIt = allRooms.find("cell_1");
+        if (startIt == allRooms.end()) {
+            std::cout << "ERROR: Starting room 'cell_1' not found.\n";
+            return 1;
         }
-        else if (running) {
-            // Check if typing just finished this frame
-            static bool wasTyping = false;
+
+        Player player("Ferengate");
+        player.setCurrentRoom(&startIt->second);
+        bool running = true;
+        std::string userInput = "";
+        std::vector<std::string> displayLines;
+        CommandParser parser(&player, running, &fm, &renderer, &allRooms);
+
+        // Reset renderer state for a fresh run
+        renderer.SetDayProgress(0.0f);
+        renderer.SnapToBottom();
+
+        // Show starting room description immediately (no typing animation)
+        std::vector<std::string> startingLines = captureOutput([&]() {
+            parser.writeMessage(allRooms.at("cell_1").describeSelf());
+            });
+        startingLines.erase(std::remove_if(startingLines.begin(), startingLines.end(),
+            [](const std::string& s) { return s.empty(); }), startingLines.end());
+        for (const auto& line : startingLines) {
+            if (!line.empty()) displayLines.push_back(line);
+        }
+        renderer.SnapToBottom();
+
+        InputHandler inputHandler;
+        bool wasTyping = false;
+
+        //////////////////////* GAME LOOP */////////////////////
+        while (!renderer.WindowShouldClose()) {
+            renderer.UpdateDayProgress();
+            renderer.UpdateScrollInput();
+            renderer.UpdateTypingAnimation(GetFrameTime());
+
+            // ── Always runs regardless of game state ──────────────────────────
             bool currentlyTyping = renderer.IsTypingActive();
-
             if (wasTyping && !currentlyTyping) {
-                // Typing just finished — move it to permanent history
                 const auto& completedLines = renderer.GetLastTypedLines();
                 for (const auto& line : completedLines) {
-                    if (!line.empty()) {
-                        displayLines.push_back(line);
-                    }
+                    if (!line.empty()) displayLines.push_back(line);
                 }
+                renderer.SnapToBottom();
             }
-
             wasTyping = currentlyTyping;
 
-
-            // TESTING PURPOSES ONLY COMMENT OUT WHEN DONE
-            if (IsKeyPressed(KEY_LEFT_CONTROL)) {
-                if (renderer.GetTimeSpeed() > 1.0f) {
-                    renderer.SetTimeSpeed(1.0f); // Back to normal speed 
-                }
-                else {
-                    renderer.SetTimeSpeed(60.0f); // Speed up time for testing
+            // ── Game state branches ───────────────────────────────────────────
+            if (parser.gameOver) {
+                // Wait for player to acknowledge, then break to play-again screen
+                if (IsKeyPressed(KEY_ENTER) || IsKeyPressed(KEY_ESCAPE) || IsKeyPressed(KEY_SPACE)) {
+                    break;
                 }
             }
+            else if (running) {
+                // Debug keys — remove when done
+                if (IsKeyPressed(KEY_N)) {
+                    renderer.SetDayProgress(0.65f);
+                }
+                if (IsKeyPressed(KEY_LEFT_CONTROL)) {
+                    renderer.SetTimeSpeed(renderer.GetTimeSpeed() > 1.0f ? 1.0f : 60.0f);
+                }
+                if (IsKeyPressed(KEY_F11)) {
+                    ToggleFullscreen();
+                }
 
-            if (IsKeyPressed(KEY_F11)) {
-                ToggleFullscreen();
-            }
+                // Handle player input
+                if (inputHandler.UpdateInput(userInput)) {
+                    std::string inputLine = "> " + userInput;
+                    displayLines.push_back(inputLine);
 
-            // Handle input
-            if (inputHandler.UpdateInput(userInput)) {
-                // Compose input line
-                std::string inputLine = "> " + userInput;
+                    std::vector<std::string> newOutputLines;
 
-                // Echo input immediately
-                displayLines.push_back(inputLine);
+                    if (parser.pendingChoice.active) {
+                        int choice = -1;
+                        try { choice = std::stoi(userInput) - 1; }
+                        catch (...) {}
 
-                // Compute wrapped height for proper spacing (matches DrawTextOverlay)
-                int fontSize = 32; // same as in DrawTextOverlay
-                int textAreaWidth = GetScreenWidth() - 80; // same as in DrawTextOverlay
-                int inputHeight = renderer.GetWrappedHeight(inputLine.c_str(), textAreaWidth, fontSize);
-
-                // Optionally auto-scroll to bottom after input
-                // renderer.SnapToBottom(0); // 0 = no extra padding; adjust if you want
-
-                std::vector<std::string> newOutputLines;
-
-
-                // Check if choice prompt bool is active
-                if (parser.pendingChoice.active) {
-                    int choice = -1;
-                    try { choice = std::stoi(userInput) - 1; }
-                    catch (...) {}
-
-                    if (choice >= 0 && choice < parser.pendingChoice.choices.size()) {
-                        newOutputLines = captureOutput([&]() {
-                            parser.pendingChoice.choices[choice].action();
-                            });
-                        parser.pendingChoice.active = false;
+                        if (choice >= 0 && choice < (int)parser.pendingChoice.choices.size()) {
+                            newOutputLines = captureOutput([&]() {
+                                parser.pendingChoice.choices[choice].action();
+                                });
+                            parser.pendingChoice.active = false;
+                        }
+                        else {
+                            newOutputLines.push_back("Invalid choice, enter a number corresponding to your exit.");
+                        }
                     }
                     else {
-                        newOutputLines.push_back("Invalid choice, enter a number corresponding to your exit.");
+                        newOutputLines = captureOutput([&]() { parser.parse(userInput); });
                     }
-                }
-                else {                                                                                           // else, regular input parsing
-                    newOutputLines = captureOutput([&]() { parser.parse(userInput); });
-                }
 
-                // Only start animation if there are new lines
-                if (!newOutputLines.empty()) {
-                    renderer.StartTypingAnimation(newOutputLines);
-                    // Do NOT append to displayLines here – it happens after animation completes
-                }
+                    if (!newOutputLines.empty()) {
+                        renderer.StartTypingAnimation(newOutputLines);
+                        renderer.SnapToBottom();
+                    }
 
-                userInput.clear();
+                    userInput.clear();
+                }
+            }
+            else {
+                // running == false means handleQuit was called — exit immediately
+                break;
             }
 
-
+            // ── Draw ─────────────────────────────────────────────────────────
+            BeginDrawing();
+            renderer.DrawBackground();
+            renderer.DrawTextOverlay(
+                displayLines,
+                parser.gameOver ? "Press ENTER to play again, ESC to quit" : inputHandler.GetBuffer()
+            );
+            EndDrawing();
         }
-        // Draw everything
-        BeginDrawing();
-        renderer.DrawBackground();
-        renderer.DrawTextOverlay(displayLines, parser.gameOver ? "Press ENTER to exit" : inputHandler.GetBuffer()); // Pass handler's buffer
-        EndDrawing();
+
+        // ── If quit was typed (not game over), don't show play again ─────────
+        if (!running && !parser.gameOver) {
+            break;
+        }
+
+        // ── Play again screen ─────────────────────────────────────────────────
+        while (!renderer.WindowShouldClose()) {
+            if (IsKeyPressed(KEY_ENTER)) { playAgain = true;  break; }
+            if (IsKeyPressed(KEY_ESCAPE)) { playAgain = false; break; }
+
+            BeginDrawing();
+            renderer.DrawBackground();
+            renderer.DrawTextOverlay(
+                displayLines,
+                parser.gameWon ? "You escaped! ENTER to play again, ESC to quit"
+                : "Game Over. ENTER to play again, ESC to quit"
+            );
+            EndDrawing();
+        }
     }
 
     return 0;
