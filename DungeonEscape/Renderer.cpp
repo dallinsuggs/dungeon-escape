@@ -437,8 +437,204 @@ void Renderer::SnapToBottom(int paddingLines) {
     scrollOffset = -paddingPixels;
 }
 
-void Renderer::SetDayProgress(float value) { simulatedElapsed = value * 900.0f; }
+//////////////////////////////////////////////////// MAIN MENU /////////////////////////////////////////////////////////
+void Renderer::DrawMenuScreen(int selectedIndex) {
+    // panel dimensions
+    int panelW = 500;
+    int panelH = 400;
+    int panelX = GetScreenWidth() / 2 - panelW / 2;
+    int panelY = GetScreenHeight() / 2 - panelH / 2;
+    // Background panel
+    DrawRectangle(panelX, panelY, panelW, panelH, Fade(BLACK, 0.75f));
 
+    // Decorative border - outer
+    DrawRectangleLinesEx(
+        Rectangle{ (float)panelX, (float)panelY, (float)panelW, (float)panelH }, 3.0f, Fade(WHITE, 0.6f)
+    );
+    // Decorative border - inner (double line effect)
+    DrawRectangleLinesEx(
+        Rectangle{ (float)panelX + 8, (float)panelY + 8, (float)panelW - 16, (float)panelH - 16 },
+        1.0f, Fade(WHITE, 0.25f)
+    );
+    // Corner ornaments
+    int cx = panelX, cy = panelY;
+    int cw = panelW, ch = panelH;
+    int orn = 12;
+    // Top-left
+    DrawLineEx({ (float)cx + 4, (float)cy + orn + 4 }, { (float)cx + orn + 4, (float)cy + 4 }, 1.5f, Fade(WHITE, 0.4f));
+    // Top-right
+    DrawLineEx({ (float)cx + cw - 4, (float)cy + orn + 4 }, { (float)cx + cw - orn - 4, (float)cy + 4 }, 1.5f, Fade(WHITE, 0.4f));
+    // Bottom-left
+    DrawLineEx({ (float)cx + 4, (float)cy + ch - orn - 4 }, { (float)cx + orn + 4, (float)cy + ch - 4 }, 1.5f, Fade(WHITE, 0.4f));
+    // Bottom-right
+    DrawLineEx({ (float)cx + cw - 4, (float)cy + ch - orn - 4 }, { (float)cx + cw - orn - 4, (float)cy + ch - 4 }, 1.5f, Fade(WHITE, 0.4f));
+    
+    const char* title = "Dungeon Escape";
+    int titleSize = 52;
+    float titleW = MeasureTextEx(customFont, title, (float)titleSize, 2.0f).x;
+    DrawTextEx(customFont, title,
+        Vector2{ (float)(GetScreenWidth() / 2) - titleW / 2.0f, (float)panelY + 40 },
+        (float)titleSize, 2.0f, WHITE);
+
+    // Divider line under title
+    DrawLineEx(
+        { (float)panelX + 30, (float)panelY + 105 },
+        { (float)panelX + panelW - 30, (float)panelY + 105 },
+        1.0f, Fade(WHITE, 0.3f)
+    );
+
+    /////////////// MENU OPTIONS //////////////////
+    const char* options[] = { "New Game", "How to Play", "Quit" };
+    int optionSize = 36;
+    int optionStartY = panelY + 130;
+    int optionSpacing = 70;
+
+    for (int i = 0; i < 3; i++) {
+        float optW = MeasureTextEx(customFont, options[i], (float)optionSize, 2.0f).x;
+        float optX = (float)(GetScreenWidth() / 2) - optW / 2.0f;
+        float optY = (float)(optionStartY + i * optionSpacing);
+
+        // Highlight selected
+        Color col = (i == selectedIndex) ? WHITE : Fade(WHITE, 0.45f);
+
+        // Arrow indicator
+        if (i == selectedIndex) {
+            DrawTextEx(customFont, ">",
+                Vector2{ optX - 30, optY },
+                (float)optionSize, 2.0f, WHITE);
+        }
+
+        // Check mouse hover
+        Rectangle optRect = { optX, optY, optW, (float)optionSize };
+        if (CheckCollisionPointRec(GetMousePosition(), optRect)) {
+            col = WHITE;
+        }
+
+        DrawTextEx(customFont, options[i], Vector2{ optX, optY },
+            (float)optionSize, 2.0f, col);
+    }
+
+}
+
+
+//////////////////////////////////////////////////// HOW TO PLAY SCREEN /////////////////////////////////////////////////////////
+void Renderer::DrawHowToPlayScreen() {
+    int panelW = 700;
+    int panelH = 500;
+    int panelX = GetScreenWidth() / 2 - panelW / 2;
+    int panelY = GetScreenHeight() / 2 - panelH / 2;
+
+    DrawRectangle(panelX, panelY, panelW, panelH, Fade(BLACK, 0.75f));
+    DrawRectangleLinesEx(
+        Rectangle{ (float)panelX, (float)panelY, (float)panelW, (float)panelH },
+        3.0f, Fade(WHITE, 0.6f)
+    );
+    DrawRectangleLinesEx(
+        Rectangle{ (float)panelX + 8, (float)panelY + 8, (float)panelW - 16, (float)panelH - 16 },
+        1.0f, Fade(WHITE, 0.25f)
+    );
+
+    // Title
+    const char* title = "How to Play";
+    int titleSize = 44;
+    float titleW = MeasureTextEx(customFont, title, (float)titleSize, 2.0f).x;
+    DrawTextEx(customFont, title,
+        Vector2{ (float)(GetScreenWidth() / 2) - titleW / 2.0f, (float)panelY + 30 },
+        (float)titleSize, 2.0f, WHITE);
+
+    DrawLineEx(
+        { (float)panelX + 30, (float)panelY + 90 },
+        { (float)panelX + panelW - 30, (float)panelY + 90 },
+        1.0f, Fade(WHITE, 0.3f)
+    );
+
+    // Commands list
+    const char* commands[] = {
+        "look [object]       - Look around or at an object",
+        "go [direction]      - Move north, south, east, west",
+        "take / pick up      - Pick up an item",
+        "drop [object]       - Drop an item",
+        "use [item] on [obj] - Use an item on something",
+        "inventory / i       - View your inventory",
+        "examine [object]    - Examine something closely",
+        "quit / q            - Quit the game",
+    };
+    int numCommands = 8;
+    int cmdSize = 24;
+    int cmdStartY = panelY + 110;
+    int cmdSpacing = 44;
+
+    for (int i = 0; i < numCommands; i++) {
+        DrawTextEx(customFont, commands[i],
+            Vector2{ (float)panelX + 30, (float)(cmdStartY + i * cmdSpacing) },
+            (float)cmdSize, 2.0f, Fade(WHITE, 0.85f));
+    }
+
+    // Back prompt
+    const char* back = "Press BACKSPACE to return";
+    float backW = MeasureTextEx(customFont, back, 24.0f, 2.0f).x;
+    DrawTextEx(customFont, back,
+        Vector2{ (float)(GetScreenWidth() / 2) - backW / 2.0f, (float)(panelY + panelH - 40) },
+        24.0f, 2.0f, Fade(WHITE, 0.4f));
+}
+
+
+//////////////////////////////////////////////////// GAME OVER SCREEN /////////////////////////////////////////////////////////
+void Renderer::DrawEndScreen(bool won) {
+    int panelW = 560;
+    int panelH = 320;
+    int panelX = GetScreenWidth() / 2 - panelW / 2;
+    int panelY = GetScreenWidth() / 2 - panelH / 2;
+
+    Color panelColor = won ? Fade(Color{ 10, 30, 10, 255 }, 0.85f) : Fade(Color{ 30, 5, 5, 255 }, 0.85f);
+    DrawRectangle(panelX, panelY, panelW, panelH, panelColor);
+    DrawRectangleLinesEx(
+        Rectangle{ (float)panelX, (float)panelY, (float)panelW, (float)panelH },
+        3.0f, Fade(WHITE, 0.6f)
+    );
+    DrawRectangleLinesEx(
+        Rectangle{ (float)panelX + 8, (float)panelY + 8, (float)panelW - 16, (float)panelH - 16 },
+        1.0f, Fade(WHITE, 0.25f)
+    );
+
+    // Title
+    const char* title = won ? "You Escaped!" : "Game Over";
+    int titleSize = 52;
+    float titleW = MeasureTextEx(customFont, title, (float)titleSize, 2.0f).x;
+    Color titleCol = won ? Color{ 180, 255, 180, 255 } : Color{ 255, 120, 120, 255 };
+    DrawTextEx(customFont, title,
+        Vector2{ (float)(GetScreenWidth() / 2) - titleW / 2.0f, (float)panelY + 40 },
+        (float)titleSize, 2.0f, titleCol);
+
+    DrawLineEx(
+        { (float)panelX + 30, (float)panelY + 108 },
+        { (float)panelX + panelW - 30, (float)panelY + 108 },
+        1.0f, Fade(WHITE, 0.3f)
+    );
+
+    // Subtitle
+    const char* sub = won ? "Freedom tastes sweeter than dungeon air." : "The dungeon claims another soul.";
+    float subW = MeasureTextEx(customFont, sub, 28.0f, 2.0f).x;
+    DrawTextEx(customFont, sub,
+        Vector2{ (float)(GetScreenWidth() / 2) - subW / 2.0f, (float)panelY + 130 },
+        28.0f, 2.0f, Fade(WHITE, 0.7f));
+
+    // Options
+    const char* opt1 = "ENTER - Play Again";
+    const char* opt2 = "ESC   - Quit";
+    float opt1W = MeasureTextEx(customFont, opt1, 30.0f, 2.0f).x;
+    float opt2W = MeasureTextEx(customFont, opt2, 30.0f, 2.0f).x;
+    DrawTextEx(customFont, opt1,
+        Vector2{ (float)(GetScreenWidth() / 2) - opt1W / 2.0f, (float)panelY + 210 },
+        30.0f, 2.0f, WHITE);
+    DrawTextEx(customFont, opt2,
+        Vector2{ (float)(GetScreenWidth() / 2) - opt2W / 2.0f, (float)panelY + 255 },
+        30.0f, 2.0f, Fade(WHITE, 0.55f));
+}
+
+
+// FOR TESTING REMOVE OR COMMENT OUT WHEN NOT NEEDED
+void Renderer::SetDayProgress(float value) { simulatedElapsed = value * 900.0f; }
 
 bool Renderer::WindowShouldClose() {
     return ::WindowShouldClose();

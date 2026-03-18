@@ -54,4 +54,18 @@ public:
     float GetTimeSpeed() const { return timeSpeed; } // for display
     void SetTimeSpeed(float speed) { timeSpeed = speed; } // to adjust speed
     void SetDayProgress(float value); // set day progress automtically for testing
+
+    // Game State classes
+    enum class GameState {
+        MENU,
+        HOW_TO_PLAY,
+        PLAYING,
+        DEAD,
+        WIN
+    };
+
+    // Menus / UI
+    void DrawMenuScreen(int selectedIndex);
+    void DrawHowToPlayScreen();
+    void DrawEndScreen(bool won);
 };
